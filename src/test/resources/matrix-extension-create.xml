@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Extensions xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
+
+    <Extension class="java.util.function.Function" base="baseFunctionImpl" desc="测试扩展Function定义">
+        <ExtensionImpl group="BASE, XXX" code="yhb, xxx" type="bean" desc="验货宝">
+            <!--            <bean name="yhbFunctionImpl"/>-->
+            <bean class="com.alibaba.matrix.test.extension.impl.function.YhbFunctionImpl"/>
+        </ExtensionImpl>
+    </Extension>
+
+    <Extension class="java.util.function.Supplier" base="baseSupplierImpl" desc="测试扩展Supplier定义">
+        <ExtensionImpl group="BASE" code="xxx, hhh" type="dubbo">
+            <dubbo version="xxx" group="xxx" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl group="BASE" code="xxx" type="bean" desc="">
+            <bean name="xxx" class="java.util.function.Supplier" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="yhb" type="hsf" desc="验货宝">
+            <hsf service="xxx" group="xxx" version="xxx.yhb" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="dubbo" type="dubbo">
+            <dubbo version="sss" timeout="100" check="true" group="xxx" lazy="true"/>
+        </ExtensionImpl>
+    </Extension>
+
+    <!--
+    <Extension class="com.alibaba.matrix.test.extension.spi.OrderCreateSpi" base="baseOrderCreateSpiImpl"
+               desc="下单扩展能力">
+        <ExtensionImpl code="normal" type="bean" desc="普通电商交易">
+            <bean name="normalOrderCreateSpiImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="o2c" type="bean" desc="O2O交易">
+            <bean name="o2OOrderCreateSpiImpl"/>
+        </ExtensionImpl>
+    </Extension>
+    -->
+
+</Extensions>

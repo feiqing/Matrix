@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xsd:schema xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="https://www.alibaba.com/matrix/extension"
+            elementFormDefault="qualified">
+
+    <xsd:element name="Extensions">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+
+    <xsd:element name="Extension">
+        <xsd:annotation>
+            <xsd:documentation>扩展Ext定义</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element ref="ExtensionImpl" minOccurs="0" maxOccurs="unbounded"/>
+            </xsd:sequence>
+            <xsd:attributeGroup ref="extensionAttrs"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:attributeGroup name="extensionAttrs">
+        <xsd:attribute name="class" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>扩展SPI的Java接口全限定名</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="base" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>SPI默认实现: 必填、值为spring bean name(当基于业务身份找不到具体路由时,
+                    会自动调用默认实现)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="desc" type="xsd:string" use="optional">
+            <xsd:annotation>
+                <xsd:documentation>SPI描述</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:element name="ExtensionImpl">
+        <xsd:annotation>
+            <xsd:documentation>扩展实现定义</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element ref="bean"/>
+                <xsd:element ref="hsf"/>
+                <xsd:element ref="dubbo"/>
+            </xsd:choice>
+            <xsd:attributeGroup ref="extensionImplAttrs"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:attributeGroup name="extensionImplAttrs">
+        <xsd:attribute name="group" type="xsd:string" use="optional" default="BASE">
+            <xsd:annotation>
+                <xsd:documentation>扩展分组定义: 支持以','分割定义多个扩展分组
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="code" type="xsd:string" use="required">
+            <xsd:annotation>
+                <xsd:documentation>扩展身份定义: 支持以','分割定义多个扩展身份
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="type" type="Type" use="required">
+            <xsd:annotation>
+                <xsd:documentation>扩展实现的实现类型定义: 目前支持bean、hsf、dubbo三种(推荐使用hsf、dubbo类型实现,
+                    bean适用于需要极致性能或者本地事务的场景)
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="priority" type="xsd:long" default="0">
+            <xsd:annotation>
+                <xsd:documentation>扩展实现的优先级定义(相同扩展身份的不同实现的调用排序): 越小优先级越高
+                </xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="desc" type="xsd:string">
+            <xsd:annotation>
+                <xsd:documentation>扩展身份描述</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:simpleType name="Type">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="bean"/>
+            <xsd:enumeration value="hsf"/>
+            <xsd:enumeration value="dubbo"/>
+            <xsd:enumeration value="http(*暂不支持*)"/>
+            <xsd:enumeration value="SpEL(*暂不支持*)"/>
+            <xsd:enumeration value="mvel(*暂不支持*)"/>
+            <xsd:enumeration value="ognl(*暂不支持*)"/>
+            <xsd:enumeration value="script:sql(*暂不支持*)"/>
+            <xsd:enumeration value="script:java(*暂不支持*)"/>
+            <xsd:enumeration value="script:groovy(*暂不支持*)"/>
+            <xsd:enumeration value="script:python(*暂不支持*)"/>
+            <xsd:enumeration value="script:lua(*暂不支持*)"/>
+            <xsd:enumeration value="script:javascript/nashorn(*暂不支持*)"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+    <xsd:element name="bean">
+        <xsd:annotation>
+            <xsd:documentation>spring bean类型的扩展实现定义: 支持以BeanName、BeanClass两种方式引用(以BeanName优先)
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="name" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>spring bean name</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="class" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>spring bean class</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否开启懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="hsf">
+        <xsd:annotation>
+            <xsd:documentation>hsf类型的扩展实现定义</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="service" type="xsd:string" use="required"/>
+            <xsd:attribute name="version" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>HSF服务版本定义: 必填: 由于同一个SPI不同业务会有不同的实现,
+                        但此时暴露的serviceName都是一样, 因此我们强制使用版本来进行区分.
+                        我们会在框架层面进行强制校验:此处所定义的服务版本<p color="red">一定</p>是以上面所定义的业务身份中的<b>
+                            一个</b>作为后缀(如:
+                        '1.0.0.yhb'、'1.0.0.grey.recycle'), 否则会在解析阶段报错
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="group" type="xsd:string" default="HSF"/>
+            <xsd:attribute name="timeout" type="xsd:long">
+                <xsd:annotation>
+                    <xsd:documentation>clientTimeOut时间</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="dubbo">
+        <xsd:annotation>
+            <xsd:documentation>dubbo类型的扩展实现定义: 由于同一Ext不同业务会有不同实现,
+                但此时暴露的Ext类型相同, 因此我们使用版本(version)或分组(group)来进行不同业务区分.
+                所以version、group
+                <p color="red">必须设置其中一个</p>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="version" type="xsd:string"/>
+            <xsd:attribute name="group" type="xsd:string"/>
+            <xsd:attribute name="timeout" type="xsd:long">
+                <xsd:annotation>
+                    <xsd:documentation>clientTimeOut时间设置</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="check" type="xsd:boolean"/>
+            <xsd:attribute name="filter" type="xsd:string"/>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+</xsd:schema>
