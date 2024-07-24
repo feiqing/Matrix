@@ -1,0 +1,131 @@
+[INFO] Scanning for projects...
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.alibaba.matrix:matrix-logging:jar:2.1.0-SNAPSHOT
+[WARNING] 'version' contains an expression but should be a constant. @ com.alibaba.matrix:matrix-logging:${project.version}, /Users/feiqing.zjf/IdeaProjects/Matrix/matrix-logging/pom.xml, line 15, column 14
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.alibaba.matrix:matrix-extension:jar:2.1.0-SNAPSHOT
+[WARNING] 'version' contains an expression but should be a constant. @ com.alibaba.matrix:matrix-extension:${project.version}, /Users/feiqing.zjf/IdeaProjects/Matrix/matrix-extension/pom.xml, line 17, column 14
+[WARNING] 
+[WARNING] Some problems were encountered while building the effective model for com.alibaba.matrix:matrix-flow:jar:2.1.0-SNAPSHOT
+[WARNING] 'version' contains an expression but should be a constant. @ com.alibaba.matrix:matrix-flow:${project.version}, /Users/feiqing.zjf/IdeaProjects/Matrix/matrix-flow/pom.xml, line 15, column 14
+[WARNING] 
+[WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
+[WARNING] 
+[WARNING] For this reason, future Maven versions might no longer support building such malformed projects.
+[WARNING] 
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Build Order:
+[INFO] 
+[INFO] matrix                                                             [pom]
+[INFO] matrix-logging                                                     [jar]
+[INFO] matrix-extension                                                   [jar]
+[INFO] matrix-flow                                                        [jar]
+[INFO] 
+[INFO] ---------------------< com.alibaba.matrix:matrix >----------------------
+[INFO] Building matrix 2.1.0-SNAPSHOT                                     [1/4]
+[INFO]   from pom.xml
+[INFO] --------------------------------[ pom ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ matrix ---
+[INFO] 
+[INFO] --- dependency:3.6.1:tree (default-cli) @ matrix ---
+[INFO] com.alibaba.matrix:matrix:pom:2.1.0-SNAPSHOT
+[INFO] 
+[INFO] -----------------< com.alibaba.matrix:matrix-logging >------------------
+[INFO] Building matrix-logging 2.1.0-SNAPSHOT                             [2/4]
+[INFO]   from matrix-logging/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ matrix-logging ---
+[INFO] 
+[INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-logging ---
+[INFO] com.alibaba.matrix:matrix-logging:jar:2.1.0-SNAPSHOT
+[INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
+[INFO] +- ch.qos.logback:logback-classic:jar:1.2.3:provided
+[INFO] |  \- ch.qos.logback:logback-core:jar:1.2.3:provided
+[INFO] +- org.apache.logging.log4j:log4j-slf4j-impl:jar:2.11.1:provided
+[INFO] |  \- org.apache.logging.log4j:log4j-api:jar:2.11.1:provided
+[INFO] +- org.apache.logging.log4j:log4j-core:jar:2.11.1:provided
+[INFO] +- junit:junit:jar:4.13.2:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] \- org.springframework:spring-test:jar:4.3.30.RELEASE:test
+[INFO]    \- org.springframework:spring-core:jar:5.2.21.RELEASE:test
+[INFO]       \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:test
+[INFO] 
+[INFO] ----------------< com.alibaba.matrix:matrix-extension >-----------------
+[INFO] Building matrix-extension 2.1.0-SNAPSHOT                           [3/4]
+[INFO]   from matrix-extension/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ matrix-extension ---
+[INFO] 
+[INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-extension ---
+[INFO] com.alibaba.matrix:matrix-extension:jar:2.1.0-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-logging:jar:2.1.0-SNAPSHOT:compile
+[INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
+[INFO] +- com.google.guava:guava:jar:33.0.0-jre:compile
+[INFO] |  +- com.google.guava:failureaccess:jar:1.0.2:compile
+[INFO] |  +- com.google.guava:listenablefuture:jar:9999.0-empty-to-avoid-conflict-with-guava:compile
+[INFO] |  +- com.google.code.findbugs:jsr305:jar:3.0.2:compile
+[INFO] |  +- org.checkerframework:checker-qual:jar:3.41.0:compile
+[INFO] |  +- com.google.errorprone:error_prone_annotations:jar:2.23.0:compile
+[INFO] |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
+[INFO] +- org.apache.commons:commons-lang3:jar:3.12.0:compile
+[INFO] +- org.reflections:reflections:jar:0.9.10:compile
+[INFO] |  +- org.javassist:javassist:jar:3.19.0-GA:compile
+[INFO] |  \- com.google.code.findbugs:annotations:jar:2.0.1:compile
+[INFO] +- org.dom4j:dom4j:jar:2.1.3:compile
+[INFO] +- cglib:cglib-nodep:jar:3.2.0:provided
+[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:compile
+[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:compile
+[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:compile
+[INFO] +- org.springframework:spring-core:jar:5.2.21.RELEASE:compile
+[INFO] |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:compile
+[INFO] +- org.springframework:spring-aop:jar:5.2.21.RELEASE:compile
+[INFO] +- com.alibaba:dubbo:jar:2.6.12:provided
+[INFO] |  \- org.jboss.netty:netty:jar:3.2.5.Final:provided
+[INFO] +- org.aspectj:aspectjweaver:jar:1.9.6:test
+[INFO] +- junit:junit:jar:4.13.2:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] +- org.springframework:spring-test:jar:4.3.30.RELEASE:test
+[INFO] \- ch.qos.logback:logback-classic:jar:1.2.3:test
+[INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
+[INFO] 
+[INFO] -------------------< com.alibaba.matrix:matrix-flow >-------------------
+[INFO] Building matrix-flow 2.1.0-SNAPSHOT                                [4/4]
+[INFO]   from matrix-flow/pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- clean:3.2.0:clean (default-clean) @ matrix-flow ---
+[INFO] 
+[INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-flow ---
+[INFO] com.alibaba.matrix:matrix-flow:jar:2.1.0-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-logging:jar:2.1.0-SNAPSHOT:compile
+[INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
+[INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
+[INFO] +- org.apache.commons:commons-lang3:jar:3.12.0:compile
+[INFO] +- junit:junit:jar:4.13.2:test
+[INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] +- org.springframework:spring-test:jar:4.3.30.RELEASE:test
+[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:test
+[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:test
+[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:test
+[INFO] +- org.springframework:spring-core:jar:5.2.21.RELEASE:test
+[INFO] |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:test
+[INFO] +- org.springframework:spring-aop:jar:5.2.21.RELEASE:test
+[INFO] \- ch.qos.logback:logback-classic:jar:1.2.3:test
+[INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
+[INFO] ------------------------------------------------------------------------
+[INFO] Reactor Summary for matrix 2.1.0-SNAPSHOT:
+[INFO] 
+[INFO] matrix ............................................. SUCCESS [  0.640 s]
+[INFO] matrix-logging ..................................... SUCCESS [  0.070 s]
+[INFO] matrix-extension ................................... SUCCESS [  0.054 s]
+[INFO] matrix-flow ........................................ SUCCESS [  0.009 s]
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  0.988 s
+[INFO] Finished at: 2024-07-24T18:11:21+08:00
+[INFO] ------------------------------------------------------------------------

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO">
+
+    <Properties>
+        <Property name="logPath" value="${sys:user.home}/logs/matrix"/>
+        <Property name="logFormat"
+                  value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{EAGLEEYE_TRACE_ID}] %-5level %logger{36} - %msg%n"/>
+    </Properties>
+
+    <Appenders>
+        <RollingFile name="FLOW_LOG_FILE" fileName="${logPath}/flow.log"
+                     filePattern="${logPath}/flow.log.%d{yyyy-MM-dd}.%i">
+            <PatternLayout>
+                <Pattern>${logFormat}</Pattern>
+            </PatternLayout>
+
+            <Policies>
+                <TimeBasedTriggeringPolicy/>
+                <SizeBasedTriggeringPolicy size="100MB"/>
+            </Policies>
+
+            <DefaultRolloverStrategy max="7"/>
+        </RollingFile>
+
+        <Async name="ASYNC_FLOW" bufferSize="1024" blocking="false">
+            <AppenderRef ref="FLOW_LOG_FILE"/>
+        </Async>
+    </Appenders>
+
+    <Loggers>
+        <Logger name="FLOW" level="trace" additivity="false">
+            <AppenderRef ref="ASYNC_FLOW"/>
+        </Logger>
+    </Loggers>
+</Configuration>

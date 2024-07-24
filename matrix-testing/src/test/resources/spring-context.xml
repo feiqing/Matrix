@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+           http://www.springframework.org/schema/util https://www.springframework.org/schema/util/spring-util.xsd http://www.springframework.org/schema/context https://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.alibaba.matrix.testing"/>
+
+    <bean id="ORDER-CREATE-FLOW" class="com.alibaba.matrix.flow.Flow">
+        <constructor-arg name="name" value="ORDER-CREATE"/>
+        <constructor-arg name="nodes">
+            <util:list>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>
+                <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode3"/>
+            </util:list>
+        </constructor-arg>
+    </bean>
+
+</beans>
