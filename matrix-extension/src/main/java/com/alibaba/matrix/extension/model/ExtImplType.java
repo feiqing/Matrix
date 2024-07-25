@@ -20,6 +20,10 @@ public enum ExtImplType {
 
     DUBBO("DUBBO"),
 
+    HTTP("HTTP"),
+
+    GROOVY("GROOVY"),
+
     ;
 
     private final String desc;

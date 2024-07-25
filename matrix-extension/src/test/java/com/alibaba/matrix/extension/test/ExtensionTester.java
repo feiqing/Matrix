@@ -3,6 +3,7 @@ package com.alibaba.matrix.extension.test;
 import com.alibaba.matrix.extension.ExtensionContext;
 import com.alibaba.matrix.extension.ExtensionInvoker;
 import com.alibaba.matrix.extension.reducer.Reducers;
+import com.alibaba.matrix.extension.test.domain.TestModel;
 import com.alibaba.matrix.extension.test.ext.ShowDemoExt;
 import com.google.common.base.Function;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.annotation.Resource;
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Map;
 import java.util.function.Supplier;
 
@@ -30,6 +32,26 @@ public class ExtensionTester {
 
     @Resource
     private Function<Object, Object> guavaFunctionExt;
+
+    @Test
+    public void testGroovy() throws Exception {
+        try {
+            ExtensionInvoker.resolve(String::toString, "groovy");
+            TestModel model = new TestModel();
+            model.name = "feiqing";
+            model.list = Collections.singletonList(18);
+            model.map = Collections.singletonMap("key", "value-186");
+
+            while (true) {
+
+                Object invoke = ExtensionInvoker.invoke(java.util.function.BiFunction.class, function -> function.apply(model, "feiqing"));
+                System.out.println("invoke = " + invoke);
+                Thread.sleep(5000);
+            }
+        } finally {
+            ExtensionInvoker.clear();
+        }
+    }
 
     @Test
     public void test() throws Exception {

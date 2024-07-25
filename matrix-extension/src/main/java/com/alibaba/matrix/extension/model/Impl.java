@@ -29,6 +29,10 @@ public class Impl {
 
     public Dubbo dubbo = null;
 
+    public Http http = null;
+
+    public Groovy groovy = null;
+
     public boolean isLazy() {
         if (instance != null) {
             return false;

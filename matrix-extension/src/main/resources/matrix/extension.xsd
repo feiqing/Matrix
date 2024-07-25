@@ -54,6 +54,8 @@
                 <xsd:element ref="bean"/>
                 <xsd:element ref="hsf"/>
                 <xsd:element ref="dubbo"/>
+                <xsd:element ref="http"/>
+                <xsd:element ref="groovy"/>
             </xsd:choice>
             <xsd:attributeGroup ref="extensionImplAttrs"/>
         </xsd:complexType>
@@ -97,16 +99,16 @@
             <xsd:enumeration value="bean"/>
             <xsd:enumeration value="hsf"/>
             <xsd:enumeration value="dubbo"/>
-            <xsd:enumeration value="http(*暂不支持*)"/>
-            <xsd:enumeration value="SpEL(*暂不支持*)"/>
+            <xsd:enumeration value="http"/>
+            <xsd:enumeration value="groovy"/>
+            <xsd:enumeration value="spel(*暂不支持*)"/>
             <xsd:enumeration value="mvel(*暂不支持*)"/>
             <xsd:enumeration value="ognl(*暂不支持*)"/>
-            <xsd:enumeration value="script:sql(*暂不支持*)"/>
-            <xsd:enumeration value="script:java(*暂不支持*)"/>
-            <xsd:enumeration value="script:groovy(*暂不支持*)"/>
-            <xsd:enumeration value="script:python(*暂不支持*)"/>
-            <xsd:enumeration value="script:lua(*暂不支持*)"/>
-            <xsd:enumeration value="script:javascript/nashorn(*暂不支持*)"/>
+            <xsd:enumeration value="sql(*暂不支持*)"/>
+            <xsd:enumeration value="java(*暂不支持*)"/>
+            <xsd:enumeration value="python(*暂不支持*)"/>
+            <xsd:enumeration value="lua(*暂不支持*)"/>
+            <xsd:enumeration value="javascript(*暂不支持*)"/>
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -187,6 +189,31 @@
                     <xsd:documentation>是否启用懒加载</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="http">
+        <xsd:annotation>
+            <xsd:documentation>仅用于演示
+                <p color="red">千万不要应用到任何实际业务当中</p>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="url" type="xsd:string"/>
+            <xsd:attribute name="method" type="xsd:string" default="POST"/>
+            <xsd:attribute name="camelToUnderline" type="xsd:boolean" default="true"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="groovy">
+        <xsd:annotation>
+            <xsd:documentation>仅用于演示
+                <p color="red">千万不要应用到任何实际业务当中</p>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="protocol" type="xsd:string" use="required"/>
+            <xsd:attribute name="path" type="xsd:string" use="required"/>
         </xsd:complexType>
     </xsd:element>
 </xsd:schema>

@@ -3,10 +3,27 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
 
+    <Extension class="com.alibaba.matrix.extension.test.ext.ShowDemoExt" base="showDemoExtBaseImpl">
+        <ExtensionImpl code="http" type="http">
+            <http url="http://localhost:8080/" method="POST"/>
+        </ExtensionImpl>
+
+    </Extension>
+
     <Extension class="java.util.function.Function" base="baseFunctionImpl" desc="测试扩展Function定义">
         <ExtensionImpl group="BASE, XXX" code="yhb, xxx" type="bean" desc="验货宝">
-            <!--            <bean name="yhbFunctionImpl"/>-->
             <bean class="com.alibaba.matrix.extension.test.impl.function.YhbFunctionImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="groovy" type="http">
+            <http url="xxx"/>
+        </ExtensionImpl>
+    </Extension>
+
+    <Extension class="java.util.function.BiFunction" base="baseBiFunctionImpl">
+        <ExtensionImpl code="groovy" type="groovy">
+<!--            <groovy protocol="nacos" path="serverAddr=localhost:8848;namespace=c8914181-d464-4f9b-a9d6-2a124205793a;dataId=bg-aristotle-api.force.h5.uid.gray;group=DEFAULT_GROUP"/>-->
+<!--            <groovy protocol="file" path="/Users/feiqing.zjf/IdeaProjects/demo/src/main/java/com/alibaba/matrix/demo/test/Test.groovy"/>-->
+            <groovy protocol="http" path="http://127.0.0.1:8080/test.groovy"/>
         </ExtensionImpl>
     </Extension>
 
@@ -22,6 +39,9 @@
         </ExtensionImpl>
         <ExtensionImpl code="dubbo" type="dubbo">
             <dubbo version="sss" timeout="100" check="true" group="xxx" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="http" type="http">
+            <http url="https://www.baidu.com/rest/" method="POST" camelToUnderline="true"/>
         </ExtensionImpl>
     </Extension>
 

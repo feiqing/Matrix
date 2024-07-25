@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Random;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author jifang.zjf@alibaba-inc.com
  * @version 1.0
  * @since 2024/7/24 23:05.
  */

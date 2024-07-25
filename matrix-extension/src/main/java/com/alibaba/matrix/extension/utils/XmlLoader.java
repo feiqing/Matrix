@@ -2,7 +2,9 @@ package com.alibaba.matrix.extension.utils;
 
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.factory.DubboServiceFactory;
+import com.alibaba.matrix.extension.factory.GroovyServiceFactory;
 import com.alibaba.matrix.extension.factory.HsfServiceFactory;
+import com.alibaba.matrix.extension.factory.HttpServiceFactory;
 import com.alibaba.matrix.extension.model.*;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
@@ -45,27 +47,30 @@ public class XmlLoader {
         // todo msg
         log.info("Xml configLocations: {}", configLocations);
 
-        Map<Class<?>, Extension> extensionMap = new HashMap<>();
-        for (String configLocation : configLocations) {
-            try {
-                Resource[] resources = new PathMatchingResourcePatternResolver().getResources(configLocation);
-                if (resources == null || resources.length == 0) {
+        try {
+            Map<Class<?>, Extension> extensionMap = new HashMap<>();
+            for (String configLocation : configLocations) {
+                try {
+                    Resource[] resources = new PathMatchingResourcePatternResolver().getResources(configLocation);
+                    if (resources == null || resources.length == 0) {
+                        // todo msg
+                        log.error("No resources founded by configLocation:[{}]", configLocation);
+                        continue;
+                    }
+
+                    loadResources(resources, extensionMap, applicationContext);
+                } catch (IOException e) {
                     // todo msg
-                    log.error("No resources founded by configLocation:[{}]", configLocation);
-                    continue;
+                    log.error("parse configLocation:[{}] error.", configLocation, e);
                 }
-
-                loadResources(resources, extensionMap, applicationContext);
-            } catch (IOException e) {
-                // todo msg
-                log.error("parse configLocation:[{}] error.", configLocation, e);
             }
+            return extensionMap;
+        } catch (ClassNotFoundException e) {
+            throw new ExtensionException(e);
         }
-
-        return extensionMap;
     }
 
-    public static void loadResources(Resource[] resources, Map<Class<?>, Extension> extensionMap, ApplicationContext applicationContext) {
+    public static void loadResources(Resource[] resources, Map<Class<?>, Extension> extensionMap, ApplicationContext applicationContext) throws ClassNotFoundException {
         for (Resource resource : resources) {
             String file = resource.getFilename();
             // todo msg
@@ -81,7 +86,7 @@ public class XmlLoader {
         }
     }
 
-    private static void loadExtensionsDocument(String file, Element document, Map<Class<?>, Extension> extensionMap, ApplicationContext applicationContext) {
+    private static void loadExtensionsDocument(String file, Element document, Map<Class<?>, Extension> extensionMap, ApplicationContext applicationContext) throws ClassNotFoundException {
         for (Iterator<Element> iterator = document.elementIterator(); iterator.hasNext(); ) {
             Extension extension = loadExtensionElement(file, iterator.next(), applicationContext);
             if (extensionMap.containsKey(extension.clazz)) {
@@ -93,25 +98,21 @@ public class XmlLoader {
     }
 
 
-    private static Extension loadExtensionElement(String file, Element extensionElement, ApplicationContext applicationContext) {
-        try {
-            Class<?> ext = Class.forName(getAttrValNoneNull(extensionElement, file, "<Extension/>", "class"));
-            // todo 需要吗?
-            Preconditions.checkState(ext.isInterface());
-            log.info("Loaded <Extension/>: ext:[{}] desc:{}.", ext.getName(), Logger.formatDesc(extensionElement.attributeValue("desc")));
+    private static Extension loadExtensionElement(String file, Element extensionElement, ApplicationContext applicationContext) throws ClassNotFoundException {
+        Class<?> ext = Class.forName(getAttrValNoneNull(extensionElement, file, "<Extension/>", "class"));
+        // todo 需要吗?
+        Preconditions.checkState(ext.isInterface());
+        log.info("Loaded <Extension/>: ext:[{}] desc:{}.", ext.getName(), Logger.formatDesc(extensionElement.attributeValue("desc")));
 
-            Object base = applicationContext.getBean(getAttrValNoneNull(extensionElement, file, "<Extension/>", "base"));
-            log.info("Loaded <ExtensionBase/>: ext:[{}] bean:[{}] type:[{}].", ext.getName(), base, AopUtils.getTargetClass(base).getName());
+        Object base = applicationContext.getBean(getAttrValNoneNull(extensionElement, file, "<Extension/>", "base"));
+        log.info("Loaded <ExtensionBase/>: ext:[{}] bean:[{}] type:[{}].", ext.getName(), base, AopUtils.getTargetClass(base).getName());
 
-            Map<String, Group> groupMap = loadExtensionGroupMap(ext, file, extensionElement, applicationContext);
+        Map<String, Group> groupMap = loadExtensionGroupMap(ext, file, extensionElement, applicationContext);
 
-            return new Extension(ext, base, groupMap);
-        } catch (ClassNotFoundException e) {
-            throw new ExtensionException(e);
-        }
+        return new Extension(ext, base, groupMap);
     }
 
-    private static Map<String, Group> loadExtensionGroupMap(Class<?> ext, String file, Element extensionElement, ApplicationContext applicationContext) {
+    private static Map<String, Group> loadExtensionGroupMap(Class<?> ext, String file, Element extensionElement, ApplicationContext applicationContext) throws ClassNotFoundException {
 
         Map<String, Map<String, List<Wrapper>>> group2code2wrappers = new HashMap<>();
         for (Iterator<Element> iterator = extensionElement.elementIterator(); iterator.hasNext(); ) {
@@ -157,6 +158,12 @@ public class XmlLoader {
             case DUBBO:
                 wrapper.dubbo = loadingDubbo(file, extensionImplElement.element("dubbo"));
                 break;
+            case HTTP:
+                wrapper.http = loadingHttp(file, extensionImplElement.element("http"));
+                break;
+            case GROOVY:
+                wrapper.groovy = loadingGroovy(file, extensionImplElement.element("groovy"));
+                break;
             default:
                 throw new ExtensionException(String.format("type:[%s] not support for group:[%s] code:[%s] in file:[%s].", type, group, code, file));
         }
@@ -164,7 +171,7 @@ public class XmlLoader {
         return wrapper;
     }
 
-    private static Group convertToExtensionGroup(Class<?> ext, String group, Map<String, List<Wrapper>> code2wrappers, ApplicationContext applicationContext) {
+    private static Group convertToExtensionGroup(Class<?> ext, String group, Map<String, List<Wrapper>> code2wrappers, ApplicationContext applicationContext) throws ClassNotFoundException {
 
         Map<String, List<Impl>> code2impls = new HashMap<>();
 
@@ -185,7 +192,7 @@ public class XmlLoader {
         return new Group(group, code2impls);
     }
 
-    private static Impl convertToImpl(Class<?> ext, String group, String code, Wrapper wrapper, ApplicationContext applicationContext) {
+    private static Impl convertToImpl(Class<?> ext, String group, String code, Wrapper wrapper, ApplicationContext applicationContext) throws ClassNotFoundException {
         if (wrapper.bean != null) {
             Impl impl = new Impl(group, code, wrapper.type, wrapper.priority);
             impl.bean = wrapper.bean;
@@ -206,6 +213,22 @@ public class XmlLoader {
             Impl impl = new Impl(group, code, wrapper.type, wrapper.priority);
             impl.dubbo = wrapper.dubbo;
             impl.instance = getDubboService(ext, wrapper.dubbo);
+            impl.desc = wrapper.desc;
+            return impl;
+        }
+
+        if (wrapper.http != null) {
+            Impl impl = new Impl(group, code, wrapper.type, wrapper.priority);
+            impl.http = wrapper.http;
+            impl.instance = getHttpService(ext, wrapper.http);
+            impl.desc = wrapper.desc;
+            return impl;
+        }
+
+        if (wrapper.groovy != null) {
+            Impl impl = new Impl(group, code, wrapper.type, wrapper.priority);
+            impl.groovy = wrapper.groovy;
+            impl.instance = getGroovyService(ext, wrapper.groovy);
             impl.desc = wrapper.desc;
             return impl;
         }
@@ -272,6 +295,33 @@ public class XmlLoader {
         return dubbo;
     }
 
+    private static Http loadingHttp(String file, Element element) {
+        String tag = "<http/>";
+        if (element == null) {
+            throw new ExtensionException(String.format("Tag %s definition can not be null in file:[%s].", tag, file));
+        }
+
+        String url = getAttrValNoneNull(element, file, tag, "url");
+        Http http = new Http(url);
+
+        ofNullable(element.attributeValue("method")).ifPresent(method -> http.method = method);
+        ofNullable(element.attributeValue("camelToUnderline")).map(Boolean::valueOf).ifPresent(camelToUnderline -> http.camelToUnderline = camelToUnderline);
+
+        return http;
+    }
+
+    private static Groovy loadingGroovy(String file, Element element) {
+        String tag = "<groovy/>";
+        if (element == null) {
+            throw new ExtensionException(String.format("Tag %s definition can not be null in file:[%s].", tag, file));
+        }
+
+        String protocol = getAttrValNoneNull(element, file, tag, "protocol");
+        String path = getAttrValNoneNull(element, file, tag, "path");
+
+        return new Groovy(protocol, path);
+    }
+
     private static String getAttrValNoneNull(Element element, String file, String tag, String attr) {
         String value = element.attributeValue(attr);
         if (Strings.isNullOrEmpty(value)) {
@@ -280,20 +330,15 @@ public class XmlLoader {
         return value;
     }
 
-    private static Object getSpringBean(Bean bean, ApplicationContext applicationContext) {
+    private static Object getSpringBean(Bean bean, ApplicationContext applicationContext) throws ClassNotFoundException {
         if (!bean.lazy) {
             Preconditions.checkState(!(StringUtils.isAllEmpty(bean.name, bean.clazz)));
             if (bean.name != null) {
                 return applicationContext.getBean(bean.name);
             } else {
-                try {
-                    return applicationContext.getBean(Class.forName(bean.clazz));
-                } catch (ClassNotFoundException e) {
-                    throw new ExtensionException(e);
-                }
+                return applicationContext.getBean(Class.forName(bean.clazz));
             }
         }
-
         return null;
     }
 
@@ -301,7 +346,6 @@ public class XmlLoader {
         if (!hsf.lazy) {
             return HsfServiceFactory.getHsfService(hsf);
         }
-
         return null;
     }
 
@@ -309,8 +353,15 @@ public class XmlLoader {
         if (!dubbo.lazy) {
             return DubboServiceFactory.getDubboService(ext, dubbo);
         }
-
         return null;
+    }
+
+    private static Object getHttpService(Class<?> ext, Http http) {
+        return HttpServiceFactory.getHttpService(ext, http);
+    }
+
+    private static Object getGroovyService(Class<?> ext, Groovy groovy) {
+        return GroovyServiceFactory.getGroovyService(ext, groovy);
     }
 
     private static class Wrapper implements Serializable {
@@ -326,5 +377,7 @@ public class XmlLoader {
         public Bean bean;
         public Hsf hsf;
         public Dubbo dubbo;
+        public Http http;
+        public Groovy groovy;
     }
 }
