@@ -14,11 +14,11 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
     @Override
     public Object invoke(ExtensionInvocation invocation) throws Exception {
         long start = System.currentTimeMillis();
-        String group = invocation.getGroup();
+        String scope = invocation.getScope();
         String extType = invocation.getExtType().getName();
         String extPoint = invocation.getExtPoint().getName();
-        String router = ExtensionContext.getExtensionRouter(group).getClass().getSimpleName();
-        String code = ExtensionContext.getExtensionCode(group);
+        String router = ExtensionContext.getExtensionRouter(scope).getClass().getSimpleName();
+        String code = ExtensionContext.getExtensionCode(scope);
         String type = invocation.getType();
         Object instance = invocation.getInstance();
         Object[] args = invocation.getArgs();
@@ -32,9 +32,9 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                getLogger().info("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", group, extType, extPoint, router, code, type, instance, getArgs(args), getResult(result), rt);
+                getLogger().info("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, extType, extPoint, router, code, type, instance, getArgs(args), getResult(result), rt);
             } else {
-                getLogger().error("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", group, extType, extPoint, router, code, type, instance, getArgs(args), getResult(result), rt, except);
+                getLogger().error("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, extType, extPoint, router, code, type, instance, getArgs(args), getResult(result), rt, except);
             }
         }
     }

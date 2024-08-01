@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_GROUP;
+import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_SCOPE;
 
 /**
  * 扩展Ext 实现
@@ -21,11 +21,13 @@ import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_GROUP;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExtensionImpl {
 
-    String[] group() default BASE_GROUP;
+    String[] scope() default BASE_SCOPE;
 
     String[] code();
 
     int priority() default 0;
 
     String desc() default "";
+
+    Class<?> extension() default Object.class;
 }

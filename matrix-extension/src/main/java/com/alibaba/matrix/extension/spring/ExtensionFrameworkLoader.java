@@ -1,16 +1,18 @@
 package com.alibaba.matrix.extension.spring;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.matrix.extension.core.ExtensionContainer;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.factory.SpringBeanFactory;
 import com.alibaba.matrix.extension.model.Extension;
-import com.alibaba.matrix.extension.model.Group;
 import com.alibaba.matrix.extension.model.Impl;
+import com.alibaba.matrix.extension.model.Scope;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.utils.AnnotationLoader;
 import com.alibaba.matrix.extension.utils.Logger;
 import com.alibaba.matrix.extension.utils.XmlLoader;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
@@ -20,9 +22,18 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
+import static com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect;
 import static com.alibaba.matrix.extension.utils.Logger.log;
 
 /**
@@ -34,6 +45,8 @@ import static com.alibaba.matrix.extension.utils.Logger.log;
 // @SuppressWarnings("all")
 public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefreshedEvent> {
 
+    private static final AtomicBoolean started = new AtomicBoolean(false);
+
     private boolean enableAnnotationScan = false;
 
     private List<String> scanPackages = Collections.emptyList();
@@ -42,13 +55,20 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
 
     private List<String> configLocations = Collections.emptyList();
 
+    private List<ExtensionPlugin> extensionPlugins = Collections.emptyList();
+
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        SpringBeanFactory.setApplicationContext(event.getApplicationContext());
+        if (!started.compareAndSet(false, true)) {
+            log.warn("[Matrix-Extension] is Started !");
+            return;
+        }
 
-        log.info("[Matrix-Extension] Starting...");
+        log.info("[Matrix-Extension] Version: [{}] Starting...", resolveProjectVersion());
+        SpringBeanFactory.setApplicationContext(event.getApplicationContext());
         ExtensionContainer.plugins = loadExtensionPlugins();
         ExtensionContainer.extensionMap = loadExtensionDefinitions(event.getApplicationContext());
+        log.info("Extension loaded summary: {}", toExtensionSummary(ExtensionContainer.extensionMap));
         log.info("[Matrix-Extension] Started Success!");
 
         if (!enableAnnotationScan && !enableXmlConfig) {
@@ -58,12 +78,12 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
 
     private ExtensionPlugin[] loadExtensionPlugins() {
         try {
-            List<ExtensionPlugin> plugins = new LinkedList<>();
-            for (ExtensionPlugin plugin : ServiceLoader.load(ExtensionPlugin.class, ExtensionPlugin.class.getClassLoader())) {
-                log.info("Loaded ExtensionPlugin: [{}]", plugin);
-                plugins.add(plugin);
+            ExtensionPlugin[] plugins = new ExtensionPlugin[extensionPlugins.size()];
+            for (int i = 0; i < extensionPlugins.size(); ++i) {
+                plugins[i] = extensionPlugins.get(i);
+                log.info("Loaded ExtensionPlugin: [{}]", plugins[i]);
             }
-            return plugins.toArray(new ExtensionPlugin[0]);
+            return plugins;
         } catch (Throwable t) {
             log.error("Loading ExtensionPlugin error.", t);
             throw new ExtensionException(t);
@@ -78,7 +98,7 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
 
         Map<Class<?>, Extension> annotationExtensionMap = Collections.emptyMap();
         if (enableAnnotationScan) {
-            annotationExtensionMap = AnnotationLoader.loadAnnotation(xmlExtensionMap, scanPackages, applicationContext);
+            annotationExtensionMap = AnnotationLoader.loadAnnotation(scanPackages, applicationContext);
         }
 
         return mergeExtensionMap(annotationExtensionMap, xmlExtensionMap);
@@ -87,16 +107,16 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
 
     private Map<Class<?>, Extension> mergeExtensionMap(Map<Class<?>, Extension> extensionMap1, Map<Class<?>, Extension> extensionMap2) {
 
-        Map<Class<?>, Extension> extensionMapResult = new HashMap<>();
+        Map<Class<?>, Extension> resultExtensionMap = new HashMap<>();
 
         MapDifference<Class<?>, Extension> difference = Maps.difference(extensionMap1, extensionMap2);
-        extensionMapResult.putAll(difference.entriesOnlyOnLeft());
-        extensionMapResult.putAll(difference.entriesOnlyOnRight());
+        resultExtensionMap.putAll(difference.entriesOnlyOnLeft());
+        resultExtensionMap.putAll(difference.entriesOnlyOnRight());
         for (Map.Entry<Class<?>, MapDifference.ValueDifference<Extension>> entry : difference.entriesDiffering().entrySet()) {
-            extensionMapResult.put(entry.getKey(), resolveExtensionDifference(entry.getValue()));
+            resultExtensionMap.put(entry.getKey(), resolveExtensionDifference(entry.getValue()));
         }
 
-        return ImmutableMap.copyOf(extensionMapResult);
+        return ImmutableMap.copyOf(resultExtensionMap);
     }
 
     private Extension resolveExtensionDifference(MapDifference.ValueDifference<Extension> extensionDifference) {
@@ -107,57 +127,112 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
         Preconditions.checkState(extension1.clazz != null && extension2.clazz != null && extension1.clazz == extension2.clazz);
         Preconditions.checkState(extension1.base != null && extension2.base != null && extension1.base == extension2.base);
 
-        Map<String, Group> groupMap1 = extension1.groupMap == null ? Collections.emptyMap() : extension1.groupMap;
-        Map<String, Group> groupMap2 = extension2.groupMap == null ? Collections.emptyMap() : extension2.groupMap;
+        Map<String, Scope> scopeMap1 = extension1.scopeMap == null ? Collections.emptyMap() : extension1.scopeMap;
+        Map<String, Scope> scopeMap2 = extension2.scopeMap == null ? Collections.emptyMap() : extension2.scopeMap;
 
-        MapDifference<String, Group> difference = Maps.difference(groupMap1, groupMap2);
-        Map<String, Group> groupMapResult = new HashMap<>();
-        groupMapResult.putAll(difference.entriesOnlyOnLeft());
-        groupMapResult.putAll(difference.entriesOnlyOnRight());
-        for (Map.Entry<String, MapDifference.ValueDifference<Group>> entry : difference.entriesDiffering().entrySet()) {
-            groupMapResult.put(entry.getKey(), resoleGroupDifference(extension1.clazz, entry.getValue()));
+        MapDifference<String, Scope> difference = Maps.difference(scopeMap1, scopeMap2);
+        Map<String, Scope> resultScopeMap = new HashMap<>();
+        resultScopeMap.putAll(difference.entriesOnlyOnLeft());
+        resultScopeMap.putAll(difference.entriesOnlyOnRight());
+        for (Map.Entry<String, MapDifference.ValueDifference<Scope>> entry : difference.entriesDiffering().entrySet()) {
+            resultScopeMap.put(entry.getKey(), resoleScopeDifference(extension1.clazz, entry.getValue()));
         }
 
-        return new Extension(extension1.clazz, extension1.base, groupMapResult);
+        return new Extension(extension1.clazz, extension1.desc, extension1.base, resultScopeMap);
     }
 
-    private Group resoleGroupDifference(Class<?> ext, MapDifference.ValueDifference<Group> groupDifference) {
-        Group group1 = groupDifference.leftValue();
-        Group group2 = groupDifference.rightValue();
+    private Scope resoleScopeDifference(Class<?> ext, MapDifference.ValueDifference<Scope> scopeDifference) {
+        Scope scope1 = scopeDifference.leftValue();
+        Scope scope2 = scopeDifference.rightValue();
 
-        Preconditions.checkState(group1 != null && group2 != null);
-        Preconditions.checkState(group1.group != null && group2.group != null && StringUtils.equals(group1.group, group2.group));
+        Preconditions.checkState(scope1 != null && scope2 != null);
+        Preconditions.checkState(scope1.scope != null && scope2.scope != null && StringUtils.equals(scope1.scope, scope2.scope));
 
-        Map<String, List<Impl>> code2impls1 = group1.code2impls == null ? Collections.emptyMap() : group1.code2impls;
-        Map<String, List<Impl>> code2impls2 = group2.code2impls == null ? Collections.emptyMap() : group2.code2impls;
+        Map<String, List<Impl>> code2impls1 = scope1.code2impls == null ? Collections.emptyMap() : scope1.code2impls;
+        Map<String, List<Impl>> code2impls2 = scope2.code2impls == null ? Collections.emptyMap() : scope2.code2impls;
 
         MapDifference<String, List<Impl>> difference = Maps.difference(code2impls1, code2impls2);
 
-        Map<String, List<Impl>> code2implsResult = new HashMap<>();
-        code2implsResult.putAll(difference.entriesOnlyOnLeft());
-        code2implsResult.putAll(difference.entriesOnlyOnRight());
+        Map<String, List<Impl>> resultCode2impls = new HashMap<>();
+        resultCode2impls.putAll(difference.entriesOnlyOnLeft());
+        resultCode2impls.putAll(difference.entriesOnlyOnRight());
 
         for (Map.Entry<String, MapDifference.ValueDifference<List<Impl>>> entry : difference.entriesDiffering().entrySet()) {
-            code2implsResult.put(entry.getKey(), resoleImplsDifference(ext, group1.group, entry.getKey(), entry.getValue()));
+            resultCode2impls.put(entry.getKey(), resoleImplsDifference(ext, scope1.scope, entry.getKey(), entry.getValue()));
         }
 
-        return new Group(group1.group, code2implsResult);
+        return new Scope(scope1.scope, resultCode2impls);
     }
 
-    private List<Impl> resoleImplsDifference(Class<?> ext, String group, String code, MapDifference.ValueDifference<List<Impl>> difference) {
+    private List<Impl> resoleImplsDifference(Class<?> ext, String scope, String code, MapDifference.ValueDifference<List<Impl>> difference) {
         List<Impl> impls1 = difference.leftValue() == null ? Collections.emptyList() : difference.leftValue();
         List<Impl> impls2 = difference.rightValue() == null ? Collections.emptyList() : difference.rightValue();
 
-        Preconditions.checkState(impls1.stream().allMatch(impl -> StringUtils.equals(group, impl.group) && StringUtils.equals(code, impl.code)));
-        Preconditions.checkState(impls2.stream().allMatch(impl -> StringUtils.equals(group, impl.group) && StringUtils.equals(code, impl.code)));
+        Preconditions.checkState(impls1.stream().allMatch(impl -> StringUtils.equals(scope, impl.scope) && StringUtils.equals(code, impl.code)));
+        Preconditions.checkState(impls2.stream().allMatch(impl -> StringUtils.equals(scope, impl.scope) && StringUtils.equals(code, impl.code)));
 
         List<Impl> implsResult = new ArrayList<>(impls1.size() + impls2.size());
         implsResult.addAll(impls1);
         implsResult.addAll(impls2);
 
         implsResult.sort(Comparator.comparingInt(o -> o.priority));
-        log.info("Merge ExtensionImpl: ext:[{}] group:[{}] code:[{}] -> [{}].", ext.getName(), group, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+        log.info("! Merge ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
 
         return implsResult;
     }
+
+    private String resolveProjectVersion() {
+        String version;
+        String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
+        log.info("[Matrix-Extension] Project Path: [{}]", path);
+        try (JarFile jar = new JarFile(path)) {
+            if (!Strings.isNullOrEmpty(version = jar.getManifest().getMainAttributes().getValue("Implementation-Version"))) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            if (!Strings.isNullOrEmpty(version = getClass().getPackage().getImplementationVersion())) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            if (!Strings.isNullOrEmpty(version = StringUtils.substringAfter(StringUtils.substringBeforeLast(path, ".jar"), "matrix-extension-"))) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return "unresolved";
+    }
+
+    private String toExtensionSummary(Map<Class<?>, Extension> extensionMap) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        for (Extension extension : extensionMap.values()) {
+            summary.put(Logger.formatExt(extension.clazz, extension.desc), toScopeSummary(extension.base, extension.scopeMap));
+        }
+        return JSON.toJSONString(summary, DisableCircularReferenceDetect);
+    }
+
+    private Map<String, Object> toScopeSummary(Object base, Map<String, Scope> scopeMap) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        summary.put("_BASE_IMPL_", Logger.formatBase(base));
+        for (Scope scope : scopeMap.values()) {
+            summary.put(scope.scope, toCodeSummary(scope.code2impls));
+        }
+        return summary;
+    }
+
+    private Map<String, Object> toCodeSummary(Map<String, List<Impl>> code2impls) {
+        Map<String, Object> summary = new LinkedHashMap<>();
+        code2impls.forEach((code, impls) -> {
+            List<String> implsDesc = impls.stream().map(Logger::formatImpl).collect(Collectors.toList());
+            summary.put(code, implsDesc);
+        });
+        return summary;
+    }
+
 }

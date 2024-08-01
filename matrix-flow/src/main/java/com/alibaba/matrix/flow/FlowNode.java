@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2022/4/10 15:47.
+ * @since 2017/4/10 15:47.
  */
 @SuppressWarnings({"rawtypes", "unchecked"})
 public abstract class FlowNode<Context, Result> {

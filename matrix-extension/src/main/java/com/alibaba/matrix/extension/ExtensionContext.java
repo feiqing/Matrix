@@ -1,5 +1,7 @@
 package com.alibaba.matrix.extension;
 
+import com.alibaba.matrix.extension.router.ExtensionRouter;
+
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
@@ -21,86 +23,86 @@ public class ExtensionContext {
 
     private static final String CODE = "code__";
 
-    // group -> [ key -> value ]
+    // scope -> [ key -> value ]
     private static final ThreadLocal<Map<String, Map<String, Serializable>>> contextMap = ThreadLocal.withInitial(HashMap::new);
 
-    public static boolean isGroupExists(String group) {
-        return contextMap.get().containsKey(group);
+    public static boolean isScopeExists(String scope) {
+        return contextMap.get().containsKey(scope);
     }
 
     // code
-    protected static void setExtensionCode(String group, String code) {
-        setCtxVal(group, SYS_PREFIX, CODE, code);
+    protected static void setExtensionCode(String scope, String code) {
+        setCtxVal(scope, SYS_PREFIX, CODE, code);
     }
 
-    public static String getExtensionCode(String group) {
-        return getCtxVal(group, SYS_PREFIX, CODE);
+    public static String getExtensionCode(String scope) {
+        return getCtxVal(scope, SYS_PREFIX, CODE);
     }
 
-    public static void rmExtensionCode(String group) {
-        rmCtxVal(group, SYS_PREFIX, CODE);
+    public static void rmExtensionCode(String scope) {
+        rmCtxVal(scope, SYS_PREFIX, CODE);
     }
 
     // router
-    protected static void setExtensionRouter(String group, ExtensionRouter router) {
-        setCtxVal(group, SYS_PREFIX, ROUTER, router);
+    protected static void setExtensionRouter(String scope, ExtensionRouter router) {
+        setCtxVal(scope, SYS_PREFIX, ROUTER, router);
     }
 
-    public static ExtensionRouter getExtensionRouter(String group) {
-        return getCtxVal(group, SYS_PREFIX, ROUTER);
+    public static ExtensionRouter getExtensionRouter(String scope) {
+        return getCtxVal(scope, SYS_PREFIX, ROUTER);
     }
 
-    public static void rmExtensionRouter(String group) {
-        rmCtxVal(group, SYS_PREFIX, ROUTER);
+    public static void rmExtensionRouter(String scope) {
+        rmCtxVal(scope, SYS_PREFIX, ROUTER);
     }
 
     // 扩展自定义上下文: 业务可以设置自定义
-    public static <Ctx extends Serializable> void addExtCtx(String group, Ctx ctx) {
+    public static <Ctx extends Serializable> void addExtCtx(String scope, Ctx ctx) {
         if (ctx != null) {
-            setCtxVal(group, BIZ_PREFIX, ctx.getClass().getName(), ctx);
+            setCtxVal(scope, BIZ_PREFIX, ctx.getClass().getName(), ctx);
         }
     }
 
-    public static <Ctx extends Serializable> void addExtCtx(String group, String key, Ctx ctx) {
-        setCtxVal(group, BIZ_PREFIX, key, ctx);
+    public static <Ctx extends Serializable> void addExtCtx(String scope, String key, Ctx ctx) {
+        setCtxVal(scope, BIZ_PREFIX, key, ctx);
     }
 
-    public static <Ctx extends Serializable> Ctx getExtCtx(String group, String key) {
-        return getCtxVal(group, BIZ_PREFIX, key);
+    public static <Ctx extends Serializable> Ctx getExtCtx(String scope, String key) {
+        return getCtxVal(scope, BIZ_PREFIX, key);
     }
 
-    public static <Ctx extends Serializable> Ctx getExtCtx(String group, Class<Ctx> ctx) {
-        return getCtxVal(group, BIZ_PREFIX, ctx.getName());
+    public static <Ctx extends Serializable> Ctx getExtCtx(String scope, Class<Ctx> ctx) {
+        return getCtxVal(scope, BIZ_PREFIX, ctx.getName());
     }
 
-    public static void rmExtCtx(String group, String key) {
-        rmCtxVal(group, BIZ_PREFIX, key);
+    public static void rmExtCtx(String scope, String key) {
+        rmCtxVal(scope, BIZ_PREFIX, key);
     }
 
-    public static <Ctx extends Serializable> void rmExtCtx(String group, Class<Ctx> ctx) {
-        rmExtCtx(group, ctx.getName());
+    public static <Ctx extends Serializable> void rmExtCtx(String scope, Class<Ctx> ctx) {
+        rmExtCtx(scope, ctx.getName());
     }
 
     public static void clear() {
         contextMap.remove();
     }
 
-    public static void clear(String group) {
-        contextMap.get().remove(group);
+    public static void clear(String scope) {
+        contextMap.get().remove(scope);
     }
 
     // helper
-    private static void setCtxVal(String group, String prefix, String key, Serializable ctxVal) {
-        contextMap.get().computeIfAbsent(group, _K -> new HashMap<>()).put(prefix + key, ctxVal);
+    private static void setCtxVal(String scope, String prefix, String key, Serializable ctxVal) {
+        contextMap.get().computeIfAbsent(scope, _K -> new HashMap<>()).put(prefix + key, ctxVal);
     }
 
     @SuppressWarnings("unchecked")
-    private static <Ctx extends Serializable> Ctx getCtxVal(String group, String prefix, String key) {
-        return (Ctx) contextMap.get().computeIfAbsent(group, _K -> new HashMap<>()).get(prefix + key);
+    private static <Ctx extends Serializable> Ctx getCtxVal(String scope, String prefix, String key) {
+        return (Ctx) contextMap.get().computeIfAbsent(scope, _K -> new HashMap<>()).get(prefix + key);
     }
 
-    private static void rmCtxVal(String group, String prefix, String key) {
-        contextMap.get().getOrDefault(group, Collections.emptyMap()).remove(prefix + key);
+    private static void rmCtxVal(String scope, String prefix, String key) {
+        contextMap.get().getOrDefault(scope, Collections.emptyMap()).remove(prefix + key);
     }
 
     // ContextCopy(for 多线程/RPC)

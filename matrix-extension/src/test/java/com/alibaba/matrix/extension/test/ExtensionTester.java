@@ -18,8 +18,8 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_EXTENSION_ROUTER;
-import static com.alibaba.matrix.extension.test.constants.ExtensionConstants.GROUP_1;
-import static com.alibaba.matrix.extension.test.constants.ExtensionConstants.GROUP_2;
+import static com.alibaba.matrix.extension.test.constants.ExtensionConstants.SCOPE_1;
+import static com.alibaba.matrix.extension.test.constants.ExtensionConstants.SCOPE_2;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -67,7 +67,7 @@ public class ExtensionTester {
                 System.out.println("invoke = " + invoke1);
             }).start();
 
-            Thread.sleep(5000);
+//            Thread.sleep(5000);
         } finally {
             ExtensionInvoker.clear();
         }
@@ -99,7 +99,7 @@ public class ExtensionTester {
     }
 
     @Test
-    public void testSubGroup1() {
+    public void testSubScope1() {
         try {
             ExtensionInvoker.resolve(_k -> "base-code", null);
 
@@ -107,13 +107,13 @@ public class ExtensionTester {
             System.out.println(baseInvoke);
 
             // 二次解析 & 二次调用
-            ExtensionInvoker.resolve(GROUP_1, _k -> "my-code-1", null);
-            Object subGroupInvoke = ExtensionInvoker.invoke(GROUP_1, ShowDemoExt.class, ShowDemoExt::showDemo);
-            System.out.println(subGroupInvoke);
+            ExtensionInvoker.resolve(SCOPE_1, _k -> "my-code-1", null);
+            Object subScopeInvoke = ExtensionInvoker.invoke(SCOPE_1, ShowDemoExt.class, ShowDemoExt::showDemo);
+            System.out.println(subScopeInvoke);
 
-            ExtensionInvoker.resolve(GROUP_2, _k -> "my-code-1", null);
-            subGroupInvoke = ExtensionInvoker.invoke(GROUP_2, ShowDemoExt.class, ShowDemoExt::showDemo);
-            System.out.println(subGroupInvoke);
+            ExtensionInvoker.resolve(SCOPE_2, _k -> "my-code-1", null);
+            subScopeInvoke = ExtensionInvoker.invoke(SCOPE_2, ShowDemoExt.class, ShowDemoExt::showDemo);
+            System.out.println(subScopeInvoke);
 
             // 回到初次调用
             baseInvoke = ExtensionInvoker.invoke(ShowDemoExt.class, ShowDemoExt::showDemo);
@@ -125,7 +125,7 @@ public class ExtensionTester {
 
 
     @Test
-    public void testSubGroup() {
+    public void testSubScope() {
         try {
             ExtensionInvoker.resolve(_k -> "base-code", null);
 
@@ -133,9 +133,9 @@ public class ExtensionTester {
             System.out.println(baseInvoke);
 
             // 二次解析 & 二次调用
-            ExtensionInvoker.resolve("SUB-GROUP", BASE_EXTENSION_ROUTER, _k -> "base-code", null);
-            Object subGroupInvoke = ExtensionInvoker.invoke("SUB-GROUP", Function.class, function -> function.apply("yhb"));
-            System.out.println(subGroupInvoke);
+            ExtensionInvoker.resolve("SUB-SCOPE", BASE_EXTENSION_ROUTER, _k -> "base-code", null);
+            Object subScopeInvoke = ExtensionInvoker.invoke("SUB-SCOPE", Function.class, function -> function.apply("yhb"));
+            System.out.println(subScopeInvoke);
 
             // 回到初次调用
             baseInvoke = ExtensionInvoker.invoke(Supplier.class, Supplier::get);

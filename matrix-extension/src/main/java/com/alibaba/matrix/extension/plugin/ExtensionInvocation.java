@@ -13,7 +13,7 @@ import java.lang.reflect.Method;
 public class ExtensionInvocation {
 
     @Getter
-    private final String group;
+    private final String scope;
 
     @Getter
     private final Class<?> extType;
@@ -36,8 +36,8 @@ public class ExtensionInvocation {
 
     private final ExtensionPlugin[] plugins;
 
-    public ExtensionInvocation(String group, Class<?> extType, Method extPoint, String type, Object instance, Object[] args, ExtensionPlugin[] plugins) {
-        this.group = group;
+    public ExtensionInvocation(String scope, Class<?> extType, Method extPoint, String type, Object instance, Object[] args, ExtensionPlugin[] plugins) {
+        this.scope = scope;
         this.extType = extType;
         this.extPoint = extPoint;
         this.type = type;

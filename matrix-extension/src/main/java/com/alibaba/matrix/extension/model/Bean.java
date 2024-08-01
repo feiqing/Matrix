@@ -1,7 +1,6 @@
 package com.alibaba.matrix.extension.model;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -9,7 +8,7 @@ import java.io.Serializable;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2022/7/23 22:41.
+ * @since 2021/3/28 22:41.
  */
 public class Bean implements Serializable {
 

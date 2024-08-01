@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.core;
 
 import com.alibaba.matrix.extension.ExtensionContext;
-import com.alibaba.matrix.extension.ExtensionRouter;
+import com.alibaba.matrix.extension.router.ExtensionRouter;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.model.ExtImpl;
 import com.alibaba.matrix.extension.plugin.ExtensionInvocation;
@@ -33,36 +33,36 @@ public class ExtensionExecutor {
 
     private static final ConcurrentMap<String, Object> extProxies = new ConcurrentHashMap<>();
 
-    public static <Ext, T, R> R execute(String group, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
-        Preconditions.checkState(ExtensionContext.isGroupExists(group));
+    public static <Ext, T, R> R execute(String scope, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
+        Preconditions.checkState(ExtensionContext.isScopeExists(scope));
         try {
             Wrapper wrapper = new Wrapper();
             wrapper.reducer = reducer;
-            ExtensionContext.addExtCtx(group, wrapper);
+            ExtensionContext.addExtCtx(scope, wrapper);
 
-            Object result = action.apply((Ext) extProxies.computeIfAbsent(group + ":" + ext, _K -> ProxyFactory.newProxy(group, ext)));
+            Object result = action.apply((Ext) extProxies.computeIfAbsent(scope + ":" + ext, _K -> ProxyFactory.newProxy(scope, ext)));
             if (reducer.sameType()) {
                 return (R) result;
             } else {
                 return (R) wrapper.result;
             }
         } finally {
-            ExtensionContext.rmExtCtx(group, Wrapper.class);
+            ExtensionContext.rmExtCtx(scope, Wrapper.class);
         }
     }
 
-    public static <Ext> Object callback(String group, Class<Ext> ext, Method method, Object[] args, Reducer reducer) throws Throwable {
+    public static <Ext> Object callback(String scope, Class<Ext> ext, Method method, Object[] args, Reducer reducer) throws Throwable {
         try {
-            ExtensionContext.addExtCtx(group, Namespaces.EXT_TYPE, ext);
-            ExtensionContext.addExtCtx(group, Namespaces.EXT_POINT, method.getName());
-            reducer = reducer != null ? reducer : ExtensionContext.getExtCtx(group, Wrapper.class).reducer;
+            ExtensionContext.addExtCtx(scope, Namespaces.EXT_TYPE, ext);
+            ExtensionContext.addExtCtx(scope, Namespaces.EXT_POINT, method.getName());
+            reducer = reducer != null ? reducer : ExtensionContext.getExtCtx(scope, Wrapper.class).reducer;
 
-            List<ExtImpl> impls = getExtensionImpls(group, ext, args);
+            List<ExtImpl> impls = getExtensionImpls(scope, ext, args);
             List<Object> results = new ArrayList<>(impls.size());
 
             for (ExtImpl impl : impls) {
                 Preconditions.checkState(ext.isInstance(impl.instance));
-                Object result = execute(group, ext, impl, method, args);
+                Object result = execute(scope, ext, impl, method, args);
                 results.add(result);
                 if (reducer.willBreak(result)) {
                     break;
@@ -73,24 +73,24 @@ public class ExtensionExecutor {
             if (reducer.sameType()) {
                 return result;
             } else {
-                ExtensionContext.getExtCtx(group, Wrapper.class).result = result;
+                ExtensionContext.getExtCtx(scope, Wrapper.class).result = result;
                 return null;
             }
         } finally {
-            ExtensionContext.rmExtCtx(group, Namespaces.EXT_POINT);
-            ExtensionContext.rmExtCtx(group, Namespaces.EXT_TYPE);
+            ExtensionContext.rmExtCtx(scope, Namespaces.EXT_POINT);
+            ExtensionContext.rmExtCtx(scope, Namespaces.EXT_TYPE);
         }
     }
 
-    private static <Ext> Object execute(String group, Class<Ext> ext, ExtImpl impl, Method method, Object[] args) throws Exception {
+    private static <Ext> Object execute(String scope, Class<Ext> ext, ExtImpl impl, Method method, Object[] args) throws Exception {
         Preconditions.checkState(ext.isInstance(impl.instance));
-        return new ExtensionInvocation(group, ext, method, impl.type, impl.instance, args, plugins).proceed();
+        return new ExtensionInvocation(scope, ext, method, impl.type, impl.instance, args, plugins).proceed();
     }
 
-    private static List<ExtImpl> getExtensionImpls(String group, Class<?> ext, Object... args) {
-        ExtensionRouter router = ExtensionContext.getExtensionRouter(group);
+    private static List<ExtImpl> getExtensionImpls(String scope, Class<?> ext, Object... args) {
+        ExtensionRouter router = ExtensionContext.getExtensionRouter(scope);
         Preconditions.checkState(router != null);
-        List<ExtImpl> impls = router.route(ext, group, args);
+        List<ExtImpl> impls = router.route(ext, scope, args);
         if (CollectionUtils.isEmpty(impls)) {
             throw new ExtensionRuntimeException(String.format("[ExtensionRouter:%s] could not found any impls for [Extension:%s]!", router, ext.getName()));
         }

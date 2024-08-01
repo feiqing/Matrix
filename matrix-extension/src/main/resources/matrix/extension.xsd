@@ -62,9 +62,9 @@
     </xsd:element>
 
     <xsd:attributeGroup name="extensionImplAttrs">
-        <xsd:attribute name="group" type="xsd:string" use="optional" default="BASE">
+        <xsd:attribute name="scope" type="xsd:string" use="optional" default="BASE">
             <xsd:annotation>
-                <xsd:documentation>扩展分组定义: 支持以','分割定义多个扩展分组
+                <xsd:documentation>扩展领域定义: 支持以','分割定义多个扩展领域
                 </xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>

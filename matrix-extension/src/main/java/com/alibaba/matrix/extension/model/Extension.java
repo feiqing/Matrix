@@ -12,14 +12,17 @@ public class Extension {
 
     public final Class<?> clazz;
 
+    public final String desc;
+
     // 默认实现是一定不支持懒加载的
     public final Object base;
 
-    public final Map<String, Group> groupMap;
+    public final Map<String, Scope> scopeMap;
 
-    public Extension(@Nonnull Class<?> clazz, @Nonnull Object base, @Nonnull Map<String, Group> groupMap) {
+    public Extension(@Nonnull Class<?> clazz, String desc, @Nonnull Object base, @Nonnull Map<String, Scope> scopeMap) {
         this.clazz = clazz;
+        this.desc = desc;
         this.base = base;
-        this.groupMap = groupMap;
+        this.scopeMap = scopeMap;
     }
 }

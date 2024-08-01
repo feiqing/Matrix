@@ -9,6 +9,7 @@ import java.lang.annotation.*;
  * @version 1.0
  * @since 2022/7/1 17:03.
  */
+@Deprecated
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Import(ExtensionFrameworkRegister.class)

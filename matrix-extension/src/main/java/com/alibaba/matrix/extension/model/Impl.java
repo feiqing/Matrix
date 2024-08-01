@@ -1,7 +1,5 @@
 package com.alibaba.matrix.extension.model;
 
-import com.alibaba.matrix.extension.exception.ExtensionException;
-
 import javax.annotation.Nonnull;
 
 /**
@@ -11,7 +9,7 @@ import javax.annotation.Nonnull;
  */
 public class Impl {
 
-    public final String group;
+    public final String scope;
 
     public final String code;
 
@@ -19,7 +17,7 @@ public class Impl {
 
     public final int priority;
 
-    public String desc;
+    public final String desc;
 
     public volatile Object instance = null;
 
@@ -28,7 +26,7 @@ public class Impl {
     public Hsf hsf = null;
 
     public Dubbo dubbo = null;
-
+    
     public Http http = null;
 
     public Groovy groovy = null;
@@ -46,14 +44,14 @@ public class Impl {
         if (dubbo != null) {
             return dubbo.lazy;
         }
-        // todo msg
-        throw new ExtensionException("todo");
+        return false;
     }
 
-    public Impl(@Nonnull String group, @Nonnull String code, @Nonnull String type, @Nonnull int priority) {
-        this.group = group;
+    public Impl(@Nonnull String scope, @Nonnull String code, @Nonnull String type, @Nonnull int priority, String desc) {
+        this.scope = scope;
         this.code = code;
         this.type = type;
         this.priority = priority;
+        this.desc = desc;
     }
 }

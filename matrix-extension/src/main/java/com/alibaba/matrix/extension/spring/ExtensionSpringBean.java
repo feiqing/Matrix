@@ -6,7 +6,7 @@ import com.google.common.base.Preconditions;
 import lombok.Setter;
 import org.springframework.beans.factory.FactoryBean;
 
-import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_GROUP;
+import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_SCOPE;
 import static com.alibaba.matrix.extension.utils.Logger.log;
 
 /**
@@ -26,7 +26,7 @@ public class ExtensionSpringBean<Ext> implements FactoryBean<Ext> {
     @Override
     public Ext getObject() {
         Preconditions.checkState(ext != null && reducer != null && reducer.sameType());
-        Ext proxy = ProxyFactory.newProxy(BASE_GROUP, ext, reducer);
+        Ext proxy = ProxyFactory.newProxy(BASE_SCOPE, ext, reducer);
         log.info("Register ext:[{}] reducer:[{}] bean:[{}] into Spring Context.", ext, reducer, proxy);
         return proxy;
     }

@@ -11,16 +11,16 @@ import java.util.concurrent.ConcurrentMap;
  * @version 1.0
  * @since 2022/7/23 22:40.
  */
-public class Group {
+public class Scope {
 
-    public final String group;
+    public final String scope;
 
     public final Map<String, List<Impl>> code2impls;
 
     public final ConcurrentMap<String, List<ExtImpl>> CODE_2_IMPLS_CACHE = new ConcurrentHashMap<>();
 
-    public Group(@Nonnull String group, @Nonnull Map<String, List<Impl>> code2impls) {
-        this.group = group;
+    public Scope(@Nonnull String scope, @Nonnull Map<String, List<Impl>> code2impls) {
+        this.scope = scope;
         this.code2impls = code2impls;
     }
 }

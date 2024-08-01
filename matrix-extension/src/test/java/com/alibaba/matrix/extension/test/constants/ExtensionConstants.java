@@ -7,7 +7,7 @@ package com.alibaba.matrix.extension.test.constants;
  */
 public interface ExtensionConstants {
 
-    String GROUP_1 = "group.1";
+    String SCOPE_1 = "group.1";
 
-    String GROUP_2 = "group.2";
+    String SCOPE_2 = "group.2";
 }

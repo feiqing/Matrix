@@ -31,7 +31,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * fixme: 仅作为一个Demo演示groovy类型扩展实现的支持, 没做任何的优化和异常处理, 千万不要应用到任何实际业务当中
+ * warning: 仅作为Demo演示Groovy类型扩展实现支持, 没做任何的优化和异常处理, 千万不要应用到实际业务当中
  *
  * @author jifang.zjf@alibaba-inc.com
  * @version 1.0
@@ -58,15 +58,15 @@ public class GroovyServiceFactory {
         Enhancer enhancer = new Enhancer();
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
-        enhancer.setCallback(new GroovyExtensionImplProxy(scriptRef));
+        enhancer.setCallback(new GroovyImplAdaptor(scriptRef));
         return enhancer.create();
     }
 
-    private static class GroovyExtensionImplProxy implements MethodInterceptor {
+    private static class GroovyImplAdaptor implements MethodInterceptor {
 
         private final AtomicReference<Script> scriptRef;
 
-        public GroovyExtensionImplProxy(AtomicReference<Script> scriptRef) {
+        public GroovyImplAdaptor(AtomicReference<Script> scriptRef) {
             this.scriptRef = scriptRef;
         }
 
@@ -135,13 +135,11 @@ public class GroovyServiceFactory {
 
     private static ConfigService getNacosConfigService(Map<String, String> config) {
         String serverAddr = config.get(PropertyKeyConst.SERVER_ADDR);
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(serverAddr));
         String namespace = config.get(PropertyKeyConst.NAMESPACE);
         return nacosConfigServices.computeIfAbsent(String.format("%s#%s", serverAddr, namespace), _K -> {
             Properties properties = new Properties();
-            // @菲青 目前serverAddr还是必填的
-            if (!Strings.isNullOrEmpty(serverAddr)) {
-                properties.setProperty(PropertyKeyConst.SERVER_ADDR, serverAddr);
-            }
+            properties.setProperty(PropertyKeyConst.SERVER_ADDR, serverAddr);
             if (!Strings.isNullOrEmpty(namespace)) {
                 properties.setProperty(PropertyKeyConst.NAMESPACE, namespace);
             }

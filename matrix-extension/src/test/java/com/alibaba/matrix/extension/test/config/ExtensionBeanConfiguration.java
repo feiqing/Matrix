@@ -1,5 +1,7 @@
 package com.alibaba.matrix.extension.test.config;
 
+import com.alibaba.matrix.extension.plugin.ExtensionIndependentLoggingPlugin;
+import com.alibaba.matrix.extension.plugin.ExtensionLoggingPlugin;
 import com.alibaba.matrix.extension.reducer.Reducers;
 import com.alibaba.matrix.extension.spring.ExtensionFrameworkLoader;
 import com.alibaba.matrix.extension.spring.ExtensionSpringBean;
@@ -24,7 +26,9 @@ public class ExtensionBeanConfiguration {
         extensionFrameworkLoader.setScanPackages(Arrays.asList("com.alibaba.matrix.extension.test"));
 
         extensionFrameworkLoader.setEnableXmlConfig(true);
-        extensionFrameworkLoader.setConfigLocations(Arrays.asList("classpath*:matrix-extension-*.xml"));
+        extensionFrameworkLoader.setConfigLocations(Arrays.asList("classpath*:matrix-extension-demo.xml"));
+
+        extensionFrameworkLoader.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin(), new ExtensionIndependentLoggingPlugin()));
 
         return extensionFrameworkLoader;
     }

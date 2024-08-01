@@ -17,14 +17,14 @@ import java.lang.reflect.Method;
 @SuppressWarnings("unchecked")
 public class SpringProxyFactory<Ext> implements MethodInterceptor {
 
-    private final String group;
+    private final String scope;
 
     private final Class<Ext> ext;
 
     private final Reducer<?, ?> reducer;
 
-    public SpringProxyFactory(String group, Class<Ext> ext, Reducer<?, ?> reducer) {
-        this.group = group;
+    public SpringProxyFactory(String scope, Class<Ext> ext, Reducer<?, ?> reducer) {
+        this.scope = scope;
         this.ext = ext;
         this.reducer = reducer;
     }
@@ -34,14 +34,14 @@ public class SpringProxyFactory<Ext> implements MethodInterceptor {
         if (ReflectionUtils.isObjectMethod(method)) {
             return method.invoke(this, objects);
         }
-        return ExtensionExecutor.callback(group, ext, method, objects, reducer);
+        return ExtensionExecutor.callback(scope, ext, method, objects, reducer);
     }
 
-    public static <Ext> Ext newProxy(String group, Class<Ext> ext, Reducer<?, ?> reducer) {
+    public static <Ext> Ext newProxy(String scope, Class<Ext> ext, Reducer<?, ?> reducer) {
         Enhancer enhancer = new Enhancer();
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
-        enhancer.setCallback(new SpringProxyFactory<>(group, ext, reducer));
+        enhancer.setCallback(new SpringProxyFactory<>(scope, ext, reducer));
         return (Ext) enhancer.create();
     }
 }

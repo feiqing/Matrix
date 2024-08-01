@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension;
+package com.alibaba.matrix.extension.router;
 
 import com.alibaba.matrix.extension.model.ExtImpl;
 
@@ -14,12 +14,12 @@ public interface ExtensionRouter extends Serializable {
 
 
     /**
-     * 获取扩展实现, by ext、group、code(from context)、args
+     * 获取扩展实现, by ext、scope、code(from context)、args
      *
      * @param ext
-     * @param group
+     * @param scope
      * @param args
      * @return
      */
-    List<ExtImpl> route(Class<?> ext, String group, Object[] args);
+    List<ExtImpl> route(Class<?> ext, String scope, Object[] args);
 }

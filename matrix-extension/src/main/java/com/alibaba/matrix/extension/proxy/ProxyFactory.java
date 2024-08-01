@@ -14,37 +14,37 @@ public class ProxyFactory {
 
     private static volatile String type = null;
 
-    public static <Ext> Ext newProxy(String group, Class<Ext> ext) {
-        return newProxy(group, ext, null);
+    public static <Ext> Ext newProxy(String scope, Class<Ext> ext) {
+        return newProxy(scope, ext, null);
     }
 
-    public static <Ext> Ext newProxy(String group, Class<Ext> ext, Reducer<?, ?> reducer) {
+    public static <Ext> Ext newProxy(String scope, Class<Ext> ext, Reducer<?, ?> reducer) {
         if (type != null) {
             switch (type) {
                 case "spring":
-                    return SpringProxyFactory.newProxy(group, ext, reducer);
+                    return SpringProxyFactory.newProxy(scope, ext, reducer);
                 case "cglib":
-                    return CglibProxyFactory.newProxy(group, ext, reducer);
+                    return CglibProxyFactory.newProxy(scope, ext, reducer);
                 case "jdk":
-                    return JdkProxyFactory.newProxy(group, ext, reducer);
+                    return JdkProxyFactory.newProxy(scope, ext, reducer);
             }
         }
 
         try {
             Class.forName("org.springframework.cglib.proxy.Enhancer");
             type = "spring";
-            return SpringProxyFactory.newProxy(group, ext, reducer);
+            return SpringProxyFactory.newProxy(scope, ext, reducer);
         } catch (ClassNotFoundException ignored) {
         }
 
         try {
             Class.forName("net.sf.cglib.proxy.Enhancer");
             type = "cglib";
-            return CglibProxyFactory.newProxy(group, ext, reducer);
+            return CglibProxyFactory.newProxy(scope, ext, reducer);
         } catch (ClassNotFoundException ignored) {
         }
 
         type = "jdk";
-        return JdkProxyFactory.newProxy(group, ext, reducer);
+        return JdkProxyFactory.newProxy(scope, ext, reducer);
     }
 }

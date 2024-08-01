@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 
 
 /**
- * fixme: 仅作为一个Demo演示http类型扩展实现的支持, 没做任何的优化和异常处理, 千万不要应用到任何实际业务当中
+ * warning: 仅作为Demo演示http类型扩展实现支持, 没做任何的优化和异常处理, 千万不要应用到实际业务当中
  *
  * @author jifang.zjf@alibaba-inc.com
  * @version 1.0
@@ -36,17 +36,17 @@ public class HttpServiceFactory {
         Enhancer enhancer = new Enhancer();
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
-        enhancer.setCallback(new HttpExtensionImplProxy(http));
+        enhancer.setCallback(new HttpImplAdaptor(http));
         return enhancer.create();
     }
 
-    private static class HttpExtensionImplProxy implements MethodInterceptor {
+    private static class HttpImplAdaptor implements MethodInterceptor {
 
         private final RestTemplate restTemplate;
 
         private final Http http;
 
-        public HttpExtensionImplProxy(Http http) {
+        public HttpImplAdaptor(Http http) {
             this.http = http;
             this.restTemplate = new RestTemplate(); // 扩展参数
         }

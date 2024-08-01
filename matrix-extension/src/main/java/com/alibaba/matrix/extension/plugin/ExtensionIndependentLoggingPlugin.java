@@ -14,7 +14,7 @@ public class ExtensionIndependentLoggingPlugin extends ExtensionLoggingPlugin {
     private static final Logger logger;
 
     static {
-        MatrixLoggingSystem.initLoggingSystem("classpath:matrix-ext-logback.xml", "classpath:matrix-ext-log4j2.xml");
+        MatrixLoggingSystem.initLoggingSystem("classpath:matrix-extension-logback.xml", "classpath:matrix-extension-log4j2.xml");
         logger = LoggerFactory.getLogger("EXTENSION");
     }
 
