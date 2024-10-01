@@ -1,8 +1,7 @@
-# Matrix-Extension
-> 隔离扩展框架
+# Extension: 可扩展框架
 
 ### Quick Start
-#### Step 1. 开放扩展(Ext)定义
+#### Step 1. 扩展(Ext)定义
 ```java
 @Extension(desc = "演示Demo扩展定义")
 public interface ShowDemoExt {
