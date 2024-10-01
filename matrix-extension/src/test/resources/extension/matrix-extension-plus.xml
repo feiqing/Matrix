@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Extensions xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://www.alibaba.com/matrix/extension
+            https://www.alibaba.com/matrix/extension.xsd">
+
+    <Extension class="java.util.function.Consumer" base="baseConsumerImpl" desc="测试扩展Consumer定义"/>
+
+    <Extension class="java.util.function.Function" base="baseFunctionExtImpl" desc="测试扩展Function定义">
+        <ExtensionImpl priority="1" scope="BASE, SUB-SCOPE" code="normal" type="bean" desc="普通电商交易">
+            <bean name="normalFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl priority="2" code="normal" type="bean" desc="普通电商交易">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.NormalPriority2FunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl scope="BASE, SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.YhbFunctionExtImpl"/>
+        </ExtensionImpl>
+    </Extension>
+
+    <Extension class="java.util.function.Supplier" base="baseSupplierExtImpl" desc="测试扩展Supplier定义">
+        <ExtensionImpl code="normal" type="bean" desc="普通电商交易">
+            <bean name="normalSupplierExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl scope="SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.YhbSupplierExtImpl"/>
+        </ExtensionImpl>
+    </Extension>
+
+    <Extension class="java.util.function.BiConsumer" base="baseBiConsumerImpl" desc="测试扩展BiConsumer定义"/>
+
+    <Extension class="java.util.function.BiFunction" base="baseBiFunctionImpl" desc="测试扩展BiFunction定义"/>
+
+</Extensions>

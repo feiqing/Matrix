@@ -23,15 +23,24 @@ public class ExtImpl implements Serializable {
 
     public final Object instance;
 
+    public final String desc;
+
     public ExtImpl(@Nonnull String type, @Nonnull Object instance) {
+        this(type, instance, null);
+    }
+
+    public ExtImpl(String type, Object instance, String desc) {
         this.type = type;
         this.instance = instance;
+        this.desc = desc;
     }
 
     @Getter
     public enum Type implements Serializable {
 
         BASE("BASE"),
+
+        OBJECT("OBJECT"),
 
         BEAN("BEAN"),
 
@@ -42,6 +51,8 @@ public class ExtImpl implements Serializable {
         HTTP("HTTP"),
 
         GROOVY("GROOVY"),
+
+        SPEL("SPEL"),
 
         ;
 

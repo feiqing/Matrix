@@ -11,7 +11,7 @@
 
     <bean id="ORDER-CREATE-FLOW" class="com.alibaba.matrix.flow.Flow">
         <constructor-arg name="name" value="ORDER-CREATE"/>
-        <constructor-arg name="nodes">
+        <constructor-arg name="tasks">
             <util:list>
                 <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode1"/>
                 <bean class="com.alibaba.matrix.testing.flow.node.OrderCreateNode2"/>

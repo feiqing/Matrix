@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Extensions xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
+
+    <Extension class="com.alibaba.matrix.extension.test.ext.DemoRemoteExt" base="blankDemoRemoteExtImpl"
+               desc="Demo远程扩展定义">
+        <ExtensionImpl code="code.http.post" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="POST" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http.get" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.http" type="http">
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        </ExtensionImpl>
+    </Extension>
+
+</Extensions>

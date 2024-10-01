@@ -21,6 +21,8 @@ public class Impl {
 
     public volatile Object instance = null;
 
+    public ObjectT object = null;
+
     public Bean bean = null;
 
     public Hsf hsf = null;
@@ -31,9 +33,14 @@ public class Impl {
 
     public Groovy groovy = null;
 
+    public SpEL spel = null;
+
     public boolean isLazy() {
         if (instance != null) {
             return false;
+        }
+        if (object != null) {
+            return object.lazy;
         }
         if (bean != null) {
             return bean.lazy;
@@ -43,6 +50,15 @@ public class Impl {
         }
         if (dubbo != null) {
             return dubbo.lazy;
+        }
+        if (http != null) {
+            return http.lazy;
+        }
+        if (groovy != null) {
+            return groovy.lazy;
+        }
+        if (spel != null) {
+            return spel.lazy;
         }
         return false;
     }

@@ -1,16 +1,17 @@
 package com.alibaba.matrix.extension.spring;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.matrix.extension.core.ExtensionContainer;
-import com.alibaba.matrix.extension.exception.ExtensionException;
+import com.alibaba.matrix.base.message.Message;
+import com.alibaba.matrix.extension.core.ExtensionManager;
 import com.alibaba.matrix.extension.factory.SpringBeanFactory;
 import com.alibaba.matrix.extension.model.Extension;
 import com.alibaba.matrix.extension.model.Impl;
 import com.alibaba.matrix.extension.model.Scope;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
-import com.alibaba.matrix.extension.utils.AnnotationLoader;
-import com.alibaba.matrix.extension.utils.Logger;
-import com.alibaba.matrix.extension.utils.XmlLoader;
+import com.alibaba.matrix.extension.router.BaseExtensionRouter;
+import com.alibaba.matrix.extension.router.ExtensionRouter;
+import com.alibaba.matrix.extension.util.AnnotationLoader;
+import com.alibaba.matrix.extension.util.Logger;
+import com.alibaba.matrix.extension.util.XmlLoader;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
@@ -33,8 +34,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
-import static com.alibaba.fastjson.serializer.SerializerFeature.DisableCircularReferenceDetect;
-import static com.alibaba.matrix.extension.utils.Logger.log;
+import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
+import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
  * @author jifang.zjf@alibaba-inc.com
@@ -55,6 +56,8 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
 
     private List<String> configLocations = Collections.emptyList();
 
+    private ExtensionRouter extensionRouter = new BaseExtensionRouter();
+
     private List<ExtensionPlugin> extensionPlugins = Collections.emptyList();
 
     @Override
@@ -64,12 +67,13 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
             return;
         }
 
-        log.info("[Matrix-Extension] Version: [{}] Starting...", resolveProjectVersion());
+        log.info("{}", Message.of("MATRIX-EXTENSION-0000-0000", resolveProjectVersion()).getMessage());
         SpringBeanFactory.setApplicationContext(event.getApplicationContext());
-        ExtensionContainer.plugins = loadExtensionPlugins();
-        ExtensionContainer.extensionMap = loadExtensionDefinitions(event.getApplicationContext());
-        log.info("Extension loaded summary: {}", toExtensionSummary(ExtensionContainer.extensionMap));
-        log.info("[Matrix-Extension] Started Success!");
+        ExtensionManager.router = extensionRouter;
+        ExtensionManager.plugins = loadExtensionPlugins();
+        ExtensionManager.extensionMap = loadExtensionDefinitions(event.getApplicationContext());
+        log.info("Extension load summary: {}", toExtensionSummary(ExtensionManager.extensionMap));
+        log.info("{}", Message.of("MATRIX-EXTENSION-0000-0001").getMessage());
 
         if (!enableAnnotationScan && !enableXmlConfig) {
             log.warn("enableAnnotationScan and enableXmlConfig all switch off!");
@@ -77,17 +81,12 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
     }
 
     private ExtensionPlugin[] loadExtensionPlugins() {
-        try {
-            ExtensionPlugin[] plugins = new ExtensionPlugin[extensionPlugins.size()];
-            for (int i = 0; i < extensionPlugins.size(); ++i) {
-                plugins[i] = extensionPlugins.get(i);
-                log.info("Loaded ExtensionPlugin: [{}]", plugins[i]);
-            }
-            return plugins;
-        } catch (Throwable t) {
-            log.error("Loading ExtensionPlugin error.", t);
-            throw new ExtensionException(t);
+        ExtensionPlugin[] plugins = new ExtensionPlugin[extensionPlugins.size()];
+        for (int i = 0; i < extensionPlugins.size(); ++i) {
+            plugins[i] = extensionPlugins.get(i);
+            log.info("Loaded ExtensionPlugin: [{}]", plugins[i]);
         }
+        return plugins;
     }
 
     private Map<Class<?>, Extension> loadExtensionDefinitions(ApplicationContext applicationContext) {
@@ -176,7 +175,7 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
         implsResult.addAll(impls2);
 
         implsResult.sort(Comparator.comparingInt(o -> o.priority));
-        log.info("! Merge ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+        log.info("[!Merge!] ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
 
         return implsResult;
     }
@@ -214,7 +213,7 @@ public class ExtensionFrameworkLoader implements ApplicationListener<ContextRefr
         for (Extension extension : extensionMap.values()) {
             summary.put(Logger.formatExt(extension.clazz, extension.desc), toScopeSummary(extension.base, extension.scopeMap));
         }
-        return JSON.toJSONString(summary, DisableCircularReferenceDetect);
+        return jsonMapper.toJson(summary);
     }
 
     private Map<String, Object> toScopeSummary(Object base, Map<String, Scope> scopeMap) {

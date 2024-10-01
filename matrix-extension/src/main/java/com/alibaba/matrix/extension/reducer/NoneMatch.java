@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.reducer;
 
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.List;
 import java.util.Objects;
@@ -11,7 +11,7 @@ import java.util.function.Predicate;
  * @version 1.0
  * @since 2023/8/19 08:19.
  */
-public class NoneMatch<T> extends AbstractReducer<T, Boolean> {
+public class NoneMatch<T> implements Reducer<T, Boolean> {
 
     private final Predicate<T> predicate;
 
@@ -38,5 +38,10 @@ public class NoneMatch<T> extends AbstractReducer<T, Boolean> {
     @Override
     public boolean willBreak(T t) {
         return predicate.test(t);
+    }
+
+    @Override
+    public boolean parallel() {
+        return true;
     }
 }

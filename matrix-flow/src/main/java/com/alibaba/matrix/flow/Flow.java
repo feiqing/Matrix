@@ -1,62 +1,96 @@
 package com.alibaba.matrix.flow;
 
+import com.alibaba.matrix.base.message.Message;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 import lombok.Getter;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import static com.alibaba.matrix.flow.log.FlowLoggerProvider.logger;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2017/4/10 16:01.
+ * @since 2018/9/18 16:01.
  */
-@SuppressWarnings({"rawtypes", "unchecked"})
-public class Flow<Context, Result> {
+// @SuppressWarnings({"rawtypes", "unchecked"})
+public class Flow<InputData, OutputData> {
 
-    protected static final ThreadLocal<Map<String, Meta>> metas = ThreadLocal.withInitial(HashMap::new);
+    private static final ConcurrentMap<Task<?, ?>, String> task2flow = new ConcurrentHashMap<>();
+
+    protected static final ThreadLocal<Map<String, Meta>> metaMap = ThreadLocal.withInitial(HashMap::new);
 
     @Getter
     private final String name;
 
-    private final FlowNode[] nodes;
+    private final Task<InputData, OutputData>[] tasks;
 
-    public Flow(String name, FlowNode[] nodes) {
+    public Flow(String name, List<Task<InputData, OutputData>> tasks) {
+        this(name, tasks.toArray(new Task[0]));
+    }
+
+    public Flow(String name, Task<InputData, OutputData>[] tasks) {
+        Preconditions.checkArgument(!Strings.isNullOrEmpty(name));
+        Preconditions.checkArgument(ArrayUtils.isNotEmpty(tasks));
+
         this.name = name;
-        this.nodes = nodes;
+        this.tasks = tasks;
 
-        for (FlowNode node : this.nodes) {
-            node.name = name;
+        for (Task<InputData, OutputData> task : this.tasks) {
+            task2flow.put(task, name);
+            logger.info("Load flow:[{}] task:[{}].", name, task.name());
+        }
+
+        logger.info("[Matrix-Flow] load flow:[{}] success.", name);
+    }
+
+    public OutputData execute(InputData inputData) {
+        Map<String, Meta> map = metaMap.get();
+        if (map.containsKey(name)) {
+            throw new IllegalStateException(Message.of("MATRIX-FLOW-0000-0000", name).getMessage());
+        }
+
+        map.put(name, new Meta(name, tasks, inputData));
+        try {
+            return tasks[0].next();
+        } finally {
+            map.remove(name);
         }
     }
 
-    public Result execute(Context context) throws Throwable {
-        metas.get().put(name, new Meta(nodes, context));
-        try {
-            return (Result) nodes[0].next();
-        } finally {
-            metas.get().remove(name);
-        }
+    protected static Meta getMeta(Task<?, ?> task) {
+        String name = task2flow.get(task);
+        return metaMap.get().get(name);
     }
 
     public void clear() {
-        metas.remove();
+        metaMap.remove();
     }
 
     protected static class Meta {
 
-        protected final FlowNode[] nodes;
+        protected final String name;
 
-        protected final Object context;
+        protected final Task<?, ?>[] tasks;
+
+        protected final Object inputData;
 
         protected int idx = -1;
 
-        protected long cost = 0;
+        protected long total = 0;
 
         private Map<String, Object> attributes;
 
-        public Meta(FlowNode[] nodes, Object input) {
-            this.nodes = nodes;
-            this.context = input;
+        public Meta(String name, Task<?, ?>[] tasks, Object inputData) {
+            this.name = name;
+            this.tasks = tasks;
+            this.inputData = inputData;
         }
 
         public Map<String, Object> getAttributes() {
@@ -66,7 +100,7 @@ public class Flow<Context, Result> {
             return this.attributes;
         }
 
-        public void setAttribute(String key, Object value) {
+        public void addAttribute(String key, Object value) {
             getAttributes().put(key, value);
         }
 

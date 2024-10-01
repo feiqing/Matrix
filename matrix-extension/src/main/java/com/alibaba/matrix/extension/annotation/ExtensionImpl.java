@@ -29,5 +29,5 @@ public @interface ExtensionImpl {
 
     String desc() default "";
 
-    Class<?> extension() default Object.class;
+    Class<?> belong() default Object.class;
 }

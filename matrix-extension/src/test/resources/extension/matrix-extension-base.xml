@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Extensions xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://www.alibaba.com/matrix/extension
+            https://www.alibaba.com/matrix/extension.xsd">
+
+    <Extension class="org.apache.commons.lang3.function.TriFunction" base="baseTriFunctionImpl"
+               desc="测试扩展TriFunction定义">
+
+        <ExtensionImpl code="code.object" type="object">
+            <object class="com.alibaba.matrix.extension.test.impl.function.ObjectTriFunctionExtImpl" args="OBJ-TEST"/>
+        </ExtensionImpl>
+
+        <ExtensionImpl code="code.common" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.CommonTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.yhb" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.YhbTriFunctionExtImpl"/>
+        </ExtensionImpl>
+
+        <ExtensionImpl code="code.sub.scope" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.SubScopeTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.sub.scope" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.SubScopeTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl scope="SUB-SCOPE" code="code.sub.scope" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.SubScopeTriFunctionExtImpl"/>
+        </ExtensionImpl>
+
+
+        <ExtensionImpl code="code.normal.concurrent" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.NormalTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.normal.concurrent" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.NormalTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.normal.concurrent" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.NormalTriFunctionExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.normal.concurrent" type="bean">
+            <bean class="com.alibaba.matrix.extension.test.impl.function.NormalTriFunctionExtImpl"/>
+        </ExtensionImpl>
+
+    </Extension>
+
+    <Extension class="com.alibaba.matrix.extension.test.ext.DemoBaseExt" base="baseDemoBaseExtImpl"
+               desc="测试扩展DemoBaseExt定义">
+        <ExtensionImpl code="code.yhb" type="bean" priority="1">
+            <bean name="yhbDemoBaseExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl scope="SUB-SCOPE" code="code.yhb" type="bean">
+            <bean name="yhbDemoBaseExtImpl"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.common" type="bean">
+            <bean name="commonDemoBaseExtImpl"/>
+        </ExtensionImpl>
+    </Extension>
+
+</Extensions>

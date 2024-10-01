@@ -1,9 +1,7 @@
 package com.alibaba.matrix.extension.test.aspect;
 
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
-import com.alibaba.matrix.extension.utils.Logger;
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.reflect.MethodSignature;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)

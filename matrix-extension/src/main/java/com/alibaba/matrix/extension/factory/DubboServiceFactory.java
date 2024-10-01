@@ -8,7 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.alibaba.matrix.extension.utils.Logger.log;
+import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -35,11 +35,11 @@ public class DubboServiceFactory {
             if (dubbo.timeout != null) {
                 reference.setTimeout(dubbo.timeout);
             }
-            if (dubbo.check != null) {
-                reference.setCheck(dubbo.check);
-            }
             if (dubbo.filter != null) {
                 reference.setFilter(dubbo.filter);
+            }
+            if (dubbo.check != null) {
+                reference.setCheck(dubbo.check);
             }
 
             Object serviceObj = reference.get();

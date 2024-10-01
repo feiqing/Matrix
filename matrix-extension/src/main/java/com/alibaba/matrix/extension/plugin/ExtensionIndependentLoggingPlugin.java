@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.plugin;
 
-import com.alibaba.matrix.logging.MatrixLoggingSystem;
+import com.alibaba.matrix.base.logging.MatrixLoggingSystem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,7 +14,7 @@ public class ExtensionIndependentLoggingPlugin extends ExtensionLoggingPlugin {
     private static final Logger logger;
 
     static {
-        MatrixLoggingSystem.initLoggingSystem("classpath:matrix-extension-logback.xml", "classpath:matrix-extension-log4j2.xml");
+        MatrixLoggingSystem.initLoggingSystem("classpath:extension-logback.xml", "classpath:extension-log4j2.xml");
         logger = LoggerFactory.getLogger("EXTENSION");
     }
 

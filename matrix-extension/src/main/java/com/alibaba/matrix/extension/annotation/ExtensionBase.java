@@ -19,5 +19,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface ExtensionBase {
 
-    Class<?> extension() default Object.class;
+    Class<?> belong() default Object.class;
 }

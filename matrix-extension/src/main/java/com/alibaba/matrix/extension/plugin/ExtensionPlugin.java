@@ -7,5 +7,5 @@ package com.alibaba.matrix.extension.plugin;
  */
 public interface ExtensionPlugin {
 
-    Object invoke(ExtensionInvocation invocation) throws Exception;
+    Object invoke(ExtensionInvocation invocation);
 }

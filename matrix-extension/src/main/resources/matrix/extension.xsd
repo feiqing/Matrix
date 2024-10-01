@@ -12,7 +12,6 @@
         </xsd:complexType>
     </xsd:element>
 
-
     <xsd:element name="Extension">
         <xsd:annotation>
             <xsd:documentation>扩展Ext定义</xsd:documentation>
@@ -52,10 +51,12 @@
         <xsd:complexType>
             <xsd:choice>
                 <xsd:element ref="bean"/>
+                <xsd:element ref="object"/>
                 <xsd:element ref="hsf"/>
                 <xsd:element ref="dubbo"/>
                 <xsd:element ref="http"/>
                 <xsd:element ref="groovy"/>
+                <xsd:element ref="spel"/>
             </xsd:choice>
             <xsd:attributeGroup ref="extensionImplAttrs"/>
         </xsd:complexType>
@@ -96,21 +97,50 @@
 
     <xsd:simpleType name="Type">
         <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="object"/>
             <xsd:enumeration value="bean"/>
             <xsd:enumeration value="hsf"/>
             <xsd:enumeration value="dubbo"/>
             <xsd:enumeration value="http"/>
             <xsd:enumeration value="groovy"/>
-            <xsd:enumeration value="spel(*暂不支持*)"/>
-            <xsd:enumeration value="mvel(*暂不支持*)"/>
-            <xsd:enumeration value="ognl(*暂不支持*)"/>
+            <xsd:enumeration value="spel"/>
+
+            <xsd:enumeration value="guice(*暂不支持*)"/>
+            <xsd:enumeration value="class(*暂不支持*)"/>
             <xsd:enumeration value="sql(*暂不支持*)"/>
-            <xsd:enumeration value="java(*暂不支持*)"/>
-            <xsd:enumeration value="python(*暂不支持*)"/>
+
+            <xsd:enumeration value="ognl(*暂不支持*)"/>
+            <xsd:enumeration value="mvel(*暂不支持*)"/>
+            <xsd:enumeration value="ql-express(*暂不支持*)"/>
+
             <xsd:enumeration value="lua(*暂不支持*)"/>
+            <xsd:enumeration value="python(*暂不支持*)"/>
             <xsd:enumeration value="javascript(*暂不支持*)"/>
         </xsd:restriction>
     </xsd:simpleType>
+
+    <xsd:element name="object">
+        <xsd:annotation>
+            <xsd:documentation>自定义对象类型扩展, 推荐仅对象很简单的情况下使用</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="class" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>class</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="args" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>目前仅支持添加一个参数</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
 
     <xsd:element name="bean">
         <xsd:annotation>
@@ -130,7 +160,7 @@
             </xsd:attribute>
             <xsd:attribute name="lazy" type="xsd:boolean" default="false">
                 <xsd:annotation>
-                    <xsd:documentation>是否开启懒加载</xsd:documentation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
         </xsd:complexType>
@@ -199,9 +229,16 @@
             </xsd:documentation>
         </xsd:annotation>
         <xsd:complexType>
-            <xsd:attribute name="url" type="xsd:string"/>
+            <xsd:attribute name="schema" type="xsd:string"/>
+            <xsd:attribute name="host" type="xsd:string"/>
+            <xsd:attribute name="port" type="xsd:string" default="80"/>
+            <xsd:attribute name="path" type="xsd:string"/>
             <xsd:attribute name="method" type="xsd:string" default="POST"/>
-            <xsd:attribute name="camelToUnderline" type="xsd:boolean" default="true"/>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
 
@@ -214,6 +251,28 @@
         <xsd:complexType>
             <xsd:attribute name="protocol" type="xsd:string" use="required"/>
             <xsd:attribute name="path" type="xsd:string" use="required"/>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="spel">
+        <xsd:annotation>
+            <xsd:documentation>仅用于演示
+                <p color="red">千万不要应用到任何实际业务当中</p>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="protocol" type="xsd:string" use="required"/>
+            <xsd:attribute name="path" type="xsd:string" use="required"/>
+            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+                <xsd:annotation>
+                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
 </xsd:schema>

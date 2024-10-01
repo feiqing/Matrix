@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Extensions xmlns="https://www.alibaba.com/matrix/extension"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
+
+    <Extension class="org.apache.commons.collections4.Bag" base="hashBag" desc="Object Bag定义">
+        <ExtensionImpl code="code.tree" type="object">
+            <object class="org.apache.commons.collections4.bag.TreeBag"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.hash" type="object">
+            <object class="org.apache.commons.collections4.bag.HashBag" args="[1,2,3]" lazy="true"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.hash2" type="object">
+            <object class="com.alibaba.matrix.extension.test.impl.base.HashBag" args="[1,2,3]"/>
+        </ExtensionImpl>
+    </Extension>
+</Extensions>

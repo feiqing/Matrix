@@ -8,21 +8,32 @@
 
     <bean id="ORDER-CREATE-FLOW" class="com.alibaba.matrix.flow.Flow">
         <constructor-arg name="name" value="ORDER-CREATE"/>
-        <constructor-arg name="nodes">
+        <constructor-arg name="tasks">
             <util:list>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode1"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode2"/>
-                <bean class="com.alibaba.matrix.flow.test.node.OrderCreateNode3"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.create.OrderCreateTask3"/>
+            </util:list>
+        </constructor-arg>
+    </bean>
+
+    <bean id="TEST-FLOW" class="com.alibaba.matrix.flow.Flow">
+        <constructor-arg name="name" value="ORDER-CREATE"/>
+        <constructor-arg name="tasks">
+            <util:list>
+                <bean class="com.alibaba.matrix.flow.test.task.test.TestTask1"/>
+                <bean class="com.alibaba.matrix.flow.test.task.test.TestTask2"/>
+                <bean class="com.alibaba.matrix.flow.test.task.test.TestTask3"/>
             </util:list>
         </constructor-arg>
     </bean>

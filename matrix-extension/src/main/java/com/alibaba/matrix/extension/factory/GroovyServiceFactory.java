@@ -13,13 +13,16 @@ import com.google.common.base.Strings;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.ReflectionUtils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Map;
@@ -35,7 +38,7 @@ import java.util.concurrent.atomic.AtomicReference;
  *
  * @author jifang.zjf@alibaba-inc.com
  * @version 1.0
- * @since 2024/7/25 22:00.
+ * @since 2023/7/25 22:00.
  */
 public class GroovyServiceFactory {
 
@@ -89,7 +92,7 @@ public class GroovyServiceFactory {
         try {
             return new AtomicReference<>(groovyShell.parse(URI.create(groovy.path)));
         } catch (IOException e) {
-            throw new ExtensionException(e);
+            return ExceptionUtils.rethrow(e);
         }
     }
 
@@ -101,11 +104,9 @@ public class GroovyServiceFactory {
      */
     private static AtomicReference<Script> getFileScript(Groovy groovy) {
         try {
-            File file = new File(groovy.path);
-            Preconditions.checkArgument(file.exists());
-            return new AtomicReference<>(groovyShell.parse(file));
+            return new AtomicReference<>(groovyShell.parse(new InputStreamReader(new PathMatchingResourcePatternResolver().getResource(groovy.path).getInputStream())));
         } catch (IOException e) {
-            throw new ExtensionException(e);
+            return ExceptionUtils.rethrow(e);
         }
     }
 
@@ -129,7 +130,7 @@ public class GroovyServiceFactory {
             });
             return scriptRef;
         } catch (NacosException e) {
-            throw new ExtensionException(e);
+            return ExceptionUtils.rethrow(e);
         }
     }
 
@@ -146,7 +147,7 @@ public class GroovyServiceFactory {
             try {
                 return NacosFactory.createConfigService(properties);
             } catch (NacosException e) {
-                throw new ExtensionException(e);
+                return ExceptionUtils.rethrow(e);
             }
         });
     }

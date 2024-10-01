@@ -1,8 +1,10 @@
 package com.alibaba.matrix.extension.router;
 
+import com.alibaba.matrix.extension.model.ExtExecCtx;
 import com.alibaba.matrix.extension.model.ExtImpl;
 
 import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -10,16 +12,13 @@ import java.util.List;
  * @version 1.0
  * @since 2023/11/13 10:42.
  */
-public interface ExtensionRouter extends Serializable {
-
+public interface ExtensionRouter {
 
     /**
-     * 获取扩展实现, by ext、scope、code(from context)、args
+     * 获取扩展实现
      *
-     * @param ext
-     * @param scope
-     * @param args
+     * @param ctx
      * @return
      */
-    List<ExtImpl> route(Class<?> ext, String scope, Object[] args);
+    List<ExtImpl> route(ExtExecCtx ctx);
 }

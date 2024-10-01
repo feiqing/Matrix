@@ -1,9 +1,13 @@
 package com.alibaba.matrix.extension.plugin;
 
+import com.alibaba.matrix.extension.model.ExtExecCtx;
+import com.alibaba.matrix.extension.model.ExtImpl;
+import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.lang.reflect.Method;
+import java.util.function.Function;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -16,11 +20,16 @@ public class ExtensionInvocation {
     private final String scope;
 
     @Getter
-    private final Class<?> extType;
+    private final String code;
 
     @Getter
-    @Setter
-    private Method extPoint;
+    private final Class<?> ext;
+
+    @Getter
+    private final Function action;
+
+    @Getter
+    private final Reducer reducer;
 
     @Getter
     @Setter
@@ -30,29 +39,27 @@ public class ExtensionInvocation {
     @Setter
     private Object instance;
 
-    @Getter
-    @Setter
-    private Object[] args;
-
     private final ExtensionPlugin[] plugins;
 
-    public ExtensionInvocation(String scope, Class<?> extType, Method extPoint, String type, Object instance, Object[] args, ExtensionPlugin[] plugins) {
-        this.scope = scope;
-        this.extType = extType;
-        this.extPoint = extPoint;
-        this.type = type;
-        this.instance = instance;
-        this.args = args;
+    public ExtensionInvocation(ExtExecCtx ctx, ExtImpl impl, ExtensionPlugin[] plugins) {
+        this.scope = ctx.scope;
+        this.code = ctx.code;
+        this.ext = ctx.ext;
+        this.action = ctx.action;
+        this.reducer = ctx.reducer;
+
+        this.type = impl.type;
+        this.instance = impl.instance;
         this.plugins = plugins;
     }
 
     private int idx = -1;
 
-    public Object proceed() throws Exception {
+    public Object proceed() {
         if (++idx < plugins.length) {
             return plugins[idx].invoke(this);
         } else {
-            return extPoint.invoke(instance, args);
+            return action.apply(instance);
         }
     }
 }

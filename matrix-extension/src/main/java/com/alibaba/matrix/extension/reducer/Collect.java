@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.reducer;
 
-import org.springframework.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,9 +9,10 @@ import java.util.function.Predicate;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @version 1.0
  * @since 2022/05/19
  */
-public class Collect<T> extends AbstractReducer<T, List<T>> {
+public class Collect<T> implements Reducer<T, List<T>> {
 
     private final Predicate<T> predicate;
 
@@ -35,11 +36,17 @@ public class Collect<T> extends AbstractReducer<T, List<T>> {
                 results.add(t);
             }
         }
+
         return results;
     }
 
     @Override
     public boolean willBreak(T t) {
         return false;
+    }
+
+    @Override
+    public boolean parallel() {
+        return true;
     }
 }
