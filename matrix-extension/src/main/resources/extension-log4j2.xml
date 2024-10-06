@@ -3,8 +3,7 @@
 
     <Properties>
         <Property name="logPath" value="${sys:user.home}/logs/matrix"/>
-        <Property name="logFormat"
-                  value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
+        <Property name="logFormat" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
     </Properties>
 
     <Appenders>
