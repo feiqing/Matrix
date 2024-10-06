@@ -1,8 +1,7 @@
 package com.alibaba.matrix.extension.core;
 
+import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
-import com.alibaba.matrix.extension.config.ExtensionConfigProvider;
-import com.alibaba.matrix.extension.config.ExtensionParallelConfig;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.model.ExtExecCtx;
 import com.alibaba.matrix.extension.model.ExtImpl;
@@ -30,11 +29,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
+import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.experiment;
 import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.parallel;
 import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
 import static com.alibaba.matrix.extension.core.ExtensionManager.router;
-
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -48,7 +47,7 @@ public class ExtensionExecutor {
         ExtExecCtx ctx = new ExtExecCtx(scope, code, ext, action, reducer);
         List<ExtImpl> impls = router.route(ctx);
         if (CollectionUtils.isEmpty(impls)) {
-            throw new ExtensionRuntimeException(String.format("Could not found any impls for [Extension:%s]!", ext.getName()));
+            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0002", ext.getName()).getMessage());
         }
 
         if (experiment.enableJobExecutor(ctx)) {
@@ -94,19 +93,17 @@ public class ExtensionExecutor {
 
         ListenableFuture<List<Triple<Boolean, Object, Throwable>>> future = Futures.allAsList(futures);
         try {
-            List<Triple<Boolean, Object, Throwable>> results = future.get(parallel.timeout(ctx), parallel.unit(ctx));
+            List<Triple<Boolean, Object, Throwable>> triples = future.get(parallel.timeout(ctx), parallel.unit(ctx));
             if (future.isDone()) {
-                Throwable[] throwables = results.stream().map(Triple::getRight).filter(Objects::nonNull).toArray(Throwable[]::new);
-                if (ArrayUtils.isNotEmpty(throwables)) {
-                    String exceptions = Arrays.stream(throwables).map(ExceptionUtils::getMessage).collect(Collectors.joining(", ", "[", "]"));
-                    String message = String.format("Extension:[%s] scope:[%s] code:[%s] execute throw [%s] exception(s):%s, detail please check causes.", ctx.ext.getName(), ctx.scope, ctx.code, throwables.length, exceptions);
-                    throw new ExtensionRuntimeException(message, throwables);
+                Throwable[] exceptions = triples.stream().map(Triple::getRight).filter(Objects::nonNull).toArray(Throwable[]::new);
+                if (ArrayUtils.isNotEmpty(exceptions)) {
+                    String message = Arrays.stream(exceptions).map(ExceptionUtils::getMessage).collect(Collectors.joining(", "));
+                    throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0006", ctx.ext.getName(), ctx.scope, ctx.code, exceptions.length, message).getMessage(), exceptions);
                 }
-
-                List<Object> collect = results.stream().filter(Triple::getLeft).map(Triple::getMiddle).collect(Collectors.toList());
-                return ctx.reducer.reduce(collect);
+                List<Object> results = triples.stream().filter(Triple::getLeft).map(Triple::getMiddle).collect(Collectors.toList());
+                return ctx.reducer.reduce(results);
             } else {
-                throw new ExtensionRuntimeException(String.format("Extension:[%s] scope:[%s] code:[%s] execute timeout.", ctx.ext.getName(), ctx.scope, ctx.code));
+                throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0007", ctx.ext.getName(), ctx.scope, ctx.code).getMessage());
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return ExceptionUtils.rethrow(e);
@@ -130,9 +127,11 @@ public class ExtensionExecutor {
         ISpan span = tracer.newSpan("ExecuteExtension", Logger.formatExec(ctx, impl));
         try {
             Object proceed = new ExtensionInvocation(ctx, impl, plugins).proceed();
+            metrics.incCounter("execute_extension_success", Logger.formatExec(ctx, impl));
             span.setStatus(ISpan.STATUS_SUCCESS);
             return proceed;
         } catch (Throwable t) {
+            metrics.incCounter("execute_extension_failed", Logger.formatExec(ctx, impl));
             span.setStatus(t);
             return ExceptionUtils.rethrow(t);
         } finally {

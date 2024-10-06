@@ -1,7 +1,7 @@
 package com.alibaba.matrix.config.test;
 
 import com.alibaba.matrix.base.util.T;
-import com.alibaba.matrix.config.ConfigCenterFrameworkRegister;
+import com.alibaba.matrix.config.ConfigFrameworkRegister;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,7 +17,7 @@ public class ConfigCenterTester {
 
     @Before
     public void setUp() {
-        ConfigCenterFrameworkRegister register = new ConfigCenterFrameworkRegister(Collections.singletonList("com.alibaba.matrix.config.test"));
+        ConfigFrameworkRegister register = new ConfigFrameworkRegister(Collections.singletonList("com.alibaba.matrix.config.test"));
         register.init();
     }
 

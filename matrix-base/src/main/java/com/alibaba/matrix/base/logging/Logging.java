@@ -7,7 +7,7 @@ import lombok.extern.slf4j.Slf4j;
  * @version 1.0
  * @since 2023/7/15 14:45.
  */
-@Slf4j
+@Slf4j(topic = "Logging")
 public class Logging {
 
     public static void init(String logbackConfigFile, String log4j2ConfigFile) {

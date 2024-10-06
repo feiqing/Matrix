@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.test.aspect;
 
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.aspectj.lang.ProceedingJoinPoint;
 
 /**
@@ -18,7 +18,7 @@ public class ShowDemoAspect {
             return returnValue;
         } catch (Throwable t) {
             // Logger.log.info("异常通知: {}", ((MethodSignature) pjp.getSignature()).getMethod().getName(), t);
-            throw new ExtensionRuntimeException(t);
+            return ExceptionUtils.rethrow(t);
         } finally {
             // Logger.log.info("最终通知: {}.", ((MethodSignature) pjp.getSignature()).getMethod().getName());
         }

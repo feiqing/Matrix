@@ -1,5 +1,6 @@
 package com.alibaba.matrix.extension.router;
 
+import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.core.ExtensionManager;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.model.ExtExecCtx;
@@ -29,7 +30,7 @@ public class BaseExtensionRouter implements ExtensionRouter {
 
         List<ExtImpl> impls = ExtensionManager.getExtensionImpls(scope, code, ext);
         if (CollectionUtils.isEmpty(impls)) {
-            throw new ExtensionRuntimeException("Can not find [" + ext.getName() + "] extension impl for scope: " + scope + ", code: " + code);
+            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0003", ext.getName(), scope, code).getMessage());
         }
 
         Logger.log.info("Route ext:[{}] scope:[{}] code:[{}] -> impls:[{}].", ext.getName(), scope, code, impls.stream().map(impl -> String.format("%s(%s)", impl.instance, impl.type)).collect(Collectors.joining(", ")));

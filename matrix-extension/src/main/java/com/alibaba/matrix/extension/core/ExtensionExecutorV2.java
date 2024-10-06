@@ -23,7 +23,6 @@ import java.util.stream.Collectors;
 import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.parallel;
 import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
 
-
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0
@@ -63,7 +62,6 @@ public class ExtensionExecutorV2 {
         Job job;
         if (impls.size() > 1 && parallel.enable(ctx) && reducer.parallel()) {
             job = jobBuilder.buildParallelJob("Extension", parallel.timeout(ctx), parallel.unit(ctx));
-
         } else {
             job = jobBuilder.buildSerialJob("Extension");
         }

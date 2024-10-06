@@ -33,8 +33,8 @@ import static com.alibaba.matrix.config.provider.ConfigServiceProvider.configSer
  * @version 1.0
  * @since 2017/4/23 22:51.
  */
-@Slf4j(topic = "ConfigCenter")
-public class ConfigCenterFrameworkRegister {
+@Slf4j(topic = "Config")
+public class ConfigFrameworkRegister {
 
     private static final ConcurrentMap<Class<?>, Object> clazz2instance = new ConcurrentHashMap<>();
 
@@ -42,7 +42,7 @@ public class ConfigCenterFrameworkRegister {
 
     private final List<String> scanPackages;
 
-    public ConfigCenterFrameworkRegister(List<String> scanPackages) {
+    public ConfigFrameworkRegister(List<String> scanPackages) {
         this.scanPackages = scanPackages;
     }
 

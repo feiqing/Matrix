@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
  * @version 1.0
  * @since 2018/9/18 16:01.
  */
-@Slf4j
+@Slf4j(topic = "Flow")
 // @SuppressWarnings({"rawtypes", "unchecked"})
 public class Flow<InputData, OutputData> {
 

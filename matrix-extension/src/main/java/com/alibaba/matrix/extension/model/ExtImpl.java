@@ -1,5 +1,6 @@
 package com.alibaba.matrix.extension.model;
 
+import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
@@ -68,7 +69,7 @@ public class ExtImpl implements Serializable {
                     return value;
                 }
             }
-            throw new ExtensionException("ExtImpl type:[" + name + "] not supported.");
+            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", name).getMessage());
         }
     }
 }

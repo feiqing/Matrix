@@ -38,10 +38,10 @@ public class Logger {
         }
 
         if (impl.isLazy()) {
-            return "[Ƶ]";
+            return "[LZ]";
         }
 
-        return "[ERR]";
+        return "[ER]";
     }
 
     private static String getDesc(String desc) {

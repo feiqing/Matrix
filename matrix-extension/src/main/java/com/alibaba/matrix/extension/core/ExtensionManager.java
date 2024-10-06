@@ -43,12 +43,12 @@ public class ExtensionManager {
     public static List<ExtImpl> getExtensionImpls(String scope, String code, Class<?> ext) {
         Extension _extension = extensionMap.get(ext);
         if (_extension == null) {
-            throw new ExtensionRuntimeException(String.format("Extension:[%s] not found.", ext.getName()));
+            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0004", ext.getName()).getMessage());
         }
 
         Scope _scope = _extension.scopeMap.get(scope);
         if (_scope == null) {
-            throw new ExtensionRuntimeException(String.format("Extension:[%s] scope:[%s] not found.", ext.getName(), scope));
+            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0005", ext.getName(), scope).getMessage());
         }
 
         return _scope.CODE_2_IMPLS_CACHE.computeIfAbsent(code, _K -> {
