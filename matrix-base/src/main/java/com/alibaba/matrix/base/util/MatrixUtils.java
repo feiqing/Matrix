@@ -23,7 +23,7 @@ import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
  * @since 2016/8/18 下午6:09.
  */
 @Slf4j
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class MatrixUtils {
 
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
@@ -58,6 +58,8 @@ public class MatrixUtils {
             valueObj = StringUtils.isEmpty(str) ? null : str.charAt(0);
         } else if (type == String.class) {
             valueObj = str;
+        } else if (type instanceof Class && Enum.class.isAssignableFrom((Class) type)) {
+            valueObj = StringUtils.isEmpty(str) ? null : Enum.valueOf((Class) type, str);
         } else {
             valueObj = StringUtils.isEmpty(str) ? null : jsonMapper.fromJson(str, type);
         }

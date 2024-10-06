@@ -12,24 +12,24 @@
 [INFO] matrix-testing                                                     [jar]
 [INFO] 
 [INFO] ---------------------< com.alibaba.matrix:matrix >----------------------
-[INFO] Building matrix 2.2.0-SNAPSHOT                                     [1/8]
+[INFO] Building matrix 2.2.1-SNAPSHOT                                     [1/8]
 [INFO]   from pom.xml
 [INFO] --------------------------------[ pom ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix ---
-[INFO] com.alibaba.matrix:matrix:pom:2.2.0-SNAPSHOT
+[INFO] com.alibaba.matrix:matrix:pom:2.2.1-SNAPSHOT
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-base >-------------------
-[INFO] Building matrix-base 2.2.0-SNAPSHOT                                [2/8]
+[INFO] Building matrix-base 2.2.1-SNAPSHOT                                [2/8]
 [INFO]   from matrix-base/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-base ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-base ---
-[INFO] com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT
+[INFO] com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT
 [INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -64,15 +64,15 @@
 [INFO]       \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:provided
 [INFO] 
 [INFO] ----------------< com.alibaba.matrix:matrix-extension >-----------------
-[INFO] Building matrix-extension 2.2.0-SNAPSHOT                           [3/8]
+[INFO] Building matrix-extension 2.2.1-SNAPSHOT                           [3/8]
 [INFO]   from matrix-extension/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-extension ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-extension ---
-[INFO] com.alibaba.matrix:matrix-extension:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-extension:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  \- joda-time:joda-time:jar:2.12.2:compile
 [INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
@@ -135,15 +135,15 @@
 [INFO]       \- com.alibaba.fastjson2:fastjson2:jar:2.0.51:test
 [INFO] 
 [INFO] ------------------< com.alibaba.matrix:matrix-switch >------------------
-[INFO] Building matrix-switch 2.2.0-SNAPSHOT                              [4/8]
+[INFO] Building matrix-switch 2.2.1-SNAPSHOT                              [4/8]
 [INFO]   from matrix-switch/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-switch ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-switch ---
-[INFO] com.alibaba.matrix:matrix-switch:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-switch:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -196,15 +196,15 @@
 [INFO]    \- com.google.auto:auto-common:jar:1.2:provided
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-flow >-------------------
-[INFO] Building matrix-flow 2.2.0-SNAPSHOT                                [5/8]
+[INFO] Building matrix-flow 2.2.1-SNAPSHOT                                [5/8]
 [INFO]   from matrix-flow/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-flow ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-flow ---
-[INFO] com.alibaba.matrix:matrix-flow:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-flow:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  \- joda-time:joda-time:jar:2.12.2:compile
 [INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
@@ -229,15 +229,15 @@
 [INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-job >--------------------
-[INFO] Building matrix-job 2.2.0-SNAPSHOT                                 [6/8]
+[INFO] Building matrix-job 2.2.1-SNAPSHOT                                 [6/8]
 [INFO]   from matrix-job/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-job ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-job ---
-[INFO] com.alibaba.matrix:matrix-job:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-job:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  \- joda-time:joda-time:jar:2.12.2:compile
 [INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
@@ -262,15 +262,15 @@
 [INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
 [INFO] 
 [INFO] -----------------< com.alibaba.matrix:matrix-mybatis >------------------
-[INFO] Building matrix-mybatis 2.2.0-SNAPSHOT                             [7/8]
+[INFO] Building matrix-mybatis 2.2.1-SNAPSHOT                             [7/8]
 [INFO]   from matrix-mybatis/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-mybatis ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-mybatis ---
-[INFO] com.alibaba.matrix:matrix-mybatis:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-mybatis:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -297,16 +297,16 @@
 [INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
 [INFO] 
 [INFO] -----------------< com.alibaba.matrix:matrix-testing >------------------
-[INFO] Building matrix-testing 2.2.0-SNAPSHOT                             [8/8]
+[INFO] Building matrix-testing 2.2.1-SNAPSHOT                             [8/8]
 [INFO]   from matrix-testing/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix-testing ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-testing ---
-[INFO] com.alibaba.matrix:matrix-testing:jar:2.2.0-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-extension:jar:2.2.0-SNAPSHOT:compile
-[INFO] |  +- com.alibaba.matrix:matrix-base:jar:2.2.0-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-testing:jar:2.2.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-extension:jar:2.2.1-SNAPSHOT:compile
+[INFO] |  +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
 [INFO] |  |  \- joda-time:joda-time:jar:2.12.2:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
@@ -318,7 +318,7 @@
 [INFO] |  |  +- com.google.errorprone:error_prone_annotations:jar:2.23.0:compile
 [INFO] |  |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
 [INFO] |  \- org.apache.commons:commons-lang3:jar:3.14.0:compile
-[INFO] +- com.alibaba.matrix:matrix-flow:jar:2.2.0-SNAPSHOT:compile
+[INFO] +- com.alibaba.matrix:matrix-flow:jar:2.2.1-SNAPSHOT:compile
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] +- org.springframework:spring-test:jar:5.2.21.RELEASE:test
@@ -332,7 +332,7 @@
 [INFO] |  \- org.apache.logging.log4j:log4j-api:jar:2.17.1:test
 [INFO] \- org.apache.logging.log4j:log4j-core:jar:2.17.1:test
 [INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary for matrix 2.2.0-SNAPSHOT:
+[INFO] Reactor Summary for matrix 2.2.1-SNAPSHOT:
 [INFO] 
 [INFO] matrix ............................................. SUCCESS [  1.024 s]
 [INFO] matrix-base ........................................ SUCCESS [  0.178 s]

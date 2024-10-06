@@ -153,7 +153,7 @@ public class ConfigCenterFrameworkRegister {
 
     private void handleConfigDataChanged(boolean starting, String namespace, String key, List<Handler> handlers, String newData) {
         Map<String, String> key2data = namespace2key2data.computeIfAbsent(namespace, _K -> new ConcurrentHashMap<>());
-        log.info("namespace:[{}] key:[{}] data changed from:[{}] to:[{}].", namespace, key, key2data.get(key), newData);
+        log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, key2data.get(key), newData);
         if (handlers.isEmpty()) {
             log.warn("namespace:[{}] key:[{}] bounded handlers empty.", namespace, key);
             return;
@@ -226,16 +226,9 @@ public class ConfigCenterFrameworkRegister {
         }
 
         public boolean validate(boolean starting, String valueStr, Object valueObj) {
+            boolean success;
             try {
-                boolean success = validator.validate(new Validator.Context(key, desc, valueStr, valueObj, field, method, belongs));
-                if (!success) {
-                    Message message = Message.of("MATRIX-CONFIG-0000-0007", namespace, key, valueObj);
-                    log.error("{}", message.getMessage());
-                    if (starting) {
-                        throw new ConfigUpdateException(message);
-                    }
-                }
-                return success;
+                success = validator.validate(new Validator.Context(key, desc, valueStr, valueObj, field, method, belongs));
             } catch (Throwable t) {
                 Message message = Message.of("MATRIX-CONFIG-0000-0008", namespace, key, valueObj);
                 log.error("{}", message.getMessage(), t);
@@ -244,6 +237,15 @@ public class ConfigCenterFrameworkRegister {
                 }
                 return false;
             }
+
+            if (!success) {
+                Message message = Message.of("MATRIX-CONFIG-0000-0007", namespace, key, valueObj);
+                log.error("{}", message.getMessage());
+                if (starting) {
+                    throw new ConfigUpdateException(message);
+                }
+            }
+            return success;
         }
 
         public void handle(boolean starting, Object valueObj) {
