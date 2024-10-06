@@ -12,7 +12,7 @@ import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author zhujifang@vdian.com
  * @version 1.0
  * @since 2016/7/2 下午5:00.
  */

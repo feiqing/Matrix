@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @version 1.0
  * @since 2022/05/19
  */
 public class AllMatch<T> implements Reducer<T, Boolean> {

@@ -3,7 +3,7 @@
 
     <property name="logPath" value="${user.home}/logs/matrix"/>
     <property name="logFormat"
-              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{EAGLEEYE_TRACE_ID}] %-5level %logger{36} - %msg%n"/>
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
 
     <appender name="EXTENSION_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${logPath}/extension.log</file>

@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 3.0
  * @since 2016/8/18 下午6:09.
  */

@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/19 08:19.
+ * @since 2022/05/19
  */
 public class NoneMatch<T> implements Reducer<T, Boolean> {
 

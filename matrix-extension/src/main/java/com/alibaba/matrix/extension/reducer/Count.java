@@ -4,9 +4,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/9/18 16:21.
+ * @since 2022/05/19
  */
 public class Count<T> implements Reducer<T, Long> {
 

@@ -31,7 +31,7 @@ import static com.alibaba.matrix.config.provider.ConfigServiceProvider.configSer
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2018/6/23 22:51.
+ * @since 2017/4/23 22:51.
  */
 @Slf4j(topic = "ConfigCenter")
 public class ConfigCenterFrameworkRegister {

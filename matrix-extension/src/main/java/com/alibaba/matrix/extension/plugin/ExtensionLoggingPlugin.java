@@ -1,13 +1,16 @@
 package com.alibaba.matrix.extension.plugin;
 
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/15 20:25.
+ * @since 2023/8/12 11:20.
  */
 public class ExtensionLoggingPlugin implements ExtensionPlugin {
+
+    private static final Logger logger = LoggerFactory.getLogger("EXTENSION");
 
     @Override
     public Object invoke(ExtensionInvocation invocation) {
@@ -27,15 +30,11 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                getLogger().info("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt);
+                logger.info("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt);
             } else {
-                getLogger().error("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt, except);
+                logger.error("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt, except);
             }
         }
-    }
-
-    protected Logger getLogger() {
-        return com.alibaba.matrix.extension.util.Logger.log;
     }
 
     protected Object getResult(Object result) {

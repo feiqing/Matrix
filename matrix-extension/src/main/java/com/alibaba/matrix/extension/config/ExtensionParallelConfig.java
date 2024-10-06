@@ -6,9 +6,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/27 22:07.
+ * @since 2022/3/30 10:31.
  */
 public interface ExtensionParallelConfig {
 

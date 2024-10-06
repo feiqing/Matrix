@@ -11,9 +11,9 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 /**
- * @author jifang.zjf@alibaba-inc.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/16 20:07.
+ * @since 2021/2/23 20:00.
  */
 public class NacosConfigService implements ConfigService {
 

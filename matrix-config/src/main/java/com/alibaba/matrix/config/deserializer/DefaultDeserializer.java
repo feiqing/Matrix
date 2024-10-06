@@ -5,7 +5,7 @@ import com.alibaba.matrix.base.util.MatrixUtils;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2018/6/24 10:44.
+ * @since 2017/4/23 22:51.
  */
 public class DefaultDeserializer implements Deserializer {
 

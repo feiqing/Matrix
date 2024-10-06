@@ -1,4 +1,4 @@
-package com.alibaba.matrix.base.logging.logback;
+package com.alibaba.matrix.base.logging;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
  * @author <a href="mailto:hujun3@xiaomi.com">hujun</a>
  * @since 0.9.0
  */
-public class LogbackMatrixLogging {
+public class Logback {
 
     private static final String LOGBACK_LOCATION_DEMO = "classpath:matrix-logback.xml";
 
@@ -27,7 +27,7 @@ public class LogbackMatrixLogging {
     private LoggerContext loadingConfiguration(String configFile) {
         try {
             LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
-            JoranConfiguratorAdapter configAdapter = new JoranConfiguratorAdapter();
+            JoranConfigurator configAdapter = new JoranConfigurator();
             configAdapter.setContext(context);
             configAdapter.configure(MatrixResourceUtils.getResourceUrl(configFile));
             return context;

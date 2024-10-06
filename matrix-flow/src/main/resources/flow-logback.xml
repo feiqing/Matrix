@@ -2,7 +2,7 @@
 <configuration debug="false" scan="false" packagingData="true">
 
     <property name="logPath" value="${user.home}/logs/matrix"/>
-    <property name="logFormat" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{EAGLEEYE_TRACE_ID}] %-5level %logger{36} - %msg%n"/>
+    <property name="logFormat" value="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] [%X{traceId}] %-5level %logger{36} - %msg%n"/>
 
     <appender name="FLOW_LOG_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
         <file>${logPath}/flow.log</file>
@@ -28,7 +28,7 @@
         <appender-ref ref="FLOW_LOG_FILE"/>
     </appender>
 
-    <logger name="FLOW" level="trace" additivity="false">
+    <logger name="FLOW" level="info" additivity="false">
         <appender-ref ref="ASYNC-FLOW"/>
     </logger>
 </configuration>

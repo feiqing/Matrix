@@ -3,9 +3,9 @@ package com.alibaba.matrix.extension.config;
 import com.alibaba.matrix.extension.model.ExtExecCtx;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/9/30 09:32.
+ * @since 2022/3/30 10:31.
  */
 public interface ExtensionExperimentConfig {
 

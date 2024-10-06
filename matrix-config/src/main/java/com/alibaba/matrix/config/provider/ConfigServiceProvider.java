@@ -3,9 +3,9 @@ package com.alibaba.matrix.config.provider;
 import com.alibaba.matrix.base.util.MatrixServiceLoader;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/28 11:27.
+ * @since 2017/4/23 22:51.
  */
 public class ConfigServiceProvider {
 

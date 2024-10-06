@@ -4,9 +4,9 @@ import com.alibaba.matrix.base.serializer.provider.Hessian2Serializer;
 import com.alibaba.matrix.base.util.MatrixServiceLoader;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/9/1 15:13.
+ * @since 2017/5/1 15:13.
  */
 public class SerializerProvider {
 

@@ -10,8 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * @author jifang.zjf
- * @since 2017/6/19 下午4:53.
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @version 1.0
+ * @since 2017/5/1 15:13.
  */
 public class KryoSerializer implements Serializer {
 
@@ -23,8 +24,7 @@ public class KryoSerializer implements Serializer {
 
     @Override
     public byte[] serialize(Object obj) {
-        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
-             Output output = new Output(bos)) {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream(); Output output = new Output(bos)) {
             kryo.get().writeClassAndObject(output, obj);
             output.flush();
 

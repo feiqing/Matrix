@@ -10,9 +10,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/28 11:05.
+ * @since 2022/3/30 10:31.
  */
 public class DefaultExtensionParallelConfig implements ExtensionParallelConfig {
 

@@ -26,7 +26,7 @@ import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 /**
  * @author feiqing.zjf@gmail.com
  * @version 2.0
- * @since 2019/8/7 22:43.
+ * @since 2020/9/18 13:41.
  */
 @Slf4j(topic = "Job")
 public class JobExecutor<Input, Output> {

@@ -1,4 +1,4 @@
-package com.alibaba.matrix.base.logging.log4j2;
+package com.alibaba.matrix.base.logging;
 
 import com.alibaba.matrix.base.util.MatrixResourceUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,7 +20,7 @@ import java.util.Map;
  * @author <a href="mailto:huangxiaoyu1018@gmail.com">hxy1991</a>
  * @since 0.9.0
  */
-public class Log4J2MatrixLogging {
+public class Log4J2 {
 
     private static final String LOG4J2_LOCATION_DEMO = "classpath:matrix-log4j2.xml";
 

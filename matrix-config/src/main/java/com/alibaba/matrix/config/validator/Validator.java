@@ -7,11 +7,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 /**
- * 校验器
- *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2018/6/26 20:33.
+ * @since 2017/4/23 22:51.
  */
 public interface Validator {
 

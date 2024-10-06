@@ -4,7 +4,7 @@ import java.util.List;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
- * @version 2.0
+ * @version 1.0
  * @since 2022/05/19
  */
 public interface Reducer<T, R> {

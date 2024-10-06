@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2022/7/24 09:51.
+ * @since 2022/3/30 10:31.
  */
 @Getter
 public class ExtensionRuntimeException extends RuntimeException {

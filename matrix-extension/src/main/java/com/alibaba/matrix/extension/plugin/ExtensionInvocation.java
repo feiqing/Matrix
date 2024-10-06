@@ -12,7 +12,7 @@ import java.util.function.Function;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/12 11:21.
+ * @since 2023/8/12 11:20.
  */
 public class ExtensionInvocation {
 

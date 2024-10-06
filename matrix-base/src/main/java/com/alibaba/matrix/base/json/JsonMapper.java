@@ -7,7 +7,7 @@ import java.lang.reflect.Type;
 /**
  * @author feiqing.zjf@gmail.com
  * @version 1.0
- * @since 2023/8/30 17:45.
+ * @since 2018/8/30 11:45.
  */
 public interface JsonMapper {
 

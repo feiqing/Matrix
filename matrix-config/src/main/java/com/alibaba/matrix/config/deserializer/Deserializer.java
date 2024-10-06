@@ -8,11 +8,9 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 
 /**
- * 反序列化器
- *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2018/6/23 23:09.
+ * @since 2017/4/23 22:51.
  */
 public interface Deserializer {
 

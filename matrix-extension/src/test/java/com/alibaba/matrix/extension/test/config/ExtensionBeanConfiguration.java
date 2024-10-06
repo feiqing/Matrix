@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension.test.config;
 
-import com.alibaba.matrix.extension.plugin.ExtensionIndependentLoggingPlugin;
 import com.alibaba.matrix.extension.plugin.ExtensionLoggingPlugin;
 import com.alibaba.matrix.extension.spring.ExtensionFrameworkLoader;
 import org.springframework.context.annotation.Bean;
@@ -24,7 +23,7 @@ public class ExtensionBeanConfiguration {
         extensionFrameworkLoader.setScanPackages(Collections.singletonList("com.alibaba.matrix.extension.test"));
         extensionFrameworkLoader.setEnableXmlConfig(true);
         extensionFrameworkLoader.setConfigLocations(Collections.singletonList("classpath*:/extension/matrix-extension-*.xml"));
-        extensionFrameworkLoader.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin(), new ExtensionIndependentLoggingPlugin()));
+        extensionFrameworkLoader.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin()));
 
         return extensionFrameworkLoader;
     }

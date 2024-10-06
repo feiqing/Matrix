@@ -7,9 +7,9 @@ import java.nio.charset.StandardCharsets;
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author zhujifang@vdian.com
  * @version 1.0
- * @since 2018-07-01 21:41:00.
+ * @since 2016/7/2 下午5:00.
  */
 public class JsonSerializer implements Serializer {
 

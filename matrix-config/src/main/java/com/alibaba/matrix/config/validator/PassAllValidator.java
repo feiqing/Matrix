@@ -1,9 +1,9 @@
 package com.alibaba.matrix.config.validator;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/9/26 16:08.
+ * @since 2017/4/23 22:51.
  */
 public class PassAllValidator implements Validator {
 

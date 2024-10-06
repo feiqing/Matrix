@@ -6,9 +6,9 @@ import org.apache.commons.lang3.SerializationUtils;
 import java.io.Serializable;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author zhujifang@vdian.com
  * @version 1.0
- * @since 2018-05-02 23:47:00.
+ * @since 2016/7/2 下午5:00.
  */
 public class JdkSerializer implements Serializer {
 

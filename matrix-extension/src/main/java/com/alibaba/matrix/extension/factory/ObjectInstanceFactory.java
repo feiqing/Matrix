@@ -9,9 +9,9 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/9/25 17:29.
+ * @since 2022/3/30 10:31.
  */
 public class ObjectInstanceFactory {
 

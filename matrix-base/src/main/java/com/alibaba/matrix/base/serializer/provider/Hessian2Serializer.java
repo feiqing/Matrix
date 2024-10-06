@@ -10,9 +10,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 /**
- * @author feiqing.zjf@gmail.com
- * @version 1.1
- * @since 2016/7/8.
+ * @author zhujifang@vdian.com
+ * @version 1.0
+ * @since 2016/7/2 下午5:00.
  */
 public class Hessian2Serializer implements Serializer {
 

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2018/8/18 11:41.
+ * @since 2017/4/23 22:51.
  */
 @Getter
 public class ConfigCenterException extends RuntimeException {

@@ -3,9 +3,9 @@ package com.alibaba.matrix.extension.config;
 import com.alibaba.matrix.base.util.MatrixServiceLoader;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/27 22:07.
+ * @since 2022/3/30 10:31.
  */
 public class ExtensionConfigProvider {
 

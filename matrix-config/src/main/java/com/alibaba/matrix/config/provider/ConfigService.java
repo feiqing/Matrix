@@ -4,9 +4,9 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**
- * @author jifang.zjf@alibaba-inc.com
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2023/8/16 20:04.
+ * @since 2017/4/23 22:51.
  */
 public interface ConfigService {
 

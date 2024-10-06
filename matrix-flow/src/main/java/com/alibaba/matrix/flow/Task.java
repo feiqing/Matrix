@@ -4,10 +4,11 @@ import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
-import static com.alibaba.matrix.flow.log.FlowLoggerProvider.logger;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -15,6 +16,8 @@ import static com.alibaba.matrix.flow.log.FlowLoggerProvider.logger;
  * @since 2018/9/18 15:47.
  */
 public interface Task<InputData, OutputData> {
+
+    Logger logger = LoggerFactory.getLogger("FLOW");
 
     default void setUp(InputData inputData) {
     }
@@ -42,8 +45,10 @@ public interface Task<InputData, OutputData> {
 
         ISpan span = tracer.newSpan("ExecuteFlowTask", name);
         logger.info("{} start.", name);
+
         try {
             meta.addAttribute(name, System.currentTimeMillis());
+
             OutputData outputData = null;
             try {
                 next.setUp(inputData);
@@ -51,18 +56,24 @@ public interface Task<InputData, OutputData> {
             } finally {
                 next.tearDown(inputData, outputData);
             }
+
             metrics.incCounter("execute_flow_task_success", name);
             span.setStatus(ISpan.STATUS_SUCCESS);
+
             return outputData;
         } catch (Throwable t) {
+
             metrics.incCounter("execute_flow_task_failed", name);
             span.setStatus(t);
             logger.error("{} execute error.", name, t);
+
             return ExceptionUtils.rethrow(t);
         } finally {
+
             long total = System.currentTimeMillis() - (long) meta.removeAttribute(name);
             logger.info("{} end {}/{}.", name, total - meta.total, total);
             meta.total = total;
+
             span.finish();
         }
     }

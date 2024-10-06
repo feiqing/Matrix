@@ -4,6 +4,7 @@ import com.alibaba.matrix.base.message.Message;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.HashMap;
@@ -12,13 +13,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import static com.alibaba.matrix.flow.log.FlowLoggerProvider.logger;
-
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
  * @since 2018/9/18 16:01.
  */
+@Slf4j
 // @SuppressWarnings({"rawtypes", "unchecked"})
 public class Flow<InputData, OutputData> {
 
@@ -44,10 +44,10 @@ public class Flow<InputData, OutputData> {
 
         for (Task<InputData, OutputData> task : this.tasks) {
             task2flow.put(task, name);
-            logger.info("Load flow:[{}] task:[{}].", name, task.name());
+            log.info("Load flow:[{}] task:[{}].", name, task.name());
         }
 
-        logger.info("[Matrix-Flow] load flow:[{}] success.", name);
+        log.info("[Matrix-Flow] load flow:[{}] success.", name);
     }
 
     public OutputData execute(InputData inputData) {

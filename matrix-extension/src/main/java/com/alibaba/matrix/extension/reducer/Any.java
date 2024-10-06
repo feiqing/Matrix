@@ -6,9 +6,9 @@ import java.util.List;
 import java.util.function.Predicate;
 
 /**
- * @author feiqing.zjf@gmail.com
- * @version 2.0: 为并发而生!
- * @since 2023/9/13 11:26.
+ * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @version 1.0
+ * @since 2022/05/19
  */
 public class Any<T> implements Reducer<T, T> {
 
