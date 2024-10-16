@@ -5,7 +5,7 @@ import com.alibaba.matrix.base.json.JsonMapperProvider;
 import com.alibaba.matrix.extension.test.ext.DemoRemoteExt;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/11 21:12.
  */

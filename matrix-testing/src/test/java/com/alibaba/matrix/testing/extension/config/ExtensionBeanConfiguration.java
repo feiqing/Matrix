@@ -1,6 +1,6 @@
 package com.alibaba.matrix.testing.extension.config;
 
-import com.alibaba.matrix.extension.router.LoggingExtensionRouter;
+import com.alibaba.matrix.extension.router.BaseLoggingExtensionRouter;
 import com.alibaba.matrix.extension.spring.ExtensionFrameworkSpringRegister;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +24,7 @@ public class ExtensionBeanConfiguration {
         extensionFrameworkSpringRegister.setEnableXmlConfig(true);
         extensionFrameworkSpringRegister.setConfigLocations(Arrays.asList("classpath*:matrix-extension-*.xml"));
 
-        extensionFrameworkSpringRegister.setExtensionRouter(new LoggingExtensionRouter());
+        extensionFrameworkSpringRegister.setExtensionRouter(new BaseLoggingExtensionRouter());
 
         return extensionFrameworkSpringRegister;
     }

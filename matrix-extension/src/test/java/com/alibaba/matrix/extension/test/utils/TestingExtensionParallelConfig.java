@@ -23,7 +23,7 @@ public class TestingExtensionParallelConfig extends DefaultExtensionParallelConf
 
     @Override
     public ExecutorService executor(ExtensionExecuteContext ctx) {
-        if (ctx.ext == TriFunction.class) {
+        if (ctx.extension == TriFunction.class) {
             return executor;
         }
 
@@ -32,7 +32,7 @@ public class TestingExtensionParallelConfig extends DefaultExtensionParallelConf
 
     @Override
     public long timeout(ExtensionExecuteContext ctx) {
-        if (ctx.ext == TriFunction.class) {
+        if (ctx.extension == TriFunction.class) {
             return T.OneS;
         }
         return super.timeout(ctx);

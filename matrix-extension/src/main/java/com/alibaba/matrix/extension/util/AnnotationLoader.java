@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension.util;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.annotation.ExtensionBase;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
@@ -40,7 +39,7 @@ public class AnnotationLoader {
 
     public static Map<Class<?>, Extension> loadAnnotation(List<String> scanPackages) {
         if (CollectionUtils.isEmpty(scanPackages)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0001").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0002-0001"));
         }
         log.info("Annotation scanPackages: {}", scanPackages);
 
@@ -98,19 +97,19 @@ public class AnnotationLoader {
 
             Class<?> belong = extensionBase.belong();
             if (belong != Object.class && belong != extension) {
-                log.info("@ExtensionBase: type:[{}] for ext:[{}].", clazz.getName(), belong.getName());
+                log.info("@ExtensionBase: type:[{}] for extension:[{}].", clazz.getName(), belong.getName());
                 continue;
             }
 
             if (baseClazz != null) {
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0002", extension.getName()).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0002-0002", extension.getName()));
             }
             baseClazz = clazz;
             baseType = extensionBase.type();
         }
 
         if (baseClazz == null || baseType == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0003", extension.getName()).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0002-0003", extension.getName()));
         }
 
         Object base;
@@ -125,13 +124,13 @@ public class AnnotationLoader {
                 base = GuiceInstanceFactory.getGuiceInstance(new Guice(baseClazz.getName()));
                 break;
             default:
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0012", baseType).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0012", baseType));
         }
 
         if (!extension.isInstance(base)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0009", base, extension.getName()).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0009", base, extension.getName()));
         }
-        log.info("Loaded @ExtensionBase: ext:[{}] base:[{}].", extension.getName(), Logger.formatBase(base));
+        log.info("Loaded @ExtensionBase: extension:[{}] base:[{}].", extension.getName(), Logger.formatBase(base));
 
         return base;
     }
@@ -154,7 +153,7 @@ public class AnnotationLoader {
 
             Class<?> belong = extensionImpl.belong();
             if (belong != Object.class && belong != extension) {
-                log.info("@ExtensionImpl: type:[{}] belongs ext:[{}].", clazz.getName(), belong.getName());
+                log.info("@ExtensionImpl: type:[{}] belongs extension:[{}].", clazz.getName(), belong.getName());
                 continue;
             }
 
@@ -167,7 +166,7 @@ public class AnnotationLoader {
         }
 
         if (MapUtils.isEmpty(scope2code2wrappers)) {
-            log.warn("{}", Message.of("MATRIX-EXTENSION-0002-0004", extension.getName()).getMessage());
+            log.warn("{}", Message.format("MATRIX-EXTENSION-0002-0004", extension.getName()));
         }
 
         Map<String, ExtensionScope> scopeMap = new LinkedHashMap<>();
@@ -201,7 +200,7 @@ public class AnnotationLoader {
                 wrapper.guice = new Guice(impl.getName());
                 break;
             default:
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", extensionImpl.type().name()).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0005", extensionImpl.type().name()));
         }
 
         return wrapper;
@@ -221,14 +220,14 @@ public class AnnotationLoader {
                 ExtensionImpl impl = convertToImpl(extension, scope, code, wrapper);
 
                 if (impl.instance != null && !extension.isInstance(impl.instance)) {
-                    throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()).getMessage());
+                    throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()));
                 }
 
                 impls.add(impl);
             }
 
             code2impls.put(code, impls);
-            log.info("Loaded @ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+            log.info("Loaded @ExtensionImpl: extension:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
         }
 
         return new ExtensionScope(scope, code2impls);
@@ -257,7 +256,7 @@ public class AnnotationLoader {
             return impl;
         }
 
-        throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", wrapper.type).getMessage());
+        throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0005", wrapper.type));
     }
 
     private static class Wrapper implements Serializable {

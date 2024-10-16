@@ -1,16 +1,14 @@
 package com.alibaba.matrix.extension.test;
 
+import com.alibaba.matrix.base.util.T;
 import com.alibaba.matrix.extension.ExtensionContext;
 import com.alibaba.matrix.extension.ExtensionInvoker;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.reducer.Reducers;
 import com.alibaba.matrix.extension.test.domain.TestModel;
-import com.alibaba.matrix.extension.test.ext.DemoRemoteExt;
-import com.google.common.base.Preconditions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.function.TriFunction;
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,6 +49,20 @@ public class BaseExtensionTestCase {
     /**
      * 基础功能
      */
+    @Test(expected = IllegalArgumentException.class)
+    public void test_null_code() {
+        Object first = ExtensionInvoker.invoke(null, TriFunction.class, ext -> ext.apply("arg1", model.list, null));
+        System.out.println(first);
+        Assert.assertTrue(String.valueOf(first).startsWith("BaseTriFunctionImpl"));
+    }
+
+    @Test
+    public void test_empty_code() {
+        Object first = ExtensionInvoker.invoke("", TriFunction.class, ext -> ext.apply("arg1", model.list, null));
+        System.out.println(first);
+        Assert.assertTrue(String.valueOf(first).startsWith("BaseTriFunctionImpl"));
+    }
+
     @Test
     public void test_base_impl() {
         Object first = ExtensionInvoker.invoke("code.base", TriFunction.class, ext -> ext.apply("arg1", model.list, null));
@@ -146,6 +158,12 @@ public class BaseExtensionTestCase {
      */
     @Test
     public void test_parallel_base() {
+        List<Object> collect = ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> ext.apply("arg1", model, null), Reducers.collect());
+        Assert.assertEquals(4, collect.size());
+    }
+
+    @Test
+    public void test_parallel_base_for() {
         for (int i = 0; i < 100; ++i) {
             List<Object> collect = ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> ext.apply("arg1", model, null), Reducers.collect());
             Assert.assertEquals(4, collect.size());
@@ -186,6 +204,26 @@ public class BaseExtensionTestCase {
         }, Reducers.any());
         Assert.assertEquals(2, collect.size());
         Assert.assertTrue(collect.stream().allMatch(str -> str.startsWith("Hello")));
+    }
+
+    @Test(expected = TimeoutException.class)
+    public void test_parallel_just_timeout() throws Throwable {
+        try {
+            ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> {
+                Object resutl = ext.apply("arg1", model, null);
+
+                try {
+                    Thread.sleep(T.OneS);
+                } catch (Throwable e) {
+                    throw new RuntimeException(e);
+                }
+
+                return resutl;
+            }, Reducers.collect());
+        } catch (ExtensionRuntimeException e) {
+            Thread.sleep(T.OneS);
+            throw e.getCauses()[0];
+        }
     }
 
     @Test(expected = TimeoutException.class)

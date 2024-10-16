@@ -10,7 +10,7 @@ import java.lang.annotation.Target;
 import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 
 /**
- * 扩展Ext 基础实现
+ * 扩展Extension 默认实现
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0

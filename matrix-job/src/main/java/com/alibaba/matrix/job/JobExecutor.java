@@ -1,7 +1,7 @@
 package com.alibaba.matrix.job;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
+import com.alibaba.matrix.job.util.Message;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -18,7 +18,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
@@ -56,7 +55,7 @@ public class JobExecutor<Input, Output> {
      * @param input
      */
     public void execute(Job job, Input input) throws JobExecuteException {
-        doExecute(job, input, new Wrapper());
+        _execute(job, input, new Wrapper());
     }
 
     /**
@@ -67,22 +66,19 @@ public class JobExecutor<Input, Output> {
      * @return Map<key = task_key, value = task_return_value>
      */
     public Map<String, Output> executeForMap(Job job, Input input) throws JobExecuteException {
-        Collection<Pair<String, Output>> outputs = doExecute(job, input, new Wrapper(new ConcurrentLinkedQueue<>()));
-
+        Collection<Pair<String, Output>> outputs = _execute(job, input, new Wrapper(new ConcurrentLinkedQueue<>()));
         if (CollectionUtils.isEmpty(outputs)) {
             return Collections.emptyMap();
         }
 
         Map<String, Output> outputMap = new LinkedHashMap<>(outputs.size());
         for (Pair<String, Output> output : outputs) {
-            if (outputMap.put(output.getKey(), output.getValue()) == null) {
-                continue;
+            if (outputMap.put(output.getKey(), output.getValue()) != null) {
+                tracer.currentSpan().event("TaskKeyDuplicated", job.name);
+                metrics.incCounter("task_key_duplicated", job.name);
+                log.error("Job:[{}] task key duplicated.", job.name);
+                throw new JobExecuteException(Message.format("MATRIX-JOB-0000-0001", job.name), null);
             }
-
-            Monitor.monitorAlarm("TASK_KEY_DUPLICATED:" + job.name);
-            String message = Message.of("MATRIX-JOB-0000-0002", job.name, output.getKey()).getMessage();
-            log.error("{}", message);
-            throw new JobExecuteException(message);
         }
         return outputMap;
     }
@@ -93,197 +89,177 @@ public class JobExecutor<Input, Output> {
      * @return List<value = task_return_value>
      */
     public List<Output> executeForList(Job job, Input input) throws JobExecuteException {
-        Collection<Pair<String, Output>> outputs = doExecute(job, input, new Wrapper(new ConcurrentLinkedQueue<>()));
+        Collection<Pair<String, Output>> outputs = _execute(job, input, new Wrapper(new ConcurrentLinkedQueue<>()));
         if (CollectionUtils.isEmpty(outputs)) {
             return Collections.emptyList();
         }
         return outputs.stream().map(Pair::getValue).collect(Collectors.toList());
     }
 
-    /**
-     * Job执行的统一入口
-     */
-    private Collection<Pair<String, Output>> doExecute(Job job, Input input, Wrapper wrapper) throws JobExecuteException {
+    private Collection<Pair<String, Output>> _execute(Job job, Input input, Wrapper wrapper) throws JobExecuteException {
         Preconditions.checkArgument(job != null);
         Preconditions.checkArgument(executor != null || !hasParallelJob(job));
-
         if (CollectionUtils.isEmpty(job.tasks)) {
-            log.warn("Job:[{}] tasks is empty.", job.name);
             return Collections.emptyList();
         }
 
         this.handleJob(job, input, wrapper);
-        log.info("Job summary: [{}] executed:[{}] skipped:[{}] excepted:[{}] outputs:[{}] cost:[{}]ms.", job.name, wrapper.executed.get(), wrapper.skipped.get(), wrapper.excepted.get(), wrapper.size(), wrapper.cost());
+        log.info("Summary:[{}] executed:[{}](except={}) skipped:[{}] outputs:[{}] cost:[{}]ms.", job.name, wrapper.executed.get(), wrapper.excepted.get(), wrapper.skipped.get(), wrapper.size(), wrapper.cost());
 
         if (CollectionUtils.isNotEmpty(wrapper.exceptions)) {
-            Monitor.monitorAlarm("JOB_THROW_EXCEPTION(S):" + job.name);
-            throw new JobExecuteException(Message.of("MATRIX-JOB-0000-0000", job.name).getMessage(), wrapper.exceptions.toArray(new Throwable[0]));
-        }
-
-        if (wrapper.hasFailFast()) {
-            Monitor.monitorAlarm("JOB_FAIL_FAST:" + job.name);
-            throw new JobExecuteException(Message.of("MATRIX-JOB-0000-0001", job.name, wrapper.failFast.get()).getMessage());
+            tracer.currentSpan().event("JobThrowException(s)", job.name);
+            metrics.incCounter("job_throw_exception(s)", job.name);
+            throw new JobExecuteException(Message.format("MATRIX-JOB-0000-0000", job.name), wrapper.exceptions.toArray(new Throwable[0]));
         }
 
         return wrapper.outputs;
     }
 
     private void handleJob(Job job, Input input, Wrapper wrapper) {
-        long start = System.currentTimeMillis();
-        try {
-            if (!job.parallel /*|| CollectionUtils.size(job.tasks) <= 1*/) {
-                handleSerialJob(job, input, wrapper);
-            } else {
-                handleParallelJob(job, input, wrapper);
-            }
-        } finally {
-            log.info("Job:[{}] execute cost:[{}]ms.", job.name, System.currentTimeMillis() - start);
-        }
-    }
-
-    private void handleSerialJob(Job job, Input input, Wrapper wrapper) {
         if (CollectionUtils.isEmpty(job.tasks)) {
             return;
         }
 
+        if (!job.parallel /*|| CollectionUtils.size(job.tasks) <= 1*/) {
+            handleSerialJob(job, input, wrapper);
+        } else {
+            handleParallelJob(job, input, wrapper);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void handleSerialJob(Job job, Input input, Wrapper wrapper) {
         for (Object t : job.tasks) {
             if (t instanceof Task) {
-                doExecuteTask(job.name, (Task<Input, Output>) t, input, wrapper);
+                this.doExecuteTask(job.name, (Task<Input, Output>) t, input, wrapper);
             } else {
-                /*递归调用*/
                 this.handleJob((Job) t, input, wrapper);
             }
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleParallelJob(Job job, Input input, Wrapper wrapper) {
-        if (CollectionUtils.isEmpty(job.tasks)) {
-            return;
-        }
-
         CountDownLatch latch = new CountDownLatch(job.tasks.size());
         for (Object t : job.tasks) {
             if (t instanceof Task) {
-                Task<Input, Output> subTask = (Task<Input, Output>) t;
-                doSubmitRunnable("Task", subTask.name(), () -> doExecuteTask(job.name, subTask, input, wrapper), latch, wrapper);
+                this.doSubmitTask(job.name, (Task<Input, Output>) t, input, latch, wrapper);
             } else {
-                Job subJob = (Job) t;
-                doSubmitRunnable("Job", subJob.name, () -> /*递归调用*/this.handleJob(subJob, input, wrapper), latch, wrapper);
+                this.doSubmitJob((Job) t, input, latch, wrapper);
             }
         }
 
         try {
-
-            if (!latch.await(job.timeout, job.unit)) {
-                String message = String.format("Job:[%s] await timeout:[%s/%s].", job.name, job.timeout, job.unit);
-
-                wrapper.makeFailFast(String.format("JobAwaitTimeout:%s", job.name));
-                wrapper.addException(new TimeoutException(message));
-
-                Monitor.monitorAlarm("JOB_AWAIT_TIMEOUT:" + job.name);
-                log.error("{}", message);
+            if (latch.await(job.timeout, job.unit)) {
+                return;
             }
-        } catch (Throwable t) {
 
-            wrapper.makeFailFast(String.format("JobAwaitError:%s", job.name));
+            wrapper.addException(new TimeoutException(Message.format("MATRIX-JOB-0000-0002", job.name)));
+
+            tracer.currentSpan().event("JobAwaitTimeout", job.name);
+            metrics.incCounter("job_await_timeout", job.name);
+            log.error("Job:[{}] await timeout.", job.name);
+        } catch (Throwable t) {
             wrapper.addException(t);
 
-            Monitor.monitorAlarm("JOB_AWAIT_ERROR:" + job.name);
+            tracer.currentSpan().event("JobAwaitError", job.name);
+            metrics.incCounter("job_await_error", job.name);
             log.error("Job:[{}] await error.", job.name, t);
         }
     }
 
-    private void doSubmitRunnable(String type, String name, Runnable runnable, CountDownLatch latch, Wrapper wrapper) {
-        if (wrapper.hasFailFast()) {
-            log.info("{}:[{}] is skipped by fail fast.", type, name);
-            latch.countDown();
-            wrapper.skipped.incrementAndGet();
-            return;
-        }
-
+    private void doSubmitJob(Job job, Input input, CountDownLatch latch, Wrapper wrapper) {
         try {
-            metrics.incCounter("submit_job_executor_" + type.toLowerCase(), name);
+            metrics.incCounter("submit_executor_job", job.name);
             executor.submit(() -> {
                 try {
-                    runnable.run();
+                    this.handleJob(job, input, wrapper);
                 } finally {
                     latch.countDown();
                 }
             });
         } catch (Throwable t) {
             latch.countDown();
-
-            wrapper.makeFailFast(String.format("Submit%sError:%s", type, name));
             wrapper.addException(t);
 
-            Monitor.monitorAlarm(String.format("SUBMIT_%s_ERROR:%s", type.toUpperCase(), name));
-            log.error("Submit {}:[{}] error.", type, name, t);
+            tracer.currentSpan().event("SubmitJobError", job.name);
+            metrics.incCounter("submit_job_error", job.name);
+            log.error("Submit job:[{}] error.", job.name, t);
+        }
+    }
+
+    private void doSubmitTask(String jobName, Task<Input, Output> task, Input input, CountDownLatch latch, Wrapper wrapper) {
+        String taskName = String.format("%s:%s", jobName, task.name());
+        try {
+            metrics.incCounter("submit_executor_task", taskName);
+            executor.submit(() -> {
+                try {
+                    this.doExecuteTask(jobName, task, input, wrapper);
+                } finally {
+                    latch.countDown();
+                }
+            });
+        } catch (Throwable t) {
+            latch.countDown();
+            wrapper.addException(t);
+
+            tracer.currentSpan().event("SubmitTaskError", taskName);
+            metrics.incCounter("submit_task_error", taskName);
+            log.error("Submit task:[{}] error.", taskName, t);
         }
     }
 
     private void doExecuteTask(String jobName, Task<Input, Output> task, Input input, Wrapper wrapper) {
-        String taskName = task.name();
-        if (wrapper.hasFailFast()) {
-            log.info("Job:[{}] task:[{}] is skipped by fail fast.", jobName, taskName);
+        String taskName = String.format("%s:%s", jobName, task.name());
+        if (enableFailFast & !wrapper.exceptions.isEmpty()) {
             wrapper.skipped.incrementAndGet();
+
+            tracer.currentSpan().event("ExecuteTaskSkipped", taskName);
+            metrics.incCounter("execute_task_skipped", taskName);
+            log.info("Job task:[{}] is skipped.", taskName);
             return;
         }
 
-        metrics.incCounter("execute_job_executor_task", taskName);
-
-        String key;
-        try {
-            key = task.key(input);
-        } catch (Throwable t) {
-            key = null;
-            wrapper.addException(t);
-            Monitor.monitorAlarm("GENERATE_KEY_ERROR:" + taskName);
-            log.error("Job:[{}] task:[{}] generate key error.", jobName, taskName, t);
-        }
-
+        metrics.incCounter("execute_job_task", taskName);
         ISpan span = tracer.newSpan("JobTask", taskName);
         Output output = null;
-        Throwable throwable = null;
         try {
+            String key = task.key(input);
             try {
                 task.setUp(input);
                 output = task.execute(input);
             } finally {
                 task.tearDown(input, output);
             }
+            wrapper.addOutput(key, output);
             span.setStatus(ISpan.STATUS_SUCCESS);
         } catch (Throwable t) {
-            wrapper.makeFailFast(String.format("TaskExecuteError:%s", taskName));
-
-            throwable = t;
             span.setStatus(t);
+            wrapper.addException(t);
             wrapper.excepted.incrementAndGet();
 
-            Monitor.monitorAlarm("TASK_EXECUTE_ERROR:" + taskName);
-            log.error("Job:[{}] task:[{}] execute error.", jobName, taskName, t);
+            span.event("ExecuteJobTaskError", taskName);
+            metrics.incCounter("execute_job_task_error", taskName);
+            log.error("Job task:[{}] execute error.", taskName, t);
         } finally {
-            wrapper.addOutput(key, output, throwable);
             wrapper.executed.incrementAndGet();
             span.finish();
         }
     }
 
-
     private class Wrapper implements Serializable {
 
         private static final long serialVersionUID = 6392898597976639655L;
 
-        private final Collection<Throwable> exceptions = new ConcurrentLinkedQueue<>();
-
         private final Collection<Pair<String, Output>> outputs;
+
+        private final Collection<Throwable> exceptions = new ConcurrentLinkedQueue<>();
 
         private final AtomicLong executed = new AtomicLong(0L);
 
-        private final AtomicLong skipped = new AtomicLong(0L);
-
         private final AtomicLong excepted = new AtomicLong(0L);
 
-        private final AtomicReference<String> failFast = new AtomicReference<>();
+        private final AtomicLong skipped = new AtomicLong(0L);
 
         private final long start = System.currentTimeMillis();
 
@@ -303,10 +279,7 @@ public class JobExecutor<Input, Output> {
             return System.currentTimeMillis() - start;
         }
 
-        public void addOutput(String key, Output output, Throwable throwable) {
-            if (throwable != null) {
-                exceptions.add(throwable);
-            }
+        public void addOutput(String key, Output output) {
             if (outputs != null) {
                 outputs.add(Pair.of(key, output));
             }
@@ -317,20 +290,9 @@ public class JobExecutor<Input, Output> {
                 exceptions.add(throwable);
             }
         }
-
-        public void makeFailFast(String cause) {
-            if (failFast.compareAndSet(null, cause)) {
-                Monitor.monitorAlarm(String.format("FAIL_FAST:%s", cause));
-                log.warn("Fail fast, caused by [{}].", cause);
-            }
-        }
-
-        public boolean hasFailFast() {
-            return enableFailFast && failFast.get() != null;
-        }
     }
 
-    private boolean hasParallelJob(Job job) {
+    private static boolean hasParallelJob(Job job) {
         if (job == null) {
             return false;
         }

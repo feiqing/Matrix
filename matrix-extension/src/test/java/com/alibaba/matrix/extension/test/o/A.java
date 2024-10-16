@@ -5,7 +5,7 @@ import org.HdrHistogram.Histogram;
 import org.LatencyUtils.LatencyStats;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/7 10:53.
  */

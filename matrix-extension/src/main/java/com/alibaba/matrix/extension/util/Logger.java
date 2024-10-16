@@ -29,7 +29,7 @@ public class Logger {
     }
 
     public static String formatExec(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
-        return String.format("%s#%s#%s", ctx.scope, ctx.code, ctx.ext.getSimpleName());
+        return String.format("%s#%s#%s", ctx.scope, ctx.code, ctx.extension.getSimpleName());
     }
 
     private static Object getImplDesc(ExtensionImpl impl) {

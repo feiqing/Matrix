@@ -15,17 +15,17 @@ import java.util.concurrent.TimeUnit;
 @Getter
 public class Job {
 
-    protected final String name;
+    public final String name;
 
-    protected final List<Object> tasks;
+    public final List<Object> tasks;
 
-    protected final boolean parallel;
+    public final boolean parallel;
 
-    protected final Long timeout;
+    public final Long timeout;
 
-    protected final TimeUnit unit;
+    public final TimeUnit unit;
 
-    private Job(String name, List<Object> tasks, boolean parallel, Long timeout, TimeUnit unit) {
+    public Job(String name, List<Object> tasks, boolean parallel, Long timeout, TimeUnit unit) {
         this.name = name;
         this.tasks = tasks;
         this.parallel = parallel;

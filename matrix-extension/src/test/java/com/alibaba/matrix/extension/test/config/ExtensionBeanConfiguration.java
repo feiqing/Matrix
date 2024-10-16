@@ -2,7 +2,7 @@ package com.alibaba.matrix.extension.test.config;
 
 import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
 import com.alibaba.matrix.extension.plugin.ExtensionLoggingPlugin;
-import com.alibaba.matrix.extension.router.LoggingExtensionRouter;
+import com.alibaba.matrix.extension.router.BaseLoggingExtensionRouter;
 import com.alibaba.matrix.extension.spring.ExtensionFrameworkSpringRegister;
 import com.google.inject.Guice;
 import org.springframework.context.annotation.Bean;
@@ -30,7 +30,7 @@ public class ExtensionBeanConfiguration {
         extensionFrameworkSpringRegister.setConfigLocations(Collections.singletonList("classpath*:/extension/matrix-extension-*.xml"));
         extensionFrameworkSpringRegister.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin()));
 
-        extensionFrameworkSpringRegister.setExtensionRouter(new LoggingExtensionRouter());
+        extensionFrameworkSpringRegister.setExtensionRouter(new BaseLoggingExtensionRouter());
 
         return extensionFrameworkSpringRegister;
     }

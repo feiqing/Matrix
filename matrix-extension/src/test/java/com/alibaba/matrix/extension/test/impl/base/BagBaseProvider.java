@@ -6,7 +6,7 @@ import org.apache.commons.collections4.bag.HashBag;
 import java.util.List;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/10 14:29.
  */

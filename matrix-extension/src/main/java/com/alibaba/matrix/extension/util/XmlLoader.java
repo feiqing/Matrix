@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension.util;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.factory.DubboServiceFactory;
 import com.alibaba.matrix.extension.factory.GroovyServiceFactory;
@@ -39,7 +38,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
@@ -64,7 +62,7 @@ public class XmlLoader {
 
     public static Map<Class<?>, Extension> loadXml(List<String> configLocations) {
         if (CollectionUtils.isEmpty(configLocations)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0001").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0001"));
         }
         log.info("Xml configLocations: {}", configLocations);
 
@@ -103,7 +101,7 @@ public class XmlLoader {
         for (Iterator<Element> iterator = document.elementIterator(); iterator.hasNext(); ) {
             Extension extension = loadExtension(iterator.next());
             if (extensionMap.containsKey(extension.clazz)) {
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0002", extension.clazz.getName()).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0002", extension.clazz.getName()));
             }
             extensionMap.put(extension.clazz, extension);
         }
@@ -114,7 +112,7 @@ public class XmlLoader {
         Class<?> extension = Class.forName(getAttrValNoneNull(extensionElement, "<Extension/>", "class"));
 
         // if (!ext.isInterface()) {
-        //    throw new ExtensionException(String.format("<Extension/>: ext: [%s] is not a interface.", ext.getName()));
+        //    throw new ExtensionException(String.format("<Extension/>: extension: [%s] is not a interface.", ext.getName()));
         // }
 
         String desc = extensionElement.attributeValue("desc");
@@ -129,7 +127,7 @@ public class XmlLoader {
     private static Object loadExtensionBase(Class<?> extension, Element extensionElement) throws Exception {
         Element extensionBaseElement = extensionElement.element("ExtensionBase");
         if (extensionBaseElement == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0011").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0011"));
         }
 
         Object base;
@@ -148,13 +146,13 @@ public class XmlLoader {
                 base = ProviderInstanceFactory.getProviderInstance(loadingProvider(extensionBaseElement.element("provider")));
                 break;
             default:
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0012", type).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0012", type));
         }
 
         if (!extension.isInstance(base)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0009", base, extension.getName()).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0009", base, extension.getName()));
         }
-        log.info("Loaded <ExtensionBase/>: ext:[{}] base:[{}].", extension.getName(), Logger.formatBase(base));
+        log.info("Loaded <ExtensionBase/>: extension:[{}] base:[{}].", extension.getName(), Logger.formatBase(base));
 
         return base;
     }
@@ -172,7 +170,7 @@ public class XmlLoader {
         }
 
         if (MapUtils.isEmpty(scope2code2wrappers)) {
-            log.warn("{}", Message.of("MATRIX-EXTENSION-0001-0006", extension.getName()).getMessage());
+            log.warn("{}", Message.format("MATRIX-EXTENSION-0001-0006", extension.getName()));
         }
 
         Map<String, ExtensionScope> scopeMap = new LinkedHashMap<>();
@@ -231,7 +229,7 @@ public class XmlLoader {
                 wrapper.provider = loadingProvider(extensionImplElement.element("provider"));
                 break;
             default:
-                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", type).getMessage());
+                throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0005", type));
         }
 
         return wrapper;
@@ -251,14 +249,14 @@ public class XmlLoader {
                 ExtensionImpl impl = convertToImpl(extension, scope, code, wrapper);
 
                 if (impl.instance != null && !extension.isInstance(impl.instance)) {
-                    throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()).getMessage());
+                    throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()));
                 }
 
                 impls.add(impl);
             }
 
             code2impls.put(code, impls);
-            log.info("Loaded <ExtensionImpl/>: ext:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+            log.info("Loaded <ExtensionImpl/>: extension:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
         }
 
         return new ExtensionScope(scope, code2impls);
@@ -329,13 +327,13 @@ public class XmlLoader {
             return impl;
         }
 
-        throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", wrapper.type).getMessage());
+        throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0005", wrapper.type));
     }
 
     private static ObjectT loadingObject(Element element) {
         String tag = "<object/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String clazz = getAttrValNoneNull(element, tag, "class");
@@ -347,13 +345,13 @@ public class XmlLoader {
 
     private static Bean loadingBean(Element element) {
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", "<bean/>").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", "<bean/>"));
         }
 
         String name = element.attributeValue("name");
         String clazz = element.attributeValue("class");
         if (StringUtils.isAllEmpty(name, clazz)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0007").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0007"));
         }
 
         return new Bean(name, clazz);
@@ -362,7 +360,7 @@ public class XmlLoader {
     private static Guice loadingGuice(Element element) {
         String tag = "<guice/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String clazz = getAttrValNoneNull(element, tag, "class");
@@ -375,7 +373,7 @@ public class XmlLoader {
     private static Hsf loadingHsf(Element element) {
         String tag = "<hsf/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String service = getAttrValNoneNull(element, tag, "service");
@@ -390,13 +388,13 @@ public class XmlLoader {
 
     private static Dubbo loadingDubbo(Element element) {
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", "<dubbo/>").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", "<dubbo/>"));
         }
 
         String version = element.attributeValue("version");
         String group = element.attributeValue("group");
         if (StringUtils.isAllEmpty(version, group)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0008").getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0008"));
         }
 
         Dubbo dubbo = new Dubbo(version, group);
@@ -412,7 +410,7 @@ public class XmlLoader {
     private static Http loadingHttp(Element element) {
         String tag = "<http/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String schema = getAttrValNoneNull(element, tag, "schema");
@@ -429,7 +427,7 @@ public class XmlLoader {
     private static Groovy loadingGroovy(Element element) {
         String tag = "<groovy/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String protocol = getAttrValNoneNull(element, tag, "protocol");
@@ -441,7 +439,7 @@ public class XmlLoader {
     private static SpEL loadingSpEL(Element element) {
         String tag = "<spel/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String protocol = getAttrValNoneNull(element, tag, "protocol");
@@ -453,7 +451,7 @@ public class XmlLoader {
     private static Provider loadingProvider(Element element) {
         String tag = "<provider/>";
         if (element == null) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0003", tag).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0003", tag));
         }
 
         String clazz = getAttrValNoneNull(element, tag, "class");
@@ -469,7 +467,7 @@ public class XmlLoader {
     private static String getAttrValNoneNull(Element element, String tag, String attr) {
         String value = element.attributeValue(attr);
         if (StringUtils.isBlank(value)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0004", tag, attr).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0004", tag, attr));
         }
         return value;
     }

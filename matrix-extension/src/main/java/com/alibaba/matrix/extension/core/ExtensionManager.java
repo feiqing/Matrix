@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension.core;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.factory.DubboServiceFactory;
@@ -17,6 +16,7 @@ import com.alibaba.matrix.extension.model.config.ExtensionImpl;
 import com.alibaba.matrix.extension.model.config.ExtensionScope;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.router.ExtensionRouter;
+import com.alibaba.matrix.extension.util.Message;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -44,12 +44,12 @@ public class ExtensionManager {
     public static List<ExtensionImplEntity> getExtensionImpls(String scope, String code, Class<?> ext) {
         Extension extension = extensionMap.get(ext);
         if (extension == null) {
-            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0004", ext.getName()).getMessage());
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0004", ext.getName()));
         }
 
         ExtensionScope extensionScope = extension.scopeMap.get(scope);
         if (extensionScope == null) {
-            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0005", ext.getName(), scope).getMessage());
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), scope));
         }
 
         return extensionScope.CODE_TO_EXT_IMPLS_CACHE.computeIfAbsent(code, _K -> {
@@ -90,7 +90,7 @@ public class ExtensionManager {
 
         Preconditions.checkState(impl.instance != null);
         if (!ext.isInstance(impl.instance)) {
-            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0010", impl.instance, ext.getName()).getMessage());
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, ext.getName()));
         }
 
         return new ExtensionImplEntity(impl.type, impl.instance, impl.priority, impl.desc);

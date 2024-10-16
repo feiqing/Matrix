@@ -13,6 +13,7 @@ import java.util.function.Function;
  * @version 1.0
  * @since 2023/8/12 11:20.
  */
+@SuppressWarnings({"rawtypes", "unchecked"})
 public class ExtensionInvocation {
 
     @Getter
@@ -22,7 +23,7 @@ public class ExtensionInvocation {
     private final String code;
 
     @Getter
-    private final Class<?> ext;
+    private final Class<?> extension;
 
     @Getter
     private final Function action;
@@ -50,7 +51,7 @@ public class ExtensionInvocation {
     public ExtensionInvocation(ExtensionExecuteContext ctx, ExtensionImplEntity impl, ExtensionPlugin[] plugins) {
         this.scope = ctx.scope;
         this.code = ctx.code;
-        this.ext = ctx.ext;
+        this.extension = ctx.extension;
         this.action = ctx.action;
         this.reducer = ctx.reducer;
 

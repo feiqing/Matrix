@@ -1,0 +1,63 @@
+Metrics  Counter[type=submit_executor_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 1.0
+Metrics  Counter[type=submit_executor_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 2.0
+Metrics  Counter[type=submit_executor_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 3.0
+Metrics  Counter[type=submit_executor_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 4.0
+Metrics  Counter[type=job_await_timeout, name=EXTENSION] -> 1.0
+Metrics  Counter[type=job_throw_exception(s), name=EXTENSION] -> 1.0
+
+Metrics  Counter[type=execute_job_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 1.0
+Metrics  Counter[type=execute_job_task, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 2.0
+Metrics  Counter[type=execute_task_skipped, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 1.0
+Metrics  Counter[type=execute_task_skipped, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] -> 2.0
+
+
+Metrics - Counter[type=execute_job_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+Metrics - Counter[type=execute_task_error, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+Metrics - Counter[type=job_throw_exception(s), name=MyJob] -> 1.0
+
+
+Metrics - Counter[type=execute_job_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+Metrics - Counter[type=execute_task_error, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+Metrics - Counter[type=job_throw_exception(s), name=MyJob] -> 1.0
+
+
+Metrics - Counter[type=execute_job_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$1] -> 1.0
+Metrics - Counter[type=execute_job_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$2] -> 1.0
+Metrics - Counter[type=task_key_duplicated, name=MyJob] -> 1.0
+
+Metrics - Counter[type=submit_executor_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+Metrics - Counter[type=execute_job_task, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] -> 1.0
+
+
+----
+
+
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] event: type=JobAwaitTimeout, value=EXTENSION.
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] event: type=JobThrowException(s), value=EXTENSION.
+
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] start.
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] start.
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] finished with [SUCCESS].
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] finished with [SUCCESS].
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] event: type=ExecuteTaskSkipped, value=EXTENSION:BASE#code.normal.concurrent#TriFunction.
+Tracer  Span[type=JobTask, name=EXTENSION:BASE#code.normal.concurrent#TriFunction] event: type=ExecuteTaskSkipped, value=EXTENSION:BASE#code.normal.concurrent#TriFunction.
+
+
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] start.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] event: type=ExecuteTaskError, value=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] finished with [ER].
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] event: type=JobThrowException(s), value=MyJob.
+
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] start.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] event: type=ExecuteTaskError, value=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] finished with [ER].
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] event: type=JobThrowException(s), value=MyJob.
+
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$1] start.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$1] finished with [SUCCESS].
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$2] start.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$2] finished with [SUCCESS].
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$2] event: type=TaskKeyDuplicated, value=MyJob.
+
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] start.
+Tracer - Span[type=JobTask, name=MyJob:com.alibaba.matrix.job.JobExecutorTestCase$$Lambda$1/1792845110] finished with [SUCCESS].

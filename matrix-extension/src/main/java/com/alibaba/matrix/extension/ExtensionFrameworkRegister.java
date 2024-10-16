@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.core.ExtensionManager;
 import com.alibaba.matrix.extension.model.config.Extension;
 import com.alibaba.matrix.extension.model.config.ExtensionImpl;
@@ -10,9 +9,9 @@ import com.alibaba.matrix.extension.router.BaseExtensionRouter;
 import com.alibaba.matrix.extension.router.ExtensionRouter;
 import com.alibaba.matrix.extension.util.AnnotationLoader;
 import com.alibaba.matrix.extension.util.Logger;
+import com.alibaba.matrix.extension.util.Message;
 import com.alibaba.matrix.extension.util.XmlLoader;
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.MapDifference;
 import com.google.common.collect.Maps;
@@ -26,10 +25,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.jar.JarFile;
 import java.util.stream.Collectors;
 
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
+import static com.alibaba.matrix.base.util.MatrixUtils.resolveProjectVersion;
 import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
@@ -60,12 +59,12 @@ public class ExtensionFrameworkRegister {
             return;
         }
 
-        log.info("{}", Message.of("MATRIX-EXTENSION-0000-0000", resolveProjectVersion()).getMessage());
+        log.info("{}", Message.format("MATRIX-EXTENSION-0000-0000", resolveProjectVersion(ExtensionFrameworkRegister.class, "matrix-extension")));
         ExtensionManager.router = extensionRouter;
         ExtensionManager.plugins = loadExtensionPlugins();
         ExtensionManager.extensionMap = loadExtensionDefinitions();
         log.info("Extension load summary: {}", toExtensionSummary(ExtensionManager.extensionMap));
-        log.info("{}", Message.of("MATRIX-EXTENSION-0000-0001").getMessage());
+        log.info("{}", Message.format("MATRIX-EXTENSION-0000-0001"));
 
         if (!enableAnnotationScan && !enableXmlConfig) {
             log.warn("enableAnnotationScan and enableXmlConfig all switch off!");
@@ -170,34 +169,6 @@ public class ExtensionFrameworkRegister {
         log.info("[MERGE] ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
 
         return implsResult;
-    }
-
-    private String resolveProjectVersion() {
-        String version;
-        String path = getClass().getProtectionDomain().getCodeSource().getLocation().getPath();
-        log.info("[Matrix-Extension] Project Path: [{}]", path);
-        try (JarFile jar = new JarFile(path)) {
-            if (!Strings.isNullOrEmpty(version = jar.getManifest().getMainAttributes().getValue("Implementation-Version"))) {
-                return version;
-            }
-        } catch (Throwable ignored) {
-        }
-
-        try {
-            if (!Strings.isNullOrEmpty(version = getClass().getPackage().getImplementationVersion())) {
-                return version;
-            }
-        } catch (Throwable ignored) {
-        }
-
-        try {
-            if (!Strings.isNullOrEmpty(version = StringUtils.substringAfter(StringUtils.substringBeforeLast(path, ".jar"), "matrix-extension-"))) {
-                return version;
-            }
-        } catch (Throwable ignored) {
-        }
-
-        return "unresolved";
     }
 
     private String toExtensionSummary(Map<Class<?>, Extension> extensionMap) {

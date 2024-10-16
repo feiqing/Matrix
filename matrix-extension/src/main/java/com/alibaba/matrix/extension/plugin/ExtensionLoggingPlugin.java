@@ -19,7 +19,7 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         long start = System.currentTimeMillis();
         String scope = invocation.getScope();
         String code = invocation.getCode();
-        String ext = invocation.getExt().getName();
+        String extension = invocation.getExtension().getName();
         String type = invocation.getType();
         Object instance = invocation.getInstance();
         int priority = invocation.getPriority();
@@ -34,9 +34,9 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, priority, getDesc(desc), getResult(result), rt);
+                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, extension, type, instance, priority, getDesc(desc), getResult(result), rt);
             } else {
-                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, priority, getDesc(desc), getResult(result), rt, except);
+                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, extension, type, instance, priority, getDesc(desc), getResult(result), rt, except);
             }
         }
     }

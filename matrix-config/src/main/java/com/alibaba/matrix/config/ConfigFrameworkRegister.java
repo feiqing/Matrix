@@ -1,10 +1,11 @@
 package com.alibaba.matrix.config;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
+import com.alibaba.matrix.base.util.MatrixUtils;
 import com.alibaba.matrix.config.deserializer.Deserializer;
 import com.alibaba.matrix.config.exception.ConfigCenterException;
-import com.alibaba.matrix.config.exception.ConfigUpdateException;
+import com.alibaba.matrix.config.service.ConfigService;
+import com.alibaba.matrix.config.util.Message;
 import com.alibaba.matrix.config.validator.Validator;
 import com.google.common.base.Preconditions;
 import io.github.classgraph.ClassGraph;
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
-import static com.alibaba.matrix.config.provider.ConfigServiceProvider.configService;
+import static com.alibaba.matrix.config.service.ConfigServiceProvider.configServices;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -49,9 +50,9 @@ public class ConfigFrameworkRegister {
     }
 
     public void init() {
-        log.info("ConfigCenter Starting....");
+        log.info("{}", Message.format("MATRIX-CONFIG-0001-0000", MatrixUtils.resolveProjectVersion(ConfigFrameworkRegister.class, "matrix-config")));
         if (scanPackages == null || scanPackages.isEmpty()) {
-            throw new ConfigCenterException(Message.of("MATRIX-CONFIG-0000-0000"));
+            throw new ConfigCenterException(Message.format("MATRIX-CONFIG-0000-0000"));
         }
         log.info("scanPackages: {}", scanPackages);
 
@@ -86,7 +87,7 @@ public class ConfigFrameworkRegister {
             addConfigListener(namespace, key, handlers);
         }
 
-        log.info("ConfigCenter Started successfully.");
+        log.info("{}", Message.format("MATRIX-CONFIG-0001-0001"));
     }
 
     private Handler initFieldHandler(Class<?> belongs, String namespace, Field field) {
@@ -139,19 +140,26 @@ public class ConfigFrameworkRegister {
 
     private String getConfigData(String namespace, String key) {
         try {
-            return configService.getConfig(namespace, key);
+            for (ConfigService configService : configServices) {
+                String config = configService.getConfig(namespace, key);
+                if (config != null) {
+                    return config;
+                }
+            }
+
+            return null;
         } catch (Throwable t) {
-            Message message = Message.of("MATRIX-CONFIG-0000-0001", namespace, key);
-            throw new ConfigCenterException(message, t);
+            throw new ConfigCenterException(Message.format("MATRIX-CONFIG-0000-0001", namespace, key), t);
         }
     }
 
     private void addConfigListener(String namespace, String key, List<Handler> handlers) {
         try {
-            configService.addConfigListener(namespace, key, newData -> handleConfigDataChanged(false, namespace, key, handlers, newData));
+            for (ConfigService configService : configServices) {
+                configService.addConfigListener(namespace, key, newData -> handleConfigDataChanged(false, namespace, key, handlers, newData));
+            }
         } catch (Throwable t) {
-            Message message = Message.of("MATRIX-CONFIG-0000-0002", namespace, key);
-            throw new ConfigCenterException(message, t);
+            throw new ConfigCenterException(Message.format("MATRIX-CONFIG-0000-0002", namespace, key), t);
         }
     }
 
@@ -177,23 +185,28 @@ public class ConfigFrameworkRegister {
     }
 
     private void handleConfigDataChanged(boolean starting, Handler handler, String newConfig) {
-        ISpan span = tracer.newSpan("UpdateConfig", handler.name());
+        String name = handler.name();
+        metrics.incCounter("handle_config_changed", name);
+        ISpan span = tracer.newSpan("ConfigChanged", name);
         try {
             Object[] deserialize = handler.deserialize(starting, newConfig);
             if (!(boolean) deserialize[0]) {
-                metrics.incCounter("update_config_failed", handler.name());
+                span.event("DeserializeConfigFailed", name);
+                metrics.incCounter("deserialize_config_failed", name);
                 span.setStatus(ISpan.STATUS_FAILED);
                 return;
             }
             if (!handler.validate(starting, newConfig, deserialize[1])) {
-                metrics.incCounter("update_config_failed", handler.name());
+                span.event("ValidateConfigFailed", name);
+                metrics.incCounter("validate_config_failed", name);
                 span.setStatus(ISpan.STATUS_FAILED);
                 return;
             }
             handler.handle(starting, deserialize[1]);
-            metrics.incCounter("update_config_success", handler.name());
             span.setStatus(ISpan.STATUS_SUCCESS);
-        } catch (ConfigUpdateException e) {
+        } catch (ConfigCenterException e) {
+            span.event("HandleConfigChangeError", name);
+            metrics.incCounter("handle_config_change_error", name);
             span.setStatus(e);
             throw e;
         } finally {
@@ -227,10 +240,10 @@ public class ConfigFrameworkRegister {
             try {
                 return new Object[]{true, deserializer.deserialize(new Deserializer.Context(key, desc, valueStr, type1, type2, field, method, belongs))};
             } catch (Throwable t) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0006", namespace, key, valueStr, type1, type2);
-                log.error("{}", message.getMessage(), t);
+                String message = Message.format("MATRIX-CONFIG-0000-0006", namespace, key, valueStr, type1, type2);
+                log.error("{}", message, t);
                 if (starting) {
-                    throw new ConfigUpdateException(message, t);
+                    throw new ConfigCenterException(message, t);
                 }
                 return new Object[]{false, null};
             }
@@ -241,19 +254,19 @@ public class ConfigFrameworkRegister {
             try {
                 success = validator.validate(new Validator.Context(key, desc, valueStr, valueObj, field, method, belongs));
             } catch (Throwable t) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0008", namespace, key, valueObj);
-                log.error("{}", message.getMessage(), t);
+                String message = Message.format("MATRIX-CONFIG-0000-0008", namespace, key, valueObj);
+                log.error("{}", message, t);
                 if (starting) {
-                    throw new ConfigUpdateException(message, t);
+                    throw new ConfigCenterException(message, t);
                 }
                 return false;
             }
 
             if (!success) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0007", namespace, key, valueObj);
-                log.error("{}", message.getMessage());
+                String message = Message.format("MATRIX-CONFIG-0000-0007", namespace, key, valueObj);
+                log.error("{}", message);
                 if (starting) {
-                    throw new ConfigUpdateException(message);
+                    throw new ConfigCenterException(message);
                 }
             }
             return success;
@@ -266,10 +279,10 @@ public class ConfigFrameworkRegister {
                     log.info("field:[{}.{}] => namespace:[{}] key:[{}] changed to:[{}] success.", belongs.getName(), field.getName(), namespace, key, valueObj);
                 }
             } catch (Throwable t) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0009", belongs.getName(), field.getName(), namespace, key, valueObj);
-                log.error("{}", message.getMessage(), t);
+                String message = Message.format("MATRIX-CONFIG-0000-0009", belongs.getName(), field.getName(), namespace, key, valueObj);
+                log.error("{}", message, t);
                 if (starting) {
-                    throw new ConfigUpdateException(message, t);
+                    throw new ConfigCenterException(message, t);
                 }
             }
 
@@ -279,10 +292,10 @@ public class ConfigFrameworkRegister {
                     log.info("method:[{}.{}] => namespace:[{}] key:[{}] invoked by:[{}] success.", belongs.getName(), method.getName(), namespace, key, valueObj);
                 }
             } catch (Throwable t) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0010", belongs.getName(), method.getName(), namespace, key, valueObj);
-                log.error("{}", message.getMessage(), t);
+                String message = Message.format("MATRIX-CONFIG-0000-0010", belongs.getName(), method.getName(), namespace, key, valueObj);
+                log.error("{}", message, t);
                 if (starting) {
-                    throw new ConfigUpdateException(message, t);
+                    throw new ConfigCenterException(message, t);
                 }
             }
         }
@@ -302,16 +315,16 @@ public class ConfigFrameworkRegister {
             try {
                 return clazz.getConstructor().newInstance();
             } catch (NoSuchMethodException e) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0003", type, clazz.getName());
-                log.error("{}", message.getMessage());
+                String message = Message.format("MATRIX-CONFIG-0000-0003", type, clazz.getName());
+                log.error("{}", message);
                 throw new ConfigCenterException(message, e);
             } catch (IllegalAccessException e) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0004", type, clazz.getName());
-                log.error("{}", message.getMessage());
+                String message = Message.format("MATRIX-CONFIG-0000-0004", type, clazz.getName());
+                log.error("{}", message);
                 throw new ConfigCenterException(message, e);
             } catch (InvocationTargetException | InstantiationException e) {
-                Message message = Message.of("MATRIX-CONFIG-0000-0005", type, clazz.getName());
-                log.error("{}", message.getMessage());
+                String message = Message.format("MATRIX-CONFIG-0000-0005", type, clazz.getName());
+                log.error("{}", message);
                 throw new ConfigCenterException(message, e);
             }
         });

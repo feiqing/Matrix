@@ -41,6 +41,6 @@ public class LogSpan implements ISpan {
 
     @Override
     public void finish() {
-        log.info("Span[type={}, name={}] finish with [{}].", type, name, status == null ? "" : status, throwable);
+        log.info("Span[type={}, name={}] finished with [{}].", type, name, status == null ? "ER" : status, throwable);
     }
 }

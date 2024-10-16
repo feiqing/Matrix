@@ -61,9 +61,9 @@ public class ExtensionExecutorV2 {
 
         Job job;
         if (impls.size() > 1 && parallel.enable(ctx) && reducer.parallel()) {
-            job = jobBuilder.buildParallelJob("Extension", parallel.timeout(ctx), parallel.unit(ctx));
+            job = jobBuilder.buildParallelJob("EXTENSION", parallel.timeout(ctx), parallel.unit(ctx));
         } else {
-            job = jobBuilder.buildSerialJob("Extension");
+            job = jobBuilder.buildSerialJob("EXTENSION");
         }
 
         try {
@@ -78,7 +78,7 @@ public class ExtensionExecutorV2 {
         } catch (JobExecuteException e) {
             if (ArrayUtils.isNotEmpty(e.getCauses())) {
                 String exceptions = Arrays.stream(e.getCauses()).map(ExceptionUtils::getMessage).collect(Collectors.joining(", ", "[", "]"));
-                String message = String.format("Extension:[%s] scope:[%s] code:[%s] execute throw [%s] exception(s):%s, detail please check causes.", ctx.ext.getName(), ctx.scope, ctx.code, e.getCauses().length, exceptions);
+                String message = String.format("Extension:[%s] scope:[%s] code:[%s] execute throw [%s] exception(s):%s, detail please check causes.", ctx.extension.getName(), ctx.scope, ctx.code, e.getCauses().length, exceptions);
                 throw new ExtensionRuntimeException(message, e.getCauses());
             }
             throw e;
@@ -86,7 +86,7 @@ public class ExtensionExecutorV2 {
     }
 
     private static Object executeImpl(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
-        Preconditions.checkState(ctx.ext.isInstance(impl.instance));
+        Preconditions.checkState(ctx.extension.isInstance(impl.instance));
         return new ExtensionInvocation(ctx, impl, plugins).proceed();
     }
 }

@@ -1,6 +1,5 @@
 package com.alibaba.matrix.extension.core;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
@@ -8,6 +7,7 @@ import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 import com.alibaba.matrix.extension.plugin.ExtensionInvocation;
 import com.alibaba.matrix.extension.reducer.Reducer;
 import com.alibaba.matrix.extension.util.Logger;
+import com.alibaba.matrix.extension.util.Message;
 import com.google.common.base.Preconditions;
 import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
@@ -28,8 +28,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
+import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.experiment;
 import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.parallel;
 import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
@@ -43,11 +43,11 @@ import static com.alibaba.matrix.extension.core.ExtensionManager.router;
 //@SuppressWarnings({"unchecked", "rawtypes"})
 public class ExtensionExecutor {
 
-    public static <Ext, T, R> R execute(String scope, String code, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
-        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, code, ext, action, reducer);
+    public static <Ext, T, R> R execute(String scope, String code, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
+        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, code, extension, action, reducer);
         List<ExtensionImplEntity> impls = router.route(ctx);
         if (CollectionUtils.isEmpty(impls)) {
-            throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0002", ext.getName()).getMessage());
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0002", extension.getName()));
         }
 
         if (experiment.enableJobExecutor(ctx)) {
@@ -98,12 +98,12 @@ public class ExtensionExecutor {
                 Throwable[] exceptions = triples.stream().map(Triple::getRight).filter(Objects::nonNull).toArray(Throwable[]::new);
                 if (ArrayUtils.isNotEmpty(exceptions)) {
                     String message = Arrays.stream(exceptions).map(ExceptionUtils::getMessage).collect(Collectors.joining(", "));
-                    throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0006", ctx.ext.getName(), ctx.scope, ctx.code, exceptions.length, message).getMessage(), exceptions);
+                    throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.scope, ctx.code, exceptions.length, message), exceptions);
                 }
                 List<Object> results = triples.stream().filter(Triple::getLeft).map(Triple::getMiddle).collect(Collectors.toList());
                 return ctx.reducer.reduce(results);
             } else {
-                throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0007", ctx.ext.getName(), ctx.scope, ctx.code).getMessage());
+                throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0007", ctx.extension.getName(), ctx.scope, ctx.code));
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return ExceptionUtils.rethrow(e);
@@ -123,15 +123,16 @@ public class ExtensionExecutor {
     }
 
     private static Object executeImpl(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
-        Preconditions.checkState(ctx.ext.isInstance(impl.instance));
-        ISpan span = tracer.newSpan("ExecuteExtension", Logger.formatExec(ctx, impl));
+        Preconditions.checkState(ctx.extension.isInstance(impl.instance));
+        metrics.incCounter("execute_extension", Logger.formatExec(ctx, impl));
+        ISpan span = tracer.newSpan("Extension", Logger.formatExec(ctx, impl));
         try {
             Object proceed = new ExtensionInvocation(ctx, impl, plugins).proceed();
-            metrics.incCounter("execute_extension_success", Logger.formatExec(ctx, impl));
             span.setStatus(ISpan.STATUS_SUCCESS);
             return proceed;
         } catch (Throwable t) {
-            metrics.incCounter("execute_extension_failed", Logger.formatExec(ctx, impl));
+            span.event("ExecuteExtensionError", Logger.formatExec(ctx, impl));
+            metrics.incCounter("execute_extension_error", Logger.formatExec(ctx, impl));
             span.setStatus(t);
             return ExceptionUtils.rethrow(t);
         } finally {

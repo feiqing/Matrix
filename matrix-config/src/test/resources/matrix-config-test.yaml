@@ -1,0 +1,5 @@
+service.key: xxxx
+test:
+  service:
+    key1: ceshi1
+    key2: ceshi2

@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.model;
 
-import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.exception.ExtensionException;
+import com.alibaba.matrix.extension.util.Message;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
 
@@ -49,6 +49,6 @@ public enum ExtensionImplType implements Serializable {
                 return value;
             }
         }
-        throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", name).getMessage());
+        throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0005", name));
     }
 }

@@ -3,8 +3,8 @@ package com.alibaba.matrix.base.logging;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import com.alibaba.matrix.base.util.MatrixResourceUtils;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * Support for Logback version 1.0.8 or higher
@@ -29,7 +29,7 @@ public class Logback {
             LoggerContext context = (LoggerContext) LoggerFactory.getILoggerFactory();
             JoranConfigurator configAdapter = new JoranConfigurator();
             configAdapter.setContext(context);
-            configAdapter.configure(MatrixResourceUtils.getResourceUrl(configFile));
+            configAdapter.doConfigure(new PathMatchingResourcePatternResolver().getResource(configFile).getInputStream());
             return context;
         } catch (Exception e) {
             throw new IllegalStateException("Could not initialize Logback logging from " + configFile, e);

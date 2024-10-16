@@ -2,9 +2,9 @@ package com.alibaba.matrix.base.util;
 
 import com.google.common.collect.ImmutableMap;
 import com.google.common.reflect.TypeToken;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -13,6 +13,7 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
@@ -48,30 +49,63 @@ public class MatrixUtils {
         return str2obj(str, (Type) clazz);
     }
 
-    @SneakyThrows
     public static <T> T str2obj(String str, Type type) {
-        Object valueObj;
-        Method primitive = primitiveMethods.get(type);
-        if (primitive != null) {
-            valueObj = StringUtils.isEmpty(str) ? null : primitive.invoke(null, str);
-        } else if (type == Character.class || type == char.class) {
-            valueObj = StringUtils.isEmpty(str) ? null : str.charAt(0);
-        } else if (type == String.class) {
-            valueObj = str;
-        } else if (type instanceof Class && Enum.class.isAssignableFrom((Class) type)) {
-            valueObj = StringUtils.isEmpty(str) ? null : Enum.valueOf((Class) type, str);
-        } else {
-            valueObj = StringUtils.isEmpty(str) ? null : jsonMapper.fromJson(str, type);
+        try {
+            Object valueObj;
+            Method primitive = primitiveMethods.get(type);
+            if (primitive != null) {
+                valueObj = StringUtils.isEmpty(str) ? null : primitive.invoke(null, str);
+            } else if (type == Character.class || type == char.class) {
+                valueObj = StringUtils.isEmpty(str) ? null : str.charAt(0);
+            } else if (type == String.class) {
+                valueObj = str;
+            } else if (type instanceof Class && Enum.class.isAssignableFrom((Class) type)) {
+                valueObj = StringUtils.isEmpty(str) ? null : Enum.valueOf((Class) type, str);
+            } else {
+                valueObj = StringUtils.isEmpty(str) ? null : jsonMapper.fromJson(str, type);
+            }
+            return (T) valueObj;
+        } catch (Throwable t) {
+            return ExceptionUtils.rethrow(t);
         }
-        return (T) valueObj;
     }
 
+    @SuppressWarnings("all")
     public static String getLocalIp() {
         return localIp;
     }
 
+    @SuppressWarnings("all")
     public static String getLocalMac() {
         return localMac;
+    }
+
+    public static String resolveProjectVersion(Class<?> projectClass, String projectName) {
+        String version;
+        String projectPath = projectClass.getProtectionDomain().getCodeSource().getLocation().getPath();
+        log.info("[{}] project path: [{}].", projectName, projectPath);
+        try (JarFile jar = new JarFile(projectPath)) {
+            if (StringUtils.isNotBlank(version = jar.getManifest().getMainAttributes().getValue("Implementation-Version"))) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            if (StringUtils.isNotBlank(version = projectClass.getPackage().getImplementationVersion())) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        try {
+            if (StringUtils.isNotBlank(version = StringUtils.substringAfter(StringUtils.substringBeforeLast(projectPath, ".jar"), projectName + "-"))) {
+                return version;
+            }
+        } catch (Throwable ignored) {
+        }
+
+        return "UNKNOWN";
     }
 
     private static void initPrimitiveMethods() {

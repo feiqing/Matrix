@@ -5,12 +5,13 @@ import com.alibaba.matrix.base.util.T;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.google.common.reflect.TypeToken;
-import lombok.SneakyThrows;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.lang.reflect.Type;
 import java.util.concurrent.ConcurrentHashMap;
@@ -48,27 +49,39 @@ public class JacksonJsonMapper implements JsonMapper {
 
 
     @Override
-    @SneakyThrows
     public String toJson(Object obj) {
-        return objectMapper.writeValueAsString(obj);
+        try {
+            return objectMapper.writeValueAsString(obj);
+        } catch (JsonProcessingException e) {
+            return ExceptionUtils.rethrow(e);
+        }
     }
 
-    @SneakyThrows
     @Override
     public <T> T fromJson(String json, Class<T> clazz) {
-        return objectMapper.readValue(json, clazz);
+        try {
+            return objectMapper.readValue(json, clazz);
+        } catch (JsonProcessingException e) {
+            return ExceptionUtils.rethrow(e);
+        }
     }
 
     @Override
-    @SneakyThrows
     public <T> T fromJson(String json, Type type) {
-        return (T) objectMapper.readValue(json, type2reference(type));
+        try {
+            return (T) objectMapper.readValue(json, type2reference(type));
+        } catch (JsonProcessingException e) {
+            return ExceptionUtils.rethrow(e);
+        }
     }
 
     @Override
-    @SneakyThrows
     public <T> T fromJson(String json, TypeToken<T> typeToken) {
-        return (T) objectMapper.readValue(json, type2reference(typeToken.getType()));
+        try {
+            return (T) objectMapper.readValue(json, type2reference(typeToken.getType()));
+        } catch (JsonProcessingException e) {
+            return ExceptionUtils.rethrow(e);
+        }
     }
 
     private static final ConcurrentMap<Type, TypeReference<?>> TYPE_REFERENCE_MAP = new ConcurrentHashMap<>();

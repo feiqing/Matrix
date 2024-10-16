@@ -1,11 +1,10 @@
 package com.alibaba.matrix.config.test;
 
 import com.alibaba.matrix.base.util.T;
-import com.alibaba.matrix.config.provider.ConfigService;
-import com.alibaba.matrix.config.provider.NacosConfigService;
+import com.alibaba.matrix.config.service.ConfigService;
+import com.alibaba.matrix.config.service.provider.NacosConfigService;
 import com.google.auto.service.AutoService;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 /**

@@ -20,7 +20,7 @@ public class ExtensionExecuteContext implements Serializable {
 
     public final String code;
 
-    public final Class<?> ext;
+    public final Class<?> extension;
 
     public final Function action;
 

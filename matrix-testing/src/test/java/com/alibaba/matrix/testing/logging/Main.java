@@ -6,15 +6,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/6 21:06.
  */
 public class Main {
 
     static {
-        Logging.init("classpath:flow-logback.xml", "classpath:flow-log4j2.xml");
-        Logging.init("classpath:extension-logback.xml", "classpath:extension-log4j2.xml");
+        Logging.init("classpath:log/flow-logback.xml", "classpath:log/flow-log4j2.xml");
+        Logging.init("classpath:log/extension-logback.xml", "classpath:log/extension-log4j2.xml");
     }
 
     private static final Logger flow = LoggerFactory.getLogger("FLOW");

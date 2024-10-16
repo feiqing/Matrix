@@ -1,17 +1,22 @@
 package com.alibaba.matrix.flow;
 
-import com.alibaba.matrix.base.message.Message;
+import com.alibaba.matrix.base.telemetry.trace.ISpan;
+import com.alibaba.matrix.flow.util.Message;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+
+import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
+import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -53,14 +58,27 @@ public class Flow<InputData, OutputData> {
     public OutputData execute(InputData inputData) {
         Map<String, Meta> map = metaMap.get();
         if (map.containsKey(name)) {
-            throw new IllegalStateException(Message.of("MATRIX-FLOW-0000-0000", name).getMessage());
+            throw new IllegalStateException(Message.format("MATRIX-FLOW-0000-0000", name));
         }
 
+        metrics.incCounter("execute_flow", name);
+        ISpan span = tracer.newSpan("Flow", name);
         map.put(name, new Meta(name, tasks, inputData));
         try {
-            return tasks[0].next();
+            OutputData outputData = tasks[0].next();
+            span.setStatus(ISpan.STATUS_SUCCESS);
+            return outputData;
+        } catch (Throwable t) {
+            span.setStatus(t);
+
+            span.event("ExecuteFlowError", name);
+            metrics.incCounter("execute_flow_error", name);
+            log.error("Flow {} execute error.", name, t);
+
+            return ExceptionUtils.rethrow(t);
         } finally {
             map.remove(name);
+            span.finish();
         }
     }
 

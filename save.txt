@@ -1,7 +1,7 @@
 [INFO] Scanning for projects...
 [WARNING] 
-[WARNING] Some problems were encountered while building the effective model for com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT
-[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: ch.qos.logback:logback-classic:jar -> duplicate declaration of version (?) @ line 108, column 21
+[WARNING] Some problems were encountered while building the effective model for com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT
+[WARNING] 'dependencies.dependency.(groupId:artifactId:type:classifier)' must be unique: ch.qos.logback:logback-classic:jar -> duplicate declaration of version (?) @ line 102, column 21
 [WARNING] 
 [WARNING] It is highly recommended to fix these problems because they threaten the stability of your build.
 [WARNING] 
@@ -19,17 +19,17 @@
 [INFO] matrix-testing                                                     [jar]
 [INFO] 
 [INFO] ---------------------< com.alibaba.matrix:matrix >----------------------
-[INFO] Building matrix 2.2.1-SNAPSHOT                                     [1/7]
+[INFO] Building matrix 2.3.1-SNAPSHOT                                     [1/7]
 [INFO]   from pom.xml
 [INFO] --------------------------------[ pom ]---------------------------------
 [INFO] 
 [INFO] --- clean:3.2.0:clean (default-clean) @ matrix ---
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix ---
-[INFO] com.alibaba.matrix:matrix:pom:2.2.1-SNAPSHOT
+[INFO] com.alibaba.matrix:matrix:pom:2.3.1-SNAPSHOT
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-base >-------------------
-[INFO] Building matrix-base 2.2.1-SNAPSHOT                                [2/7]
+[INFO] Building matrix-base 2.3.1-SNAPSHOT                                [2/7]
 [INFO]   from matrix-base/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -37,7 +37,7 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-base/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-base ---
-[INFO] com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT
+[INFO] com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT
 [INFO] +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -67,18 +67,14 @@
 [INFO] +- org.apache.logging.log4j:log4j-slf4j-impl:jar:2.17.1:provided
 [INFO] |  \- org.apache.logging.log4j:log4j-api:jar:2.17.1:provided
 [INFO] +- org.apache.logging.log4j:log4j-core:jar:2.17.1:provided
-[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:provided
-[INFO] |  +- org.springframework:spring-aop:jar:5.2.21.RELEASE:provided
-[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:provided
-[INFO] |  +- org.springframework:spring-core:jar:5.2.21.RELEASE:provided
-[INFO] |  |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:provided
-[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:provided
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] \- org.springframework:spring-test:jar:5.2.21.RELEASE:test
+[INFO]    \- org.springframework:spring-core:jar:5.2.21.RELEASE:provided
+[INFO]       \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:provided
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-job >--------------------
-[INFO] Building matrix-job 2.2.1-SNAPSHOT                                 [3/7]
+[INFO] Building matrix-job 2.3.1-SNAPSHOT                                 [3/7]
 [INFO]   from matrix-job/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -86,8 +82,8 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-job/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-job ---
-[INFO] com.alibaba.matrix:matrix-job:jar:2.2.1-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-job:jar:2.3.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -101,12 +97,12 @@
 [INFO] |  +- org.apache.commons:commons-collections4:jar:4.4:compile
 [INFO] |  +- joda-time:joda-time:jar:2.12.2:compile
 [INFO] |  \- org.jetbrains:annotations:jar:23.0.0:compile
+[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:provided
+[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:provided
+[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:provided
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] +- org.springframework:spring-test:jar:5.2.21.RELEASE:test
-[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:test
-[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:test
-[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:test
 [INFO] +- org.springframework:spring-core:jar:5.2.21.RELEASE:test
 [INFO] |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:test
 [INFO] +- org.springframework:spring-aop:jar:5.2.21.RELEASE:test
@@ -114,7 +110,7 @@
 [INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
 [INFO] 
 [INFO] ----------------< com.alibaba.matrix:matrix-extension >-----------------
-[INFO] Building matrix-extension 2.2.1-SNAPSHOT                           [4/7]
+[INFO] Building matrix-extension 2.3.1-SNAPSHOT                           [4/7]
 [INFO]   from matrix-extension/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -122,8 +118,8 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-extension/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-extension ---
-[INFO] com.alibaba.matrix:matrix-extension:jar:2.2.1-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-extension:jar:2.3.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -135,34 +131,28 @@
 [INFO] |  |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
 [INFO] |  +- org.apache.commons:commons-lang3:jar:3.12.0:compile
 [INFO] |  +- org.apache.commons:commons-collections4:jar:4.4:compile
-[INFO] |  \- joda-time:joda-time:jar:2.12.2:compile
-[INFO] +- com.alibaba.matrix:matrix-job:jar:2.2.1-SNAPSHOT:compile
+[INFO] |  +- joda-time:joda-time:jar:2.12.2:compile
+[INFO] |  \- org.jetbrains:annotations:jar:23.0.0:compile
+[INFO] +- com.alibaba.matrix:matrix-job:jar:2.3.1-SNAPSHOT:compile
 [INFO] +- com.alibaba:transmittable-thread-local:jar:2.14.5:provided
 [INFO] +- io.github.classgraph:classgraph:jar:4.8.177:provided
 [INFO] +- org.dom4j:dom4j:jar:2.1.3:provided
-[INFO] +- com.google.auto.service:auto-service:jar:1.0.1:provided
-[INFO] |  +- com.google.auto.service:auto-service-annotations:jar:1.0.1:provided
-[INFO] |  \- com.google.auto:auto-common:jar:1.2:provided
-[INFO] +- org.jetbrains:annotations:jar:23.0.0:compile
 [INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:provided
 [INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:provided
 [INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:provided
 [INFO] +- org.springframework:spring-core:jar:5.2.21.RELEASE:provided
 [INFO] |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:provided
 [INFO] +- org.springframework:spring-aop:jar:5.2.21.RELEASE:provided
-[INFO] +- com.google.inject:guice:jar:4.2.2:compile
-[INFO] |  +- javax.inject:javax.inject:jar:1:compile
-[INFO] |  \- aopalliance:aopalliance:jar:1.0:compile
+[INFO] +- org.springframework:spring-web:jar:5.2.21.RELEASE:provided
+[INFO] +- com.google.inject:guice:jar:4.2.2:provided
+[INFO] |  +- javax.inject:javax.inject:jar:1:provided
+[INFO] |  \- aopalliance:aopalliance:jar:1.0:provided
 [INFO] +- org.apache.dubbo:dubbo:jar:2.7.23:provided
 [INFO] |  +- com.alibaba.spring:spring-context-support:jar:1.0.11:provided
 [INFO] |  +- org.javassist:javassist:jar:3.30.2-GA:provided
 [INFO] |  +- io.netty:netty-all:jar:4.1.66.Final:provided
 [INFO] |  +- com.google.code.gson:gson:jar:2.8.9:provided
-[INFO] |  \- org.yaml:snakeyaml:jar:1.20:provided
-[INFO] +- org.springframework:spring-web:jar:5.2.21.RELEASE:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-core:jar:2.14.0:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.14.0:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-annotations:jar:2.14.0:provided
+[INFO] |  \- org.yaml:snakeyaml:jar:2.0:provided
 [INFO] +- org.apache.groovy:groovy:jar:4.0.22:provided
 [INFO] +- com.alibaba.nacos:nacos-client:jar:2.4.0:provided
 [INFO] |  +- com.alibaba.nacos:nacos-auth-plugin:jar:2.4.0:provided
@@ -171,6 +161,9 @@
 [INFO] |  +- com.alibaba.nacos:logback-adapter:jar:1.1.0:provided
 [INFO] |  +- com.alibaba.nacos:nacos-log4j2-adapter:jar:2.4.0:provided
 [INFO] |  +- commons-codec:commons-codec:jar:1.15:provided
+[INFO] |  +- com.fasterxml.jackson.core:jackson-core:jar:2.14.0:provided
+[INFO] |  +- com.fasterxml.jackson.core:jackson-databind:jar:2.14.0:provided
+[INFO] |  |  \- com.fasterxml.jackson.core:jackson-annotations:jar:2.14.0:provided
 [INFO] |  +- org.apache.httpcomponents:httpasyncclient:jar:4.1.5:provided
 [INFO] |  |  +- org.apache.httpcomponents:httpcore-nio:jar:4.4.15:provided
 [INFO] |  |  \- org.apache.httpcomponents:httpclient:jar:4.5.13:provided
@@ -185,6 +178,9 @@
 [INFO] +- org.aspectj:aspectjweaver:jar:1.9.6:test
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
+[INFO] +- com.google.auto.service:auto-service:jar:1.0.1:test
+[INFO] |  +- com.google.auto.service:auto-service-annotations:jar:1.0.1:test
+[INFO] |  \- com.google.auto:auto-common:jar:1.2:test
 [INFO] +- org.springframework:spring-test:jar:5.2.21.RELEASE:test
 [INFO] +- ch.qos.logback:logback-classic:jar:1.2.3:test
 [INFO] |  \- ch.qos.logback:logback-core:jar:1.2.3:test
@@ -196,7 +192,7 @@
 [INFO]       \- com.alibaba.fastjson2:fastjson2:jar:2.0.51:test
 [INFO] 
 [INFO] ------------------< com.alibaba.matrix:matrix-config >------------------
-[INFO] Building matrix-config 2.2.1-SNAPSHOT                              [5/7]
+[INFO] Building matrix-config 2.3.1-SNAPSHOT                              [5/7]
 [INFO]   from matrix-config/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -204,8 +200,8 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-config/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-config ---
-[INFO] com.alibaba.matrix:matrix-config:jar:2.2.1-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-config:jar:2.3.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -217,7 +213,8 @@
 [INFO] |  |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
 [INFO] |  +- org.apache.commons:commons-lang3:jar:3.12.0:compile
 [INFO] |  +- org.apache.commons:commons-collections4:jar:4.4:compile
-[INFO] |  \- joda-time:joda-time:jar:2.12.2:compile
+[INFO] |  +- joda-time:joda-time:jar:2.12.2:compile
+[INFO] |  \- org.jetbrains:annotations:jar:23.0.0:compile
 [INFO] +- io.github.classgraph:classgraph:jar:4.8.177:compile
 [INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:provided
 [INFO] |  +- org.springframework:spring-aop:jar:5.2.21.RELEASE:provided
@@ -225,14 +222,6 @@
 [INFO] |  +- org.springframework:spring-core:jar:5.2.21.RELEASE:provided
 [INFO] |  |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:provided
 [INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:provided
-[INFO] +- org.jetbrains:annotations:jar:23.0.0:compile
-[INFO] +- com.alibaba:fastjson:jar:2.0.51:provided
-[INFO] |  \- com.alibaba.fastjson2:fastjson2-extension:jar:2.0.51:provided
-[INFO] |     \- com.alibaba.fastjson2:fastjson2:jar:2.0.51:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-core:jar:2.14.0:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.14.0:provided
-[INFO] +- com.fasterxml.jackson.core:jackson-annotations:jar:2.14.0:provided
-[INFO] +- com.google.code.gson:gson:jar:2.8.9:provided
 [INFO] +- com.alibaba.nacos:nacos-client:jar:2.4.0:provided
 [INFO] |  +- com.alibaba.nacos:nacos-auth-plugin:jar:2.4.0:provided
 [INFO] |  +- com.alibaba.nacos:nacos-encryption-plugin:jar:2.4.0:provided
@@ -248,21 +237,27 @@
 [INFO] |  |  +- io.prometheus:simpleclient_tracer_otel:jar:0.15.0:provided
 [INFO] |  |  |  \- io.prometheus:simpleclient_tracer_common:jar:0.15.0:provided
 [INFO] |  |  \- io.prometheus:simpleclient_tracer_otel_agent:jar:0.15.0:provided
-[INFO] |  +- org.yaml:snakeyaml:jar:2.0:provided
 [INFO] |  \- io.micrometer:micrometer-core:jar:1.9.17:provided
 [INFO] |     +- org.hdrhistogram:HdrHistogram:jar:2.1.12:provided
 [INFO] |     \- org.latencyutils:LatencyUtils:jar:2.0.3:provided
+[INFO] +- org.yaml:snakeyaml:jar:2.0:provided
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] +- org.springframework:spring-test:jar:5.2.21.RELEASE:test
 [INFO] +- ch.qos.logback:logback-classic:jar:1.2.3:provided
 [INFO] |  \- ch.qos.logback:logback-core:jar:1.2.3:provided
-[INFO] \- com.google.auto.service:auto-service:jar:1.0.1:provided
-[INFO]    +- com.google.auto.service:auto-service-annotations:jar:1.0.1:provided
-[INFO]    \- com.google.auto:auto-common:jar:1.2:provided
+[INFO] +- com.google.auto.service:auto-service:jar:1.0.1:test
+[INFO] |  +- com.google.auto.service:auto-service-annotations:jar:1.0.1:test
+[INFO] |  \- com.google.auto:auto-common:jar:1.2:test
+[INFO] +- com.alibaba:fastjson:jar:2.0.51:test
+[INFO] |  \- com.alibaba.fastjson2:fastjson2-extension:jar:2.0.51:test
+[INFO] |     \- com.alibaba.fastjson2:fastjson2:jar:2.0.51:test
+[INFO] +- com.fasterxml.jackson.core:jackson-core:jar:2.14.0:test
+[INFO] +- com.fasterxml.jackson.core:jackson-databind:jar:2.14.0:test
+[INFO] \- com.fasterxml.jackson.core:jackson-annotations:jar:2.14.0:test
 [INFO] 
 [INFO] -------------------< com.alibaba.matrix:matrix-flow >-------------------
-[INFO] Building matrix-flow 2.2.1-SNAPSHOT                                [6/7]
+[INFO] Building matrix-flow 2.3.1-SNAPSHOT                                [6/7]
 [INFO]   from matrix-flow/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -270,8 +265,8 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-flow/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-flow ---
-[INFO] com.alibaba.matrix:matrix-flow:jar:2.2.1-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-flow:jar:2.3.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT:compile
 [INFO] |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  +- org.slf4j:slf4j-api:jar:1.7.21:compile
 [INFO] |  +- com.google.guava:guava:jar:33.0.0-jre:compile
@@ -285,12 +280,12 @@
 [INFO] |  +- org.apache.commons:commons-collections4:jar:4.4:compile
 [INFO] |  +- joda-time:joda-time:jar:2.12.2:compile
 [INFO] |  \- org.jetbrains:annotations:jar:23.0.0:compile
+[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:provided
+[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:provided
+[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:provided
 [INFO] +- junit:junit:jar:4.13.2:test
 [INFO] |  \- org.hamcrest:hamcrest-core:jar:1.3:test
 [INFO] +- org.springframework:spring-test:jar:5.2.21.RELEASE:test
-[INFO] +- org.springframework:spring-context:jar:5.2.21.RELEASE:test
-[INFO] |  +- org.springframework:spring-beans:jar:5.2.21.RELEASE:test
-[INFO] |  \- org.springframework:spring-expression:jar:5.2.21.RELEASE:test
 [INFO] +- org.springframework:spring-core:jar:5.2.21.RELEASE:test
 [INFO] |  \- org.springframework:spring-jcl:jar:5.2.21.RELEASE:test
 [INFO] +- org.springframework:spring-aop:jar:5.2.21.RELEASE:test
@@ -298,7 +293,7 @@
 [INFO]    \- ch.qos.logback:logback-core:jar:1.2.3:test
 [INFO] 
 [INFO] -----------------< com.alibaba.matrix:matrix-testing >------------------
-[INFO] Building matrix-testing 2.2.1-SNAPSHOT                             [7/7]
+[INFO] Building matrix-testing 2.3.1-SNAPSHOT                             [7/7]
 [INFO]   from matrix-testing/pom.xml
 [INFO] --------------------------------[ jar ]---------------------------------
 [INFO] 
@@ -306,9 +301,9 @@
 [INFO] Deleting /Users/feiqing.zjf/IdeaProjects/自己/Matrix/matrix-testing/target
 [INFO] 
 [INFO] --- dependency:3.6.1:tree (default-cli) @ matrix-testing ---
-[INFO] com.alibaba.matrix:matrix-testing:jar:2.2.1-SNAPSHOT
-[INFO] +- com.alibaba.matrix:matrix-extension:jar:2.2.1-SNAPSHOT:compile
-[INFO] |  +- com.alibaba.matrix:matrix-base:jar:2.2.1-SNAPSHOT:compile
+[INFO] com.alibaba.matrix:matrix-testing:jar:2.3.1-SNAPSHOT
+[INFO] +- com.alibaba.matrix:matrix-extension:jar:2.3.1-SNAPSHOT:compile
+[INFO] |  +- com.alibaba.matrix:matrix-base:jar:2.3.1-SNAPSHOT:compile
 [INFO] |  |  +- org.projectlombok:lombok:jar:1.18.22:compile
 [INFO] |  |  +- com.google.guava:guava:jar:33.0.0-jre:compile
 [INFO] |  |  |  +- com.google.guava:failureaccess:jar:1.0.2:compile
@@ -319,13 +314,10 @@
 [INFO] |  |  |  \- com.google.j2objc:j2objc-annotations:jar:2.8:compile
 [INFO] |  |  +- org.apache.commons:commons-lang3:jar:3.12.0:compile
 [INFO] |  |  +- org.apache.commons:commons-collections4:jar:4.4:compile
-[INFO] |  |  \- joda-time:joda-time:jar:2.12.2:compile
-[INFO] |  +- com.alibaba.matrix:matrix-job:jar:2.2.1-SNAPSHOT:compile
-[INFO] |  +- org.jetbrains:annotations:jar:23.0.0:compile
-[INFO] |  \- com.google.inject:guice:jar:4.2.2:compile
-[INFO] |     +- javax.inject:javax.inject:jar:1:compile
-[INFO] |     \- aopalliance:aopalliance:jar:1.0:compile
-[INFO] +- com.alibaba.matrix:matrix-flow:jar:2.2.1-SNAPSHOT:compile
+[INFO] |  |  +- joda-time:joda-time:jar:2.12.2:compile
+[INFO] |  |  \- org.jetbrains:annotations:jar:23.0.0:compile
+[INFO] |  \- com.alibaba.matrix:matrix-job:jar:2.3.1-SNAPSHOT:compile
+[INFO] +- com.alibaba.matrix:matrix-flow:jar:2.3.1-SNAPSHOT:compile
 [INFO] +- org.javassist:javassist:jar:3.30.2-GA:provided
 [INFO] +- com.alibaba:fastjson:jar:2.0.51:provided
 [INFO] |  \- com.alibaba.fastjson2:fastjson2-extension:jar:2.0.51:provided
@@ -346,18 +338,18 @@
 [INFO] |  \- org.apache.logging.log4j:log4j-api:jar:2.17.1:test
 [INFO] \- org.apache.logging.log4j:log4j-core:jar:2.17.1:test
 [INFO] ------------------------------------------------------------------------
-[INFO] Reactor Summary for matrix 2.2.1-SNAPSHOT:
+[INFO] Reactor Summary for matrix 2.3.1-SNAPSHOT:
 [INFO] 
-[INFO] matrix ............................................. SUCCESS [  1.062 s]
-[INFO] matrix-base ........................................ SUCCESS [  0.211 s]
-[INFO] matrix-job ......................................... SUCCESS [  0.022 s]
-[INFO] matrix-extension ................................... SUCCESS [  0.189 s]
-[INFO] matrix-config ...................................... SUCCESS [  0.036 s]
-[INFO] matrix-flow ........................................ SUCCESS [  0.021 s]
-[INFO] matrix-testing ..................................... SUCCESS [  0.034 s]
+[INFO] matrix ............................................. SUCCESS [  0.973 s]
+[INFO] matrix-base ........................................ SUCCESS [  0.203 s]
+[INFO] matrix-job ......................................... SUCCESS [  0.027 s]
+[INFO] matrix-extension ................................... SUCCESS [  0.171 s]
+[INFO] matrix-config ...................................... SUCCESS [  0.022 s]
+[INFO] matrix-flow ........................................ SUCCESS [  0.010 s]
+[INFO] matrix-testing ..................................... SUCCESS [  0.012 s]
 [INFO] ------------------------------------------------------------------------
 [INFO] BUILD SUCCESS
 [INFO] ------------------------------------------------------------------------
-[INFO] Total time:  1.860 s
-[INFO] Finished at: 2024-10-16T20:48:03+08:00
+[INFO] Total time:  1.697 s
+[INFO] Finished at: 2024-11-09T07:20:09+08:00
 [INFO] ------------------------------------------------------------------------

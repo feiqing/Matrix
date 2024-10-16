@@ -6,7 +6,7 @@ import org.objenesis.ObjenesisStd;
 import org.objenesis.instantiator.ObjectInstantiator;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/6 23:10.
  */

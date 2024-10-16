@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.annotation;
 import java.lang.annotation.*;
 
 /**
- * 扩展Ext 定义
+ * 扩展Extension 定义
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0

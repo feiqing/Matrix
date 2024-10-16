@@ -22,36 +22,36 @@ public final class ExtensionInvoker {
      * 扩展执行
      *
      * @param code
-     * @param ext
+     * @param extension
      * @param action
      * @param <Ext>
      * @param <R>
      * @return
      */
-    public static <Ext, R> R invoke(String code, Class<Ext> ext, Function<Ext, R> action) {
-        return ExtensionExecutor.execute(BASE_SCOPE, code, ext, action, Reducers.first());
+    public static <Ext, R> R invoke(String code, Class<Ext> extension, Function<Ext, R> action) {
+        return ExtensionExecutor.execute(BASE_SCOPE, code, extension, action, Reducers.first());
     }
 
-    public static <Ext, T, R> R invoke(String code, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
-        return ExtensionExecutor.execute(BASE_SCOPE, code, ext, action, reducer);
+    public static <Ext, T, R> R invoke(String code, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
+        return ExtensionExecutor.execute(BASE_SCOPE, code, extension, action, reducer);
     }
 
     /**
-     * 扩展执行: 携带领域信息(scope)的扩展执行
+     * 扩展执行: 携带领域信息(scope)扩展执行
      *
      * @param scope
      * @param code
-     * @param ext
+     * @param extension
      * @param action
      * @param <Ext>
      * @param <R>
      * @return
      */
-    public static <Ext, R> R invoke(String scope, String code, Class<Ext> ext, Function<Ext, R> action) {
-        return ExtensionExecutor.execute(scope, code, ext, action, Reducers.first());
+    public static <Ext, R> R invoke(String scope, String code, Class<Ext> extension, Function<Ext, R> action) {
+        return ExtensionExecutor.execute(scope, code, extension, action, Reducers.first());
     }
 
-    public static <Ext, T, R> R invoke(String scope, String code, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
-        return ExtensionExecutor.execute(scope, code, ext, action, reducer);
+    public static <Ext, T, R> R invoke(String scope, String code, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
+        return ExtensionExecutor.execute(scope, code, extension, action, reducer);
     }
 }

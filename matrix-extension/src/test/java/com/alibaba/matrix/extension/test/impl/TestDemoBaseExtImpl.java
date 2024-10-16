@@ -4,7 +4,7 @@ import com.alibaba.matrix.extension.annotation.ExtensionImpl;
 import com.alibaba.matrix.extension.test.impl.base.BaseDemoBaseExtImpl;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/16 20:37.
  */

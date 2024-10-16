@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.test.impl.base;
 import java.util.function.Function;
 
 /**
- * @author jimi.zhu@temu.com
+ * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2024/10/10 15:23.
  */

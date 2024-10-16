@@ -11,7 +11,7 @@ import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_SCOPE;
 import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 
 /**
- * 扩展Ext 实现
+ * 扩展Extension 实现
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0
