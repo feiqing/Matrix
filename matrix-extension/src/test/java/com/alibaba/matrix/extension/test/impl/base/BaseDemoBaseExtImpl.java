@@ -6,12 +6,14 @@ import com.alibaba.matrix.extension.test.ext.DemoBaseExt;
 
 import java.util.Arrays;
 
+import static com.alibaba.matrix.extension.model.ExtensionImplType.GUICE;
+
 /**
  * @author feiqing.zjf@gmail.com
  * @version 1.0
  * @since 2023/9/19 16:12.
  */
-@ExtensionBase
+@ExtensionBase(type = GUICE)
 public class BaseDemoBaseExtImpl implements DemoBaseExt {
 
     @Override

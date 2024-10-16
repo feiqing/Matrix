@@ -4,9 +4,16 @@
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension
             https://www.alibaba.com/matrix/extension.xsd">
 
-    <Extension class="java.util.function.Consumer" base="baseConsumerImpl" desc="测试扩展Consumer定义"/>
+    <Extension class="java.util.function.Consumer" desc="测试扩展Consumer定义">
+        <ExtensionBase type="bean">
+            <bean name="baseConsumerImpl"/>
+        </ExtensionBase>
+    </Extension>
 
-    <Extension class="java.util.function.Function" base="baseFunctionExtImpl" desc="测试扩展Function定义">
+    <Extension class="java.util.function.Function" desc="测试扩展Function定义">
+        <ExtensionBase type="bean">
+            <bean name="baseFunctionExtImpl"/>
+        </ExtensionBase>
         <ExtensionImpl priority="1" scope="BASE, SUB-SCOPE" code="normal" type="bean" desc="普通电商交易">
             <bean name="normalFunctionExtImpl"/>
         </ExtensionImpl>
@@ -18,7 +25,10 @@
         </ExtensionImpl>
     </Extension>
 
-    <Extension class="java.util.function.Supplier" base="baseSupplierExtImpl" desc="测试扩展Supplier定义">
+    <Extension class="java.util.function.Supplier" desc="测试扩展Supplier定义">
+        <ExtensionBase type="bean">
+            <bean name="baseSupplierExtImpl"/>
+        </ExtensionBase>
         <ExtensionImpl code="normal" type="bean" desc="普通电商交易">
             <bean name="normalSupplierExtImpl"/>
         </ExtensionImpl>
@@ -27,8 +37,16 @@
         </ExtensionImpl>
     </Extension>
 
-    <Extension class="java.util.function.BiConsumer" base="baseBiConsumerImpl" desc="测试扩展BiConsumer定义"/>
+    <Extension class="java.util.function.BiConsumer" desc="测试扩展BiConsumer定义">
+        <ExtensionBase type="bean">
+            <bean name="baseBiConsumerImpl"/>
+        </ExtensionBase>
+    </Extension>
 
-    <Extension class="java.util.function.BiFunction" base="baseBiFunctionImpl" desc="测试扩展BiFunction定义"/>
+    <Extension class="java.util.function.BiFunction" desc="测试扩展BiFunction定义">
+        <ExtensionBase type="bean">
+            <bean name="baseBiFunctionImpl"/>
+        </ExtensionBase>
+    </Extension>
 
 </Extensions>

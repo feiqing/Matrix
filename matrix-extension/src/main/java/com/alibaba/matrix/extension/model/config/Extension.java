@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.model.config;
 
 import javax.annotation.Nonnull;
 import java.util.Map;
@@ -14,12 +14,11 @@ public class Extension {
 
     public final String desc;
 
-    // 默认实现是一定不支持懒加载的
     public final Object base;
 
-    public final Map<String, Scope> scopeMap;
+    public final Map<String, ExtensionScope> scopeMap;
 
-    public Extension(@Nonnull Class<?> clazz, String desc, @Nonnull Object base, @Nonnull Map<String, Scope> scopeMap) {
+    public Extension(@Nonnull Class<?> clazz, String desc, @Nonnull Object base, @Nonnull Map<String, ExtensionScope> scopeMap) {
         this.clazz = clazz;
         this.desc = desc;
         this.base = base;

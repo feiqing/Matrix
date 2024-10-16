@@ -1,8 +1,8 @@
 package com.alibaba.matrix.extension.util;
 
-import com.alibaba.matrix.extension.model.ExtExecCtx;
-import com.alibaba.matrix.extension.model.ExtImpl;
-import com.alibaba.matrix.extension.model.Impl;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.model.config.ExtensionImpl;
 import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 
@@ -24,27 +24,27 @@ public class Logger {
         return base.toString();
     }
 
-    public static String formatImpl(Impl impl) {
+    public static String formatImpl(ExtensionImpl impl) {
         return String.format("%s:%s(desc:%s/priority:%s)", impl.type, getImplDesc(impl), getDesc(impl.desc), impl.priority);
     }
 
-    public static String formatExec(ExtExecCtx ctx, ExtImpl impl) {
-        return String.format("%s#%s#%s#%s#%s(%s)", ctx.scope, ctx.code, ctx.ext.getName(), impl.type, impl.instance, getDesc(impl.desc));
+    public static String formatExec(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
+        return String.format("%s#%s#%s", ctx.scope, ctx.code, ctx.ext.getSimpleName());
     }
 
-    private static Object getImplDesc(Impl impl) {
+    private static Object getImplDesc(ExtensionImpl impl) {
         if (impl.instance != null) {
             return impl.instance;
         }
 
-        if (impl.isLazy()) {
+        if (impl.lazy) {
             return "[LZ]";
         }
 
         return "[ER]";
     }
 
-    private static String getDesc(String desc) {
+    public static String getDesc(String desc) {
         return Strings.isNullOrEmpty(desc) ? "''" : desc;
     }
 }

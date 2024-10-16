@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.config;
 
-import com.alibaba.matrix.extension.model.ExtExecCtx;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
@@ -9,6 +9,6 @@ import com.alibaba.matrix.extension.model.ExtExecCtx;
  */
 public interface ExtensionExperimentConfig {
 
-    boolean enableJobExecutor(ExtExecCtx ctx);
+    boolean enableJobExecutor(ExtensionExecuteContext ctx);
 
 }

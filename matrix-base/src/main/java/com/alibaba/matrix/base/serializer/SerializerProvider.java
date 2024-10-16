@@ -1,6 +1,6 @@
 package com.alibaba.matrix.base.serializer;
 
-import com.alibaba.matrix.base.serializer.provider.Hessian2Serializer;
+import com.alibaba.matrix.base.serializer.provider.JdkSerializer;
 import com.alibaba.matrix.base.util.MatrixServiceLoader;
 
 /**
@@ -13,6 +13,6 @@ public class SerializerProvider {
     public static Serializer serializer;
 
     static {
-        serializer = MatrixServiceLoader.loadService(Serializer.class, new Hessian2Serializer());
+        serializer = MatrixServiceLoader.loadService(Serializer.class, new JdkSerializer());
     }
 }

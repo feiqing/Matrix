@@ -12,7 +12,7 @@ import java.util.function.Function;
  * @since 2022/3/30 10:31.
  */
 @AllArgsConstructor
-public class ExtExecCtx implements Serializable {
+public class ExtensionExecuteContext implements Serializable {
 
     private static final long serialVersionUID = 1374750581241420843L;
 

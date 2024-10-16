@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.factory;
 
-import com.alibaba.matrix.extension.model.SpEL;
+import com.alibaba.matrix.extension.model.config.SpEL;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -8,6 +8,7 @@ import com.alibaba.nacos.api.config.listener.AbstractListener;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.cglib.proxy.Enhancer;
@@ -32,6 +33,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
+@Slf4j
 public class SpELServiceFactory {
 
     private static final ConcurrentMap<String, AtomicReference<String>> scriptRefs = new ConcurrentHashMap<>();
@@ -43,7 +45,10 @@ public class SpELServiceFactory {
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
         enhancer.setCallback(new SpELImplAdaptor(spel));
-        return enhancer.create();
+        Object service = enhancer.create();
+
+        log.info("SpEL service init success, spel protocol:[{}] path:[{}].", spel.protocol, spel.path);
+        return service;
     }
 
     private static class SpELImplAdaptor implements MethodInterceptor {

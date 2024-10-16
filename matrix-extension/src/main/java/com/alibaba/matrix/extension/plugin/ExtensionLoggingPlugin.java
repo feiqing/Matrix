@@ -3,6 +3,8 @@ package com.alibaba.matrix.extension.plugin;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.alibaba.matrix.extension.util.Logger.getDesc;
+
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
@@ -20,6 +22,8 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         String ext = invocation.getExt().getName();
         String type = invocation.getType();
         Object instance = invocation.getInstance();
+        int priority = invocation.getPriority();
+        String desc = invocation.getDesc();
         Object result = null;
         Throwable except = null;
         try {
@@ -30,9 +34,9 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                logger.info("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt);
+                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, priority, getDesc(desc), getResult(result), rt);
             } else {
-                logger.error("{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, getResult(result), rt, except);
+                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, ext, type, instance, priority, getDesc(desc), getResult(result), rt, except);
             }
         }
     }

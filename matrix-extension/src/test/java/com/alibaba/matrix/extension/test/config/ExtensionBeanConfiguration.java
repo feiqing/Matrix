@@ -1,7 +1,10 @@
 package com.alibaba.matrix.extension.test.config;
 
+import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
 import com.alibaba.matrix.extension.plugin.ExtensionLoggingPlugin;
-import com.alibaba.matrix.extension.spring.ExtensionFrameworkLoader;
+import com.alibaba.matrix.extension.router.LoggingExtensionRouter;
+import com.alibaba.matrix.extension.spring.ExtensionFrameworkSpringRegister;
+import com.google.inject.Guice;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,14 +20,18 @@ import java.util.Collections;
 public class ExtensionBeanConfiguration {
 
     @Bean
-    public ExtensionFrameworkLoader extensionFrameworkLoader() {
-        ExtensionFrameworkLoader extensionFrameworkLoader = new ExtensionFrameworkLoader();
-        extensionFrameworkLoader.setEnableAnnotationScan(true);
-        extensionFrameworkLoader.setScanPackages(Collections.singletonList("com.alibaba.matrix.extension.test"));
-        extensionFrameworkLoader.setEnableXmlConfig(true);
-        extensionFrameworkLoader.setConfigLocations(Collections.singletonList("classpath*:/extension/matrix-extension-*.xml"));
-        extensionFrameworkLoader.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin()));
+    public ExtensionFrameworkSpringRegister extensionFrameworkLoader() {
+        GuiceInstanceFactory.setGuiceInjector(Guice.createInjector(new TestGuiceModule()));
 
-        return extensionFrameworkLoader;
+        ExtensionFrameworkSpringRegister extensionFrameworkSpringRegister = new ExtensionFrameworkSpringRegister();
+        extensionFrameworkSpringRegister.setEnableAnnotationScan(true);
+        extensionFrameworkSpringRegister.setScanPackages(Collections.singletonList("com.alibaba.matrix.extension.test"));
+        extensionFrameworkSpringRegister.setEnableXmlConfig(true);
+        extensionFrameworkSpringRegister.setConfigLocations(Collections.singletonList("classpath*:/extension/matrix-extension-*.xml"));
+        extensionFrameworkSpringRegister.setExtensionPlugins(Arrays.asList(new ExtensionLoggingPlugin()));
+
+        extensionFrameworkSpringRegister.setExtensionRouter(new LoggingExtensionRouter());
+
+        return extensionFrameworkSpringRegister;
     }
 }

@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.factory;
 
 import com.alibaba.matrix.extension.exception.ExtensionException;
-import com.alibaba.matrix.extension.model.Groovy;
+import com.alibaba.matrix.extension.model.config.Groovy;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;
@@ -12,6 +12,7 @@ import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
 import groovy.lang.GroovyShell;
 import groovy.lang.Script;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.cglib.proxy.Enhancer;
@@ -20,7 +21,6 @@ import org.springframework.cglib.proxy.MethodProxy;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.util.ReflectionUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
@@ -40,6 +40,7 @@ import java.util.concurrent.atomic.AtomicReference;
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
+@Slf4j
 public class GroovyServiceFactory {
 
     private static final ConcurrentMap<String, ConfigService> nacosConfigServices = new ConcurrentHashMap<>();
@@ -62,7 +63,11 @@ public class GroovyServiceFactory {
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
         enhancer.setCallback(new GroovyImplAdaptor(scriptRef));
-        return enhancer.create();
+        Object service = enhancer.create();
+
+        log.info("Groovy service init success, groovy protocol:[{}] path:[{}].", groovy.protocol, groovy.path);
+
+        return service;
     }
 
     private static class GroovyImplAdaptor implements MethodInterceptor {

@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.test.utils;
 import com.alibaba.matrix.base.util.T;
 import com.alibaba.matrix.extension.config.ExtensionParallelConfig;
 import com.alibaba.matrix.extension.config.DefaultExtensionParallelConfig;
-import com.alibaba.matrix.extension.model.ExtExecCtx;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
 import com.google.auto.service.AutoService;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.function.TriFunction;
@@ -22,7 +22,7 @@ public class TestingExtensionParallelConfig extends DefaultExtensionParallelConf
     private static final ExecutorService executor = Executors.newFixedThreadPool(2, new BasicThreadFactory.Builder().namingPattern("E-Parallel-Testing-Exec-%s").build());
 
     @Override
-    public ExecutorService executor(ExtExecCtx ctx) {
+    public ExecutorService executor(ExtensionExecuteContext ctx) {
         if (ctx.ext == TriFunction.class) {
             return executor;
         }
@@ -31,7 +31,7 @@ public class TestingExtensionParallelConfig extends DefaultExtensionParallelConf
     }
 
     @Override
-    public long timeout(ExtExecCtx ctx) {
+    public long timeout(ExtensionExecuteContext ctx) {
         if (ctx.ext == TriFunction.class) {
             return T.OneS;
         }

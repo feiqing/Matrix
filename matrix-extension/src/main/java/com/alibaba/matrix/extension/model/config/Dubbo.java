@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.model.config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -18,13 +18,15 @@ public class Dubbo implements Serializable {
 
     public String group;
 
-    public Integer timeout;
+    public boolean check = true;
 
-    public Boolean check;
+    public Integer timeout;
 
     public String filter;
 
-    public boolean lazy = false;
+    public String applicationName;
+
+    public String registryAddress;
 
     public Dubbo(String version, String group) {
         Preconditions.checkArgument(!(Strings.isNullOrEmpty(version) && Strings.isNullOrEmpty(group)));

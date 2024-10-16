@@ -11,7 +11,7 @@ public interface ISpan {
 
     String STATUS_FAILED = "FAILED";
 
-    void logEvent(String key, Object value);
+    void event(String type, Object value);
 
     void setStatus(Throwable t);
 

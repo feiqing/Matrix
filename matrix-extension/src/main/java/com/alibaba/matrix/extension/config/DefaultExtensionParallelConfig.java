@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.config;
 
 import com.alibaba.matrix.base.util.T;
-import com.alibaba.matrix.extension.model.ExtExecCtx;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 
@@ -26,22 +26,22 @@ public class DefaultExtensionParallelConfig implements ExtensionParallelConfig {
     }
 
     @Override
-    public boolean enable(ExtExecCtx ctx) {
+    public boolean enable(ExtensionExecuteContext ctx) {
         return true;
     }
 
     @Override
-    public ExecutorService executor(ExtExecCtx ctx) {
+    public ExecutorService executor(ExtensionExecuteContext ctx) {
         return ExecutorHolder.executor;
     }
 
     @Override
-    public long timeout(ExtExecCtx ctx) {
+    public long timeout(ExtensionExecuteContext ctx) {
         return T.OneS;
     }
 
     @Override
-    public TimeUnit unit(ExtExecCtx ctx) {
+    public TimeUnit unit(ExtensionExecuteContext ctx) {
         return TimeUnit.MILLISECONDS;
     }
 }

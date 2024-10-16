@@ -3,8 +3,8 @@ package com.alibaba.matrix.extension.core;
 import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.base.telemetry.trace.ISpan;
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
-import com.alibaba.matrix.extension.model.ExtExecCtx;
-import com.alibaba.matrix.extension.model.ExtImpl;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 import com.alibaba.matrix.extension.plugin.ExtensionInvocation;
 import com.alibaba.matrix.extension.reducer.Reducer;
 import com.alibaba.matrix.extension.util.Logger;
@@ -44,8 +44,8 @@ import static com.alibaba.matrix.extension.core.ExtensionManager.router;
 public class ExtensionExecutor {
 
     public static <Ext, T, R> R execute(String scope, String code, Class<Ext> ext, Function<Ext, T> action, Reducer<T, R> reducer) {
-        ExtExecCtx ctx = new ExtExecCtx(scope, code, ext, action, reducer);
-        List<ExtImpl> impls = router.route(ctx);
+        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, code, ext, action, reducer);
+        List<ExtensionImplEntity> impls = router.route(ctx);
         if (CollectionUtils.isEmpty(impls)) {
             throw new ExtensionRuntimeException(Message.of("MATRIX-EXTENSION-0000-0002", ext.getName()).getMessage());
         }
@@ -61,13 +61,13 @@ public class ExtensionExecutor {
         }
     }
 
-    private static Object parallelExecute(ExtExecCtx ctx, List<ExtImpl> impls) {
+    private static Object parallelExecute(ExtensionExecuteContext ctx, List<ExtensionImplEntity> impls) {
         Executor executor = parallel.executor(ctx);
         Preconditions.checkState(executor != null);
 
         AtomicBoolean isBreak = new AtomicBoolean(false);
         List<ListenableFuture<Triple<Boolean, Object, Throwable>>> futures = new ArrayList<>(impls.size());
-        for (ExtImpl impl : impls) {
+        for (ExtensionImplEntity impl : impls) {
             futures.add(Futures.submit(() -> {
                 MutableTriple<Boolean, Object, Throwable> triple = new MutableTriple<>();
                 if (isBreak.get()) {
@@ -110,9 +110,9 @@ public class ExtensionExecutor {
         }
     }
 
-    private static Object serialExecute(ExtExecCtx ctx, List<ExtImpl> impls) {
+    private static Object serialExecute(ExtensionExecuteContext ctx, List<ExtensionImplEntity> impls) {
         List<Object> results = new ArrayList<>(impls.size());
-        for (ExtImpl impl : impls) {
+        for (ExtensionImplEntity impl : impls) {
             Object result = executeImpl(ctx, impl);
             results.add(result);
             if (ctx.reducer.willBreak(result)) {
@@ -122,7 +122,7 @@ public class ExtensionExecutor {
         return ctx.reducer.reduce(results);
     }
 
-    private static Object executeImpl(ExtExecCtx ctx, ExtImpl impl) {
+    private static Object executeImpl(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
         Preconditions.checkState(ctx.ext.isInstance(impl.instance));
         ISpan span = tracer.newSpan("ExecuteExtension", Logger.formatExec(ctx, impl));
         try {

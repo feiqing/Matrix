@@ -1,17 +1,19 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.model.config;
+
+import java.io.Serializable;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
-public class SpEL {
+public class SpEL implements Serializable {
+
+    private static final long serialVersionUID = 3177409043973537881L;
 
     public final String protocol;
 
     public final String path;
-
-    public boolean lazy = false;
 
     public SpEL(String protocol, String path) {
         this.protocol = protocol;

@@ -3,32 +3,19 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
 
-    <Extension class="com.alibaba.matrix.extension.test.ext.DemoRemoteExt" base="blankDemoRemoteExtImpl"
-               desc="Demo远程扩展定义">
+    <Extension class="com.alibaba.matrix.extension.test.ext.DemoRemoteExt" desc="Demo远程扩展定义">
+        <ExtensionBase type="provider">
+            <provider class="com.alibaba.matrix.extension.test.impl.base.CommonBaseProvider"
+                      method="newDemoRemoteExtBaseImpl"/>
+        </ExtensionBase>
         <ExtensionImpl code="code.http.post" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="POST" lazy="true"/>
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="POST"/>
         </ExtensionImpl>
         <ExtensionImpl code="code.http.get" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET"/>
         </ExtensionImpl>
-
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
-        </ExtensionImpl>
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
-        </ExtensionImpl>
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
-        </ExtensionImpl>
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
-        </ExtensionImpl>
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
-        </ExtensionImpl>
-        <ExtensionImpl code="code.http" type="http">
-            <http schema="http" host="localhost" port="8080" path="/remote_service/" method="GET" lazy="true"/>
+        <ExtensionImpl code="code.dubbo" type="dubbo" lazy="true">
+            <dubbo version="1.0.0.code.dubbo" application-name="matrix-extension-test" registry-address="nacos://localhost:8848"/>
         </ExtensionImpl>
     </Extension>
 

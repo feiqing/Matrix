@@ -4,12 +4,13 @@
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
 
     <!-- 脚本扩展(SpEL、Groovy)-->
-    <Extension class="com.alibaba.matrix.extension.test.ext.DemoScriptExt" base="blankDemoScriptExtImpl"
-               desc="Demo脚本扩展定义">
+    <Extension class="com.alibaba.matrix.extension.test.ext.DemoScriptExt" desc="Demo脚本扩展定义">
+        <ExtensionBase type="bean">
+            <bean name="blankDemoScriptExtImpl"/>
+        </ExtensionBase>
         <ExtensionImpl code="code.spel.nacos" type="spel" desc="SpEL扩展实现: from Nacos">
             <spel protocol="nacos"
-                  path="serverAddr=localhost:8848;dataId=com.alibaba.matrix.extension.test.ext.demo.script.ext;group=DEFAULT_GROUP"
-                  lazy="true"/>
+                  path="serverAddr=localhost:8848;dataId=com.alibaba.matrix.extension.test.ext.demo.script.ext;group=DEFAULT_GROUP"/>
         </ExtensionImpl>
         <ExtensionImpl code="code.groovy.file" type="groovy" desc="Groovy扩展实现: from File">
             <groovy protocol="file"
@@ -17,13 +18,11 @@
         </ExtensionImpl>
         <ExtensionImpl code="code.groovy.nacos" type="groovy" desc="Groovy扩展实现: from Nacos">
             <groovy protocol="nacos"
-                    path="serverAddr=localhost:8848;dataId=com.alibaba.matrix.extension.test.ext.demo.script.ext.groovy;group=DEFAULT_GROUP"
-                    lazy="true"/>
+                    path="serverAddr=localhost:8848;dataId=com.alibaba.matrix.extension.test.ext.demo.script.ext.groovy;group=DEFAULT_GROUP"/>
         </ExtensionImpl>
-        <ExtensionImpl code="code.groovy.http" type="groovy" desc="Groovy扩展实现: from Http">
+        <ExtensionImpl code="code.groovy.http" type="groovy" lazy="true" desc="Groovy扩展实现: from Http">
             <groovy protocol="http"
-                    path="http://localhost:8080/com.alibaba.matrix.extension.test.ext.demo.script.ext.groovy"
-                    lazy="true"/>
+                    path="http://localhost:8080/com.alibaba.matrix.extension.test.ext.demo.script.ext.groovy"/>
         </ExtensionImpl>
     </Extension>
 

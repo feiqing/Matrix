@@ -21,6 +21,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
+import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 
 /**
@@ -201,7 +202,7 @@ public class JobExecutor<Input, Output> {
         }
 
         try {
-            Monitor.monitorBusiness(String.format("SUBMIT_%s:%s", type.toUpperCase(), name));
+            metrics.incCounter("submit_job_executor_" + type.toLowerCase(), name);
             executor.submit(() -> {
                 try {
                     runnable.run();
@@ -228,7 +229,7 @@ public class JobExecutor<Input, Output> {
             return;
         }
 
-        Monitor.monitorBusiness("EXECUTE_TASK:" + taskName);
+        metrics.incCounter("execute_job_executor_task", taskName);
 
         String key;
         try {
@@ -240,7 +241,7 @@ public class JobExecutor<Input, Output> {
             log.error("Job:[{}] task:[{}] generate key error.", jobName, taskName, t);
         }
 
-        ISpan span = tracer.newSpan("ExecuteJobTask", taskName);
+        ISpan span = tracer.newSpan("JobTask", taskName);
         Output output = null;
         Throwable throwable = null;
         try {

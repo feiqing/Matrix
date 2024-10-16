@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.config;
 
-import com.alibaba.matrix.extension.model.ExtExecCtx;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -12,11 +12,11 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ExtensionParallelConfig {
 
-    boolean enable(ExtExecCtx ctx);
+    boolean enable(ExtensionExecuteContext ctx);
 
-    ExecutorService executor(ExtExecCtx ctx);
+    ExecutorService executor(ExtensionExecuteContext ctx);
 
-    long timeout(ExtExecCtx ctx);
+    long timeout(ExtensionExecuteContext ctx);
 
-    TimeUnit unit(ExtExecCtx ctx);
+    TimeUnit unit(ExtensionExecuteContext ctx);
 }

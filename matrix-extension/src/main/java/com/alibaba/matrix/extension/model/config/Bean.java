@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.model.config;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
@@ -18,7 +18,9 @@ public class Bean implements Serializable {
 
     public String clazz;
 
-    public boolean lazy = false;
+    public Bean(String clazz) {
+        this(null, clazz);
+    }
 
     public Bean(String name, String clazz) {
         Preconditions.checkArgument(!(StringUtils.isAllEmpty(name, clazz)));

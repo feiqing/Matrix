@@ -18,6 +18,7 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:sequence>
+                <xsd:element ref="ExtensionBase" minOccurs="1" maxOccurs="1"/>
                 <xsd:element ref="ExtensionImpl" minOccurs="0" maxOccurs="unbounded"/>
             </xsd:sequence>
             <xsd:attributeGroup ref="extensionAttrs"/>
@@ -27,22 +28,54 @@
     <xsd:attributeGroup name="extensionAttrs">
         <xsd:attribute name="class" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>扩展SPI的Java接口全限定名</xsd:documentation>
+                <xsd:documentation>Extension类全限定名</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="base" type="xsd:string" use="required">
-            <xsd:annotation>
-                <xsd:documentation>SPI默认实现: 必填、值为spring bean name(当基于业务身份找不到具体路由时,
-                    会自动调用默认实现)
-                </xsd:documentation>
-            </xsd:annotation>
-        </xsd:attribute>
+        <!--        <xsd:attribute name="base" type="xsd:string" use="required">-->
+        <!--            <xsd:annotation>-->
+        <!--                <xsd:documentation>扩展Extension默认实现: 必填、值为spring bean name(当基于业务身份找不到具体路由时,-->
+        <!--                    会自动调用默认实现)-->
+        <!--                </xsd:documentation>-->
+        <!--            </xsd:annotation>-->
+        <!--        </xsd:attribute>-->
         <xsd:attribute name="desc" type="xsd:string" use="optional">
             <xsd:annotation>
-                <xsd:documentation>SPI描述</xsd:documentation>
+                <xsd:documentation>Extension描述</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
+
+    <xsd:element name="ExtensionBase">
+        <xsd:annotation>
+            <xsd:documentation>Extension默认实现(必填): 找不到具体实现时, 自动调用默认实现</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:choice>
+                <xsd:element ref="object"/>
+                <xsd:element ref="bean"/>
+                <xsd:element ref="guice"/>
+                <xsd:element ref="provider"/>
+            </xsd:choice>
+            <xsd:attributeGroup ref="extensionBaseAttrs"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:attributeGroup name="extensionBaseAttrs">
+        <xsd:attribute name="type" type="BaseType" use="required">
+            <xsd:annotation>
+                <xsd:documentation>ExtensionBase实现类型(如: spring bean、dubbo、groovy)</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+    </xsd:attributeGroup>
+
+    <xsd:simpleType name="BaseType">
+        <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="object"/>
+            <xsd:enumeration value="bean"/>
+            <xsd:enumeration value="guice"/>
+            <xsd:enumeration value="provider"/>
+        </xsd:restriction>
+    </xsd:simpleType>
 
     <xsd:element name="ExtensionImpl">
         <xsd:annotation>
@@ -50,13 +83,15 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:choice>
-                <xsd:element ref="bean"/>
                 <xsd:element ref="object"/>
+                <xsd:element ref="bean"/>
+                <xsd:element ref="guice"/>
                 <xsd:element ref="hsf"/>
                 <xsd:element ref="dubbo"/>
                 <xsd:element ref="http"/>
                 <xsd:element ref="groovy"/>
                 <xsd:element ref="spel"/>
+                <xsd:element ref="provider"/>
             </xsd:choice>
             <xsd:attributeGroup ref="extensionImplAttrs"/>
         </xsd:complexType>
@@ -65,57 +100,68 @@
     <xsd:attributeGroup name="extensionImplAttrs">
         <xsd:attribute name="scope" type="xsd:string" use="optional" default="BASE">
             <xsd:annotation>
-                <xsd:documentation>扩展领域定义: 支持以','分割定义多个扩展领域
-                </xsd:documentation>
+                <xsd:documentation>Extension(所属)领域定义: 支持以','分割多个scope</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="code" type="xsd:string" use="required">
             <xsd:annotation>
-                <xsd:documentation>扩展身份定义: 支持以','分割定义多个扩展身份
-                </xsd:documentation>
+                <xsd:documentation>Extension身份定义: 支持以','分割多个code</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
-        <xsd:attribute name="type" type="Type" use="required">
+        <xsd:attribute name="type" type="ImplType" use="required">
             <xsd:annotation>
-                <xsd:documentation>扩展实现的实现类型定义: 目前支持bean、hsf、dubbo三种(推荐使用hsf、dubbo类型实现,
-                    bean适用于需要极致性能或者本地事务的场景)
-                </xsd:documentation>
+                <xsd:documentation>ExtensionImpl实现类型(如: spring bean、dubbo、groovy)</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="priority" type="xsd:long" default="0">
             <xsd:annotation>
-                <xsd:documentation>扩展实现的优先级定义(相同扩展身份的不同实现的调用排序): 越小优先级越高
-                </xsd:documentation>
+                <xsd:documentation>Extension优先级定义: 越小优先级越高</xsd:documentation>
+            </xsd:annotation>
+        </xsd:attribute>
+        <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+            <xsd:annotation>
+                <xsd:documentation>启用懒加载: 运行时加载实现</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
         <xsd:attribute name="desc" type="xsd:string">
             <xsd:annotation>
-                <xsd:documentation>扩展身份描述</xsd:documentation>
+                <xsd:documentation>Extension实现描述</xsd:documentation>
             </xsd:annotation>
         </xsd:attribute>
     </xsd:attributeGroup>
 
-    <xsd:simpleType name="Type">
+    <xsd:simpleType name="ImplType">
         <xsd:restriction base="xsd:string">
             <xsd:enumeration value="object"/>
             <xsd:enumeration value="bean"/>
+            <xsd:enumeration value="guice"/>
+
             <xsd:enumeration value="hsf"/>
             <xsd:enumeration value="dubbo"/>
             <xsd:enumeration value="http"/>
+
             <xsd:enumeration value="groovy"/>
             <xsd:enumeration value="spel"/>
+            <xsd:enumeration value="provider"/>
+            <!--            <xsd:enumeration value="factory"/> 还是叫factory?-->
 
-            <xsd:enumeration value="guice(*暂不支持*)"/>
-            <xsd:enumeration value="class(*暂不支持*)"/>
             <xsd:enumeration value="sql(*暂不支持*)"/>
 
             <xsd:enumeration value="ognl(*暂不支持*)"/>
             <xsd:enumeration value="mvel(*暂不支持*)"/>
-            <xsd:enumeration value="ql-express(*暂不支持*)"/>
 
             <xsd:enumeration value="lua(*暂不支持*)"/>
             <xsd:enumeration value="python(*暂不支持*)"/>
             <xsd:enumeration value="javascript(*暂不支持*)"/>
+
+            <xsd:enumeration value="rocketmq(*暂不支持*)"/>
+            <xsd:enumeration value="kafka(*暂不支持*)"/>
+
+            <!--            <xsd:enumeration value="calcite(*暂不支持*)"/>-->
+            <!--            <xsd:enumeration value="cassandra(*暂不支持*)"/>-->
+            <!--            <xsd:enumeration value="presto(*暂不支持*)"/>-->
+            <!--            <xsd:enumeration value="clickhouse(*暂不支持*)"/>-->
+            <!--            <xsd:enumeration value="elasticsearch(*暂不支持*)"/>-->
         </xsd:restriction>
     </xsd:simpleType>
 
@@ -129,14 +175,9 @@
                     <xsd:documentation>class</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="args" type="xsd:string" use="optional">
+            <xsd:attribute name="arg0" type="xsd:string" use="optional">
                 <xsd:annotation>
-                    <xsd:documentation>目前仅支持添加一个参数</xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
-                <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                    <xsd:documentation>第一个参数(目前仅支持添加一个参数)</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
         </xsd:complexType>
@@ -158,9 +199,22 @@
                     <xsd:documentation>spring bean class</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="guice">
+        <xsd:annotation>
+            <xsd:documentation>Guice类型的扩展实现定义</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="class" type="xsd:string" use="required">
                 <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                    <xsd:documentation>guice instance class</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="name" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>guice instance @Named(value = 'name')</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
         </xsd:complexType>
@@ -174,7 +228,7 @@
             <xsd:attribute name="service" type="xsd:string" use="required"/>
             <xsd:attribute name="version" type="xsd:string" use="required">
                 <xsd:annotation>
-                    <xsd:documentation>HSF服务版本定义: 必填: 由于同一个SPI不同业务会有不同的实现,
+                    <xsd:documentation>HSF服务版本定义: 必填: 由于同一个扩展Extension不同业务会有不同的实现,
                         但此时暴露的serviceName都是一样, 因此我们强制使用版本来进行区分.
                         我们会在框架层面进行强制校验:此处所定义的服务版本<p color="red">一定</p>是以上面所定义的业务身份中的<b>
                             一个</b>作为后缀(如:
@@ -186,11 +240,6 @@
             <xsd:attribute name="timeout" type="xsd:long">
                 <xsd:annotation>
                     <xsd:documentation>clientTimeOut时间</xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
-                <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
         </xsd:complexType>
@@ -212,13 +261,10 @@
                     <xsd:documentation>clientTimeOut时间设置</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="check" type="xsd:boolean"/>
+            <xsd:attribute name="check" type="xsd:boolean" default="true"/>
             <xsd:attribute name="filter" type="xsd:string"/>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
-                <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
+            <xsd:attribute name="application-name" type="xsd:string"/>
+            <xsd:attribute name="registry-address" type="xsd:string"/>
         </xsd:complexType>
     </xsd:element>
 
@@ -234,11 +280,6 @@
             <xsd:attribute name="port" type="xsd:string" default="80"/>
             <xsd:attribute name="path" type="xsd:string"/>
             <xsd:attribute name="method" type="xsd:string" default="POST"/>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
-                <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
 
@@ -251,11 +292,6 @@
         <xsd:complexType>
             <xsd:attribute name="protocol" type="xsd:string" use="required"/>
             <xsd:attribute name="path" type="xsd:string" use="required"/>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
-                <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
 
@@ -268,9 +304,29 @@
         <xsd:complexType>
             <xsd:attribute name="protocol" type="xsd:string" use="required"/>
             <xsd:attribute name="path" type="xsd:string" use="required"/>
-            <xsd:attribute name="lazy" type="xsd:boolean" default="false">
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="provider">
+        <xsd:annotation>
+            <xsd:documentation>自定义类型的扩展实现定义</xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="class" type="xsd:string" use="required">
                 <xsd:annotation>
-                    <xsd:documentation>是否启用懒加载</xsd:documentation>
+                    <xsd:documentation>provider class</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+
+            <xsd:attribute name="method" type="xsd:string" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>provider method class(static)</xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+
+            <xsd:attribute name="arg0" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation>provider method arg0</xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
         </xsd:complexType>

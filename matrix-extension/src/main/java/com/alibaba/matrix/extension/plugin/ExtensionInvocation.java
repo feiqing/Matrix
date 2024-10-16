@@ -1,12 +1,11 @@
 package com.alibaba.matrix.extension.plugin;
 
-import com.alibaba.matrix.extension.model.ExtExecCtx;
-import com.alibaba.matrix.extension.model.ExtImpl;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.lang.reflect.Method;
 import java.util.function.Function;
 
 /**
@@ -39,9 +38,16 @@ public class ExtensionInvocation {
     @Setter
     private Object instance;
 
+    @Getter
+    public int priority;
+
+    @Getter
+    @Setter
+    public String desc;
+
     private final ExtensionPlugin[] plugins;
 
-    public ExtensionInvocation(ExtExecCtx ctx, ExtImpl impl, ExtensionPlugin[] plugins) {
+    public ExtensionInvocation(ExtensionExecuteContext ctx, ExtensionImplEntity impl, ExtensionPlugin[] plugins) {
         this.scope = ctx.scope;
         this.code = ctx.code;
         this.ext = ctx.ext;
@@ -50,6 +56,8 @@ public class ExtensionInvocation {
 
         this.type = impl.type;
         this.instance = impl.instance;
+        this.priority = impl.priority;
+        this.desc = impl.desc;
         this.plugins = plugins;
     }
 

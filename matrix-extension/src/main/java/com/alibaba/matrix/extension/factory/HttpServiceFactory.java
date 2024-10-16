@@ -1,6 +1,7 @@
 package com.alibaba.matrix.extension.factory;
 
-import com.alibaba.matrix.extension.model.Http;
+import com.alibaba.matrix.extension.model.config.Http;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
@@ -17,8 +18,6 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.alibaba.matrix.extension.util.Logger.log;
-
 
 /**
  * warning: 仅作为Demo演示http类型扩展实现支持, 没做任何的优化和异常处理, 千万不要应用到实际业务当中
@@ -27,6 +26,7 @@ import static com.alibaba.matrix.extension.util.Logger.log;
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
+@Slf4j
 public class HttpServiceFactory {
 
     public static Object getHttpService(Class<?> ext, Http http) {
@@ -34,7 +34,11 @@ public class HttpServiceFactory {
         enhancer.setClassLoader(ext.getClassLoader());
         enhancer.setInterfaces(new Class[]{ext});
         enhancer.setCallback(new HttpServiceAdaptor(http));
-        return enhancer.create();
+        Object service = enhancer.create();
+
+        log.info("Http service init success, http method:[{}] schema:[{}] host:[{}] port:[{}] path:[{}].", http.method, http.schema, http.host, http.port, http.path);
+
+        return service;
     }
 
     private static class HttpServiceAdaptor implements MethodInterceptor {

@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +22,7 @@ import java.util.Map;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = "classpath:spring-*.xml")
-public class RemoteExtensionTestCase {
+public class RemoteExtensionTestCase implements Serializable {
 
     private final TestModel model = new TestModel();
 
@@ -33,8 +34,9 @@ public class RemoteExtensionTestCase {
 
     @Test
     public void test_remote_base() {
-        Object invoke = ExtensionInvoker.invoke("code.base.none.impl", DemoRemoteExt.class, ext -> ext.apply(null, null, null));
-        Assert.assertNull(invoke);
+        Object invoke = ExtensionInvoker.invoke("code.base.none.impl", DemoRemoteExt.class, ext -> ext.apply(null, model, null));
+        Assert.assertNotNull(invoke);
+        Assert.assertTrue(String.valueOf(invoke).startsWith("Base: "));
     }
 
     @Test
@@ -49,5 +51,10 @@ public class RemoteExtensionTestCase {
         Assert.assertTrue(CollectionUtils.isEqualCollection(model.list, result));
     }
 
-
+    @Test
+    public void test_dubbo() {
+        String result = (String) ExtensionInvoker.invoke("code.dubbo", DemoRemoteExt.class, ext -> ext.apply("arg1", model, null));
+        Assert.assertTrue(result.contains("Dubbo server"));
+        Assert.assertTrue(result.contains(model.name));
+    }
 }

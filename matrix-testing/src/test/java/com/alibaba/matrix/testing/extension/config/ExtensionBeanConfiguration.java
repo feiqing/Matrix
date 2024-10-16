@@ -1,6 +1,7 @@
 package com.alibaba.matrix.testing.extension.config;
 
-import com.alibaba.matrix.extension.spring.ExtensionFrameworkLoader;
+import com.alibaba.matrix.extension.router.LoggingExtensionRouter;
+import com.alibaba.matrix.extension.spring.ExtensionFrameworkSpringRegister;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -15,14 +16,16 @@ import java.util.Arrays;
 public class ExtensionBeanConfiguration {
 
     @Bean
-    public ExtensionFrameworkLoader extensionFrameworkLoader() {
-        ExtensionFrameworkLoader extensionFrameworkLoader = new ExtensionFrameworkLoader();
-        extensionFrameworkLoader.setEnableAnnotationScan(true);
-        extensionFrameworkLoader.setScanPackages(Arrays.asList("com.alibaba.matrix.testing.extension"));
+    public ExtensionFrameworkSpringRegister extensionFrameworkLoader() {
+        ExtensionFrameworkSpringRegister extensionFrameworkSpringRegister = new ExtensionFrameworkSpringRegister();
+        extensionFrameworkSpringRegister.setEnableAnnotationScan(true);
+        extensionFrameworkSpringRegister.setScanPackages(Arrays.asList("com.alibaba.matrix.testing.extension"));
 
-        extensionFrameworkLoader.setEnableXmlConfig(true);
-        extensionFrameworkLoader.setConfigLocations(Arrays.asList("classpath*:matrix-extension-*.xml"));
+        extensionFrameworkSpringRegister.setEnableXmlConfig(true);
+        extensionFrameworkSpringRegister.setConfigLocations(Arrays.asList("classpath*:matrix-extension-*.xml"));
 
-        return extensionFrameworkLoader;
+        extensionFrameworkSpringRegister.setExtensionRouter(new LoggingExtensionRouter());
+
+        return extensionFrameworkSpringRegister;
     }
 }

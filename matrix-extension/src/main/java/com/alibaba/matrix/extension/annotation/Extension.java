@@ -13,6 +13,11 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Extension {
 
+    /**
+     * Extension描述
+     *
+     * @return
+     */
     String desc() default "";
 
 }

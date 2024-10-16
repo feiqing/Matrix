@@ -2,28 +2,33 @@ package com.alibaba.matrix.extension.util;
 
 import com.alibaba.matrix.base.message.Message;
 import com.alibaba.matrix.extension.annotation.ExtensionBase;
-import com.alibaba.matrix.extension.annotation.ExtensionImpl;
 import com.alibaba.matrix.extension.exception.ExtensionException;
-import com.alibaba.matrix.extension.model.Bean;
-import com.alibaba.matrix.extension.model.Extension;
-import com.alibaba.matrix.extension.model.Impl;
-import com.alibaba.matrix.extension.model.Scope;
+import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
+import com.alibaba.matrix.extension.factory.ObjectInstanceFactory;
+import com.alibaba.matrix.extension.factory.SpringBeanFactory;
+import com.alibaba.matrix.extension.model.ExtensionImplType;
+import com.alibaba.matrix.extension.model.config.Bean;
+import com.alibaba.matrix.extension.model.config.Extension;
+import com.alibaba.matrix.extension.model.config.ExtensionImpl;
+import com.alibaba.matrix.extension.model.config.ExtensionScope;
+import com.alibaba.matrix.extension.model.config.Guice;
+import com.alibaba.matrix.extension.model.config.ObjectT;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.ScanResult;
 import org.apache.commons.collections4.CollectionUtils;
-import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
-import org.springframework.aop.support.AopUtils;
-import org.springframework.context.ApplicationContext;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.alibaba.matrix.extension.model.ExtImpl.Type.BEAN;
 import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
@@ -33,151 +38,239 @@ import static com.alibaba.matrix.extension.util.Logger.log;
  */
 public class AnnotationLoader {
 
-    public static Map<Class<?>, Extension> loadAnnotation(List<String> scanPackages, ApplicationContext applicationContext) {
+    public static Map<Class<?>, Extension> loadAnnotation(List<String> scanPackages) {
         if (CollectionUtils.isEmpty(scanPackages)) {
             throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0001").getMessage());
         }
         log.info("Annotation scanPackages: {}", scanPackages);
 
-        Map<Class<?>, String> extensions = loadExtensionDefs(scanPackages);
-        Map<Class<?>, Extension> extensionMap = new HashMap<>(extensions.size());
+        try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(scanPackages.toArray(new String[0])).scan()) {
+            return loadExtensions(scanResult);
+        } catch (Throwable t) {
+            return ExceptionUtils.rethrow(t);
+        }
+    }
 
-        for (Map.Entry<Class<?>, String> entry : extensions.entrySet()) {
-            Class<?> extension = entry.getKey();
-            String desc = entry.getValue();
-            Object base = loadExtensionBaseImpl(extension, applicationContext);
-            Map<String, Scope> scopeMap = loadExtensionScopeMap(extension, applicationContext);
+    private static Map<Class<?>, Extension> loadExtensions(ScanResult scanResult) throws Exception {
+        Map<Class<?>, Extension> extensionMap = new LinkedHashMap<>();
+
+        for (ClassInfo classInfo : scanResult.getClassesWithAnnotation(com.alibaba.matrix.extension.annotation.Extension.class)) {
+            Class<?> extension = classInfo.loadClass();
+            com.alibaba.matrix.extension.annotation.Extension extensionAnnotation = extension.getAnnotation(com.alibaba.matrix.extension.annotation.Extension.class);
+            if (extensionAnnotation == null) {
+                continue;
+            }
+            // if (!extension.isInterface()) {
+            //    throw new ExtensionException(String.format("@Extension:[%s] is not a interface.", extension.getName()));
+            // }
+
+            String desc = extensionAnnotation.desc();
+            log.info("Loaded @Extension: [{}].", Logger.formatExt(extension, desc));
+
+            Object base = loadExtensionBase(extension, scanResult);
+            Map<String, ExtensionScope> scopeMap = loadExtensionScopeMap(extension, scanResult);
+
             extensionMap.put(extension, new Extension(extension, desc, base, scopeMap));
+        }
+
+        if (extensionMap.isEmpty()) {
+            log.warn("No extension found by @Extension annotation.");
         }
 
         return extensionMap;
     }
 
-    private static Object loadExtensionBaseImpl(Class<?> extension, ApplicationContext applicationContext) {
-        Object baseImpl = null;
-        for (Object bean : applicationContext.getBeansOfType(extension).values()) {
-            ExtensionBase extensionBase = AopUtils.getTargetClass(bean).getAnnotation(ExtensionBase.class);
+    private static Object loadExtensionBase(Class<?> extension, ScanResult scanResult) throws Exception {
+        Class<?> baseClazz = null;
+        ExtensionImplType baseType = null;
+        for (ClassInfo classInfo : scanResult.getClassesWithAnnotation(ExtensionBase.class)) {
+            if (!classInfo.extendsSuperclass(extension) && !classInfo.implementsInterface(extension)) {
+                continue;
+            }
+            Class<?> clazz = classInfo.loadClass();
+            if (!extension.isAssignableFrom(clazz)) {
+                continue;
+            }
+            ExtensionBase extensionBase = clazz.getAnnotation(ExtensionBase.class);
             if (extensionBase == null) {
                 continue;
             }
 
-            if (extensionBase.belong() != Object.class && extensionBase.belong() != extension) {
-                log.info("@ExtensionBase: bean:[{}] type:[{}] for ext:[{}].", bean, bean.getClass().getName(), extensionBase.belong().getName());
+            Class<?> belong = extensionBase.belong();
+            if (belong != Object.class && belong != extension) {
+                log.info("@ExtensionBase: type:[{}] for ext:[{}].", clazz.getName(), belong.getName());
                 continue;
             }
 
-            if (extensionBase.belong() == Object.class || extensionBase.belong() == extension) {
-                log.info("Loaded @ExtensionBase: ext:[{}] base:[{}].", extension.getName(), Logger.formatBase(bean));
-                if (baseImpl != null) {
-                    throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0002", extension.getName(), baseImpl).getMessage());
-                }
-                baseImpl = bean;
+            if (baseClazz != null) {
+                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0002", extension.getName()).getMessage());
             }
+            baseClazz = clazz;
+            baseType = extensionBase.type();
         }
 
-        if (baseImpl == null) {
+        if (baseClazz == null || baseType == null) {
             throw new ExtensionException(Message.of("MATRIX-EXTENSION-0002-0003", extension.getName()).getMessage());
         }
 
-        return baseImpl;
+        Object base;
+        switch (baseType) {
+            case OBJECT:
+                base = ObjectInstanceFactory.getObjectInstance(new ObjectT(baseClazz.getName()));
+                break;
+            case BEAN:
+                base = SpringBeanFactory.getSpringBean(new Bean(baseClazz.getName()));
+                break;
+            case GUICE:
+                base = GuiceInstanceFactory.getGuiceInstance(new Guice(baseClazz.getName()));
+                break;
+            default:
+                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0012", baseType).getMessage());
+        }
+
+        if (!extension.isInstance(base)) {
+            throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0009", base, extension.getName()).getMessage());
+        }
+        log.info("Loaded @ExtensionBase: ext:[{}] base:[{}].", extension.getName(), Logger.formatBase(base));
+
+        return base;
     }
 
-    private static Map<String, Scope> loadExtensionScopeMap(Class<?> extension, ApplicationContext applicationContext) {
+    private static Map<String, ExtensionScope> loadExtensionScopeMap(Class<?> extension, ScanResult scanResult) throws Exception {
 
-        Map<String, Map<String, List<Wrapper>>> scope2code2wrappers = new HashMap<>();
-        for (Map.Entry<String, ?> entry : applicationContext.getBeansOfType(extension).entrySet()) {
-            String name = entry.getKey();
-            Object bean = entry.getValue();
-            ExtensionImpl extensionImpl = AopUtils.getTargetClass(bean).getAnnotation(ExtensionImpl.class);
+        Map<String, Map<String, List<Wrapper>>> scope2code2wrappers = new LinkedHashMap<>();
+        for (ClassInfo classInfo : scanResult.getClassesWithAnnotation(com.alibaba.matrix.extension.annotation.ExtensionImpl.class)) {
+            if (!classInfo.extendsSuperclass(extension) && !classInfo.implementsInterface(extension)) {
+                continue;
+            }
+            Class<?> clazz = classInfo.loadClass();
+            if (!extension.isAssignableFrom(clazz)) {
+                continue;
+            }
+            com.alibaba.matrix.extension.annotation.ExtensionImpl extensionImpl = clazz.getAnnotation(com.alibaba.matrix.extension.annotation.ExtensionImpl.class);
             if (extensionImpl == null) {
                 continue;
             }
 
-            if (extensionImpl.belong() != Object.class && extensionImpl.belong() != extension) {
-                log.info("@ExtensionImpl: bean:[{}] type:[{}] belongs ext:[{}].", bean, bean.getClass().getName(), extensionImpl.belong().getName());
+            Class<?> belong = extensionImpl.belong();
+            if (belong != Object.class && belong != extension) {
+                log.info("@ExtensionImpl: type:[{}] belongs ext:[{}].", clazz.getName(), belong.getName());
                 continue;
             }
 
-            for (String scope : extensionImpl.scope()) {
-                for (String code : extensionImpl.code()) {
-                    Wrapper wrapper = new Wrapper();
-                    wrapper.name = name;
-                    wrapper.bean = bean;
-                    wrapper.priority = extensionImpl.priority();
-                    wrapper.desc = extensionImpl.desc();
-                    scope2code2wrappers.computeIfAbsent(scope, _K -> new HashMap<>()).computeIfAbsent(code, _k -> new LinkedList<>()).add(wrapper);
+            Wrapper wrapper = loadImplWrapper(clazz, extensionImpl);
+            for (String scope : wrapper.scope) {
+                for (String code : wrapper.code) {
+                    scope2code2wrappers.computeIfAbsent(scope, _K -> new LinkedHashMap<>()).computeIfAbsent(code, _K -> new LinkedList<>()).add(wrapper);
                 }
             }
         }
 
-        Map<String, Scope> scopeMap = new HashMap<>();
+        if (MapUtils.isEmpty(scope2code2wrappers)) {
+            log.warn("{}", Message.of("MATRIX-EXTENSION-0002-0004", extension.getName()).getMessage());
+        }
+
+        Map<String, ExtensionScope> scopeMap = new LinkedHashMap<>();
         for (Map.Entry<String, Map<String, List<Wrapper>>> entry : scope2code2wrappers.entrySet()) {
             String scope = entry.getKey();
             Map<String, List<Wrapper>> code2wrappers = entry.getValue();
 
-            scopeMap.put(scope, loadExtensionScope(extension, scope, code2wrappers));
+            scopeMap.put(scope, convertToExtensionScope(extension, scope, code2wrappers));
         }
 
         return scopeMap;
     }
 
-    private static Scope loadExtensionScope(Class<?> ext, String scope, Map<String, List<Wrapper>> code2wrappers) {
+    private static Wrapper loadImplWrapper(Class<?> impl, com.alibaba.matrix.extension.annotation.ExtensionImpl extensionImpl) {
+        Wrapper wrapper = new Wrapper();
+        wrapper.scope = extensionImpl.scope();
+        wrapper.code = extensionImpl.code();
+        wrapper.type = extensionImpl.type();
+        wrapper.priority = extensionImpl.priority();
+        wrapper.lazy = extensionImpl.lazy();
+        wrapper.desc = extensionImpl.desc();
 
-        Map<String, List<Impl>> code2impls = new HashMap<>();
+        switch (extensionImpl.type()) {
+            case OBJECT:
+                wrapper.object = new ObjectT(impl.getName());
+                break;
+            case BEAN:
+                wrapper.bean = new Bean(impl.getName());
+                break;
+            case GUICE:
+                wrapper.guice = new Guice(impl.getName());
+                break;
+            default:
+                throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", extensionImpl.type().name()).getMessage());
+        }
+
+        return wrapper;
+    }
+
+    private static ExtensionScope convertToExtensionScope(Class<?> extension, String scope, Map<String, List<Wrapper>> code2wrappers) throws Exception {
+
+        Map<String, List<ExtensionImpl>> code2impls = new LinkedHashMap<>();
 
         for (String code : code2wrappers.keySet()) {
             List<Wrapper> wrappers = code2wrappers.get(code);
             // 先排序一次, 后序如果同code合并, 还需要再次排序
             wrappers.sort(Comparator.comparingInt(wrapper -> wrapper.priority));
 
-            List<Impl> impls = new ArrayList<>(wrappers.size());
+            List<ExtensionImpl> impls = new ArrayList<>(wrappers.size());
             for (Wrapper wrapper : wrappers) {
+                ExtensionImpl impl = convertToImpl(extension, scope, code, wrapper);
 
-                Impl impl = new Impl(scope, code, BEAN.name(), wrapper.priority, wrapper.desc);
-                impl.bean = new Bean(wrapper.name, wrapper.bean.getClass().getName());
-                impl.instance = wrapper.bean;
+                if (impl.instance != null && !extension.isInstance(impl.instance)) {
+                    throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()).getMessage());
+                }
 
                 impls.add(impl);
             }
 
             code2impls.put(code, impls);
-            log.info("Loaded @ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+            log.info("Loaded @ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
         }
 
-        return new Scope(scope, code2impls);
+        return new ExtensionScope(scope, code2impls);
     }
 
-    private static Map<Class<?>, String> loadExtensionDefs(List<String> scanPackages) {
-        Reflections reflections = new Reflections(new ConfigurationBuilder().forPackages(scanPackages.toArray(new String[0])));
+    private static ExtensionImpl convertToImpl(Class<?> extension, String scope, String code, Wrapper wrapper) throws Exception {
 
-        Map<Class<?>, String> extensions = new HashMap<>();
-        for (Class<?> clazz : reflections.getTypesAnnotatedWith(com.alibaba.matrix.extension.annotation.Extension.class)) {
-            // 防止继承Extension的实现类也被加载进来
-            if (!clazz.isAnnotationPresent(com.alibaba.matrix.extension.annotation.Extension.class)) {
-                continue;
-            }
-            // if (!clazz.isInterface()) {
-            //    throw new ExtensionException(String.format("@Extension:[%s] is not a interface.", clazz.getName()));
-            // }
-
-            String desc = clazz.getAnnotation(com.alibaba.matrix.extension.annotation.Extension.class).desc();
-
-            log.info("Loaded @Extension: [{}].", Logger.formatExt(clazz, desc));
-            extensions.put(clazz, desc);
+        if (wrapper.object != null) {
+            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            impl.object = wrapper.object;
+            impl.instance = wrapper.lazy ? null : ObjectInstanceFactory.getObjectInstance(wrapper.object);
+            return impl;
         }
 
-        if (extensions.isEmpty()) {
-            log.warn("No extension found by @Extension annotation.");
+        if (wrapper.bean != null) {
+            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            impl.bean = wrapper.bean;
+            impl.instance = wrapper.lazy ? null : SpringBeanFactory.getSpringBean(wrapper.bean);
+            return impl;
         }
 
-        return extensions;
+        if (wrapper.guice != null) {
+            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            impl.guice = wrapper.guice;
+            impl.instance = wrapper.lazy ? null : GuiceInstanceFactory.getGuiceInstance(wrapper.guice);
+            return impl;
+        }
+
+        throw new ExtensionException(Message.of("MATRIX-EXTENSION-0001-0005", wrapper.type).getMessage());
     }
 
     private static class Wrapper implements Serializable {
         private static final long serialVersionUID = -7603465850850920008L;
-        public String name;
-        public Object bean;
-        public int priority;
+        public String[] scope;
+        public String[] code;
+        public int priority = 0;
         public String desc;
+        public ExtensionImplType type;
+        public boolean lazy = false;
+
+        public ObjectT object;
+        public Bean bean;
+        public Guice guice;
     }
 }

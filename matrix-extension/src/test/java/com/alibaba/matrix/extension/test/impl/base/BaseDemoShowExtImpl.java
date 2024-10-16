@@ -4,12 +4,14 @@ package com.alibaba.matrix.extension.test.impl.base;
 import com.alibaba.matrix.extension.annotation.ExtensionBase;
 import com.alibaba.matrix.extension.test.ext.DemoShowExt;
 
+import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
+
 /**
  * @author jifang.zjf@alibaba-inc.com
  * @version 1.0
  * @since 2022/7/21 21:06.
  */
-@ExtensionBase
+@ExtensionBase(type = OBJECT)
 public class BaseDemoShowExtImpl implements DemoShowExt {
 
     @Override

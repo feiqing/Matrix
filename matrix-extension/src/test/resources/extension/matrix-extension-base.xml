@@ -4,11 +4,12 @@
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension
             https://www.alibaba.com/matrix/extension.xsd">
 
-    <Extension class="org.apache.commons.lang3.function.TriFunction" base="baseTriFunctionImpl"
-               desc="测试扩展TriFunction定义">
-
+    <Extension class="org.apache.commons.lang3.function.TriFunction" desc="测试扩展TriFunction定义">
+        <ExtensionBase type="bean">
+            <bean name="baseTriFunctionImpl"/>
+        </ExtensionBase>
         <ExtensionImpl code="code.object" type="object">
-            <object class="com.alibaba.matrix.extension.test.impl.function.ObjectTriFunctionExtImpl" args="OBJ-TEST"/>
+            <object class="com.alibaba.matrix.extension.test.impl.function.ObjectTriFunctionExtImpl" arg0="OBJ-TEST"/>
         </ExtensionImpl>
 
         <ExtensionImpl code="code.common" type="bean">
@@ -44,8 +45,13 @@
 
     </Extension>
 
-    <Extension class="com.alibaba.matrix.extension.test.ext.DemoBaseExt" base="baseDemoBaseExtImpl"
-               desc="测试扩展DemoBaseExt定义">
+    <Extension class="com.alibaba.matrix.extension.test.ext.DemoBaseExt" desc="测试扩展DemoBaseExt定义">
+<!--        <ExtensionBase type="object">-->
+<!--            <object class="com.alibaba.matrix.extension.test.impl.base.BaseDemoBaseExtImpl"/>-->
+<!--        </ExtensionBase>-->
+        <ExtensionBase type="guice">
+            <guice class="com.alibaba.matrix.extension.test.impl.base.BaseDemoBaseExtImpl"/>
+        </ExtensionBase>
         <ExtensionImpl code="code.yhb" type="bean" priority="1">
             <bean name="yhbDemoBaseExtImpl"/>
         </ExtensionImpl>

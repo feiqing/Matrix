@@ -12,13 +12,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 2022/9/5 16:19.
  */
 @Slf4j(topic = "Metrics")
-public class NoopMetrics implements IMetrics {
+public class LogMetrics implements IMetrics {
 
     private static final Map<String, AtomicDouble> counter = new ConcurrentHashMap<>();
 
     @Override
-    public void incCounter(String type, String name, String desc, double value, Map<String, Object> attributes) {
+    public void incCounter(String type, String name, double value) {
         double count = counter.computeIfAbsent(String.format("%s#%s", type, name), k -> new AtomicDouble()).addAndGet(value);
-        log.info("counter:[{}-{}({}):{} ({})", type, name, desc, count, attributes);
+        log.info("Counter[type={}, name={}] -> {}", type, name, count);
     }
 }

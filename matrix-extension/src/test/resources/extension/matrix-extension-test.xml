@@ -3,15 +3,46 @@
             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:schemaLocation="https://www.alibaba.com/matrix/extension https://www.alibaba.com/matrix/extension.xsd">
 
-    <Extension class="org.apache.commons.collections4.Bag" base="hashBag" desc="Object Bag定义">
+    <Extension class="org.apache.commons.collections4.Bag" desc="Object Bag定义">
+        <ExtensionBase type="provider">
+            <provider class="com.alibaba.matrix.extension.test.impl.base.BagBaseProvider" method="newInstance"/>
+        </ExtensionBase>
         <ExtensionImpl code="code.tree" type="object">
             <object class="org.apache.commons.collections4.bag.TreeBag"/>
         </ExtensionImpl>
-        <ExtensionImpl code="code.hash" type="object">
-            <object class="org.apache.commons.collections4.bag.HashBag" args="[1,2,3]" lazy="true"/>
+        <ExtensionImpl code="code.hash" type="object" lazy="true">
+            <object class="org.apache.commons.collections4.bag.HashBag" arg0="[1,2,3]"/>
         </ExtensionImpl>
-        <ExtensionImpl code="code.hash2" type="object">
-            <object class="com.alibaba.matrix.extension.test.impl.base.HashBag" args="[1,2,3]"/>
+        <ExtensionImpl code="code.guice.synchronized" type="guice">
+            <guice class="org.apache.commons.collections4.Bag" name="synchronizedBag"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.guice.collection" type="guice">
+            <guice class="org.apache.commons.collections4.Bag" name="collectionBag"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.guice.hash" type="guice">
+            <guice class="org.apache.commons.collections4.bag.HashBag"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.guice.hash" type="guice">
+            <guice class="org.apache.commons.collections4.bag.HashBag" name="hashBag"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="code.provider" type="provider">
+            <provider class="com.alibaba.matrix.extension.test.impl.base.BagBaseProvider" method="newInstance"
+                      arg0="[1,2,3]"/>
+        </ExtensionImpl>
+        <ExtensionImpl code="xx" type="dubbo" lazy="true">
+            <dubbo version="111" group="111" application-name="xxx" registry-address=""/>
         </ExtensionImpl>
     </Extension>
+
+<!--    <Extension class="java.util.function.Function">-->
+<!--        <ExtensionBase type="provider">-->
+<!--            <provider class="com.alibaba.matrix.extension.test.impl.base.FunctionBaseProvider" method="newFunction"/>-->
+<!--        </ExtensionBase>-->
+<!--        <ExtensionImpl code="xx" type="dubbo" desc="hhh" lazy="true">-->
+<!--            <dubbo version="1.0.0" check="false" application-name="hhh" registry-address="nacos://localhost:8848"/>-->
+<!--        </ExtensionImpl>-->
+<!--        <ExtensionImpl code="xx" type="dubbo" scope="BASE" desc="hhh" lazy="true" priority="0">-->
+<!--            <dubbo version="1.0.0" check="false" application-name="hhh" registry-address="nacos://localhost:8848"/>-->
+<!--        </ExtensionImpl>-->
+<!--    </Extension>-->
 </Extensions>

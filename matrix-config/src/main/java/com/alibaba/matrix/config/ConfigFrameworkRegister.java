@@ -7,11 +7,13 @@ import com.alibaba.matrix.config.exception.ConfigCenterException;
 import com.alibaba.matrix.config.exception.ConfigUpdateException;
 import com.alibaba.matrix.config.validator.Validator;
 import com.google.common.base.Preconditions;
+import io.github.classgraph.ClassGraph;
+import io.github.classgraph.ClassInfo;
+import io.github.classgraph.FieldInfo;
+import io.github.classgraph.MethodInfo;
+import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
-import org.reflections.ReflectionUtils;
-import org.reflections.Reflections;
-import org.reflections.util.ConfigurationBuilder;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -52,23 +54,25 @@ public class ConfigFrameworkRegister {
             throw new ConfigCenterException(Message.of("MATRIX-CONFIG-0000-0000"));
         }
         log.info("scanPackages: {}", scanPackages);
-        Reflections reflections = new Reflections(new ConfigurationBuilder().forPackages(scanPackages.toArray(new String[0])));
 
         Map<Pair<String, String>, List<Handler>> key2handlers = new ConcurrentHashMap<>();
-        for (Class<?> belong : reflections.getTypesAnnotatedWith(ConfigCenter.class)) {
-            ConfigCenter center = belong.getAnnotation(ConfigCenter.class);
+        try (ScanResult scanResult = new ClassGraph().enableAllInfo().acceptPackages(scanPackages.toArray(new String[0])).scan()) {
+            for (ClassInfo classInfo : scanResult.getClassesWithAnnotation(ConfigCenter.class)) {
+                Class<?> belong = classInfo.loadClass();
+                ConfigCenter center = belong.getAnnotation(ConfigCenter.class);
+                log.info("loaded @ConfigCenter:[{}] => namespace:[{}] desc:[{}]", belong.getName(), center.namespace(), center.desc());
 
-            log.info("loaded @ConfigCenter:[{}] => namespace:[{}] desc:[{}]", belong.getName(), center.namespace(), center.desc());
-            for (Field field : ReflectionUtils.getAllFields(belong, field -> field.isAnnotationPresent(ConfigBinding.class))) {
-                Handler handler = initFieldHandler(belong, center.namespace(), field);
-                key2handlers.computeIfAbsent(Pair.of(handler.namespace, handler.key), _K -> new LinkedList<>()).add(handler);
-                log.info("loaded @ConfigBinding field:[{}.{}] => namespace:[{}] key:[{}] desc:[{}].", handler.belongs.getName(), handler.field.getName(), handler.namespace, handler.key, handler.desc);
-            }
+                classInfo.getDeclaredFieldInfo().stream().filter(fieldInfo -> fieldInfo.hasAnnotation(ConfigBinding.class)).map(FieldInfo::loadClassAndGetField).forEach(field -> {
+                    Handler handler = initFieldHandler(belong, center.namespace(), field);
+                    key2handlers.computeIfAbsent(Pair.of(handler.namespace, handler.key), _K -> new LinkedList<>()).add(handler);
+                    log.info("loaded @ConfigBinding field:[{}.{}] => namespace:[{}] key:[{}] desc:[{}].", handler.belongs.getName(), handler.field.getName(), handler.namespace, handler.key, handler.desc);
+                });
 
-            for (Method method : ReflectionUtils.getAllMethods(belong, method -> method.isAnnotationPresent(ConfigBinding.class))) {
-                Handler handler = initMethodHandler(belong, center.namespace(), method);
-                key2handlers.computeIfAbsent(Pair.of(handler.namespace, handler.key), _K -> new LinkedList<>()).add(handler);
-                log.info("loaded @ConfigBinding method:[{}.{}] => namespace:[{}] key:[{}] desc:[{}].", handler.belongs.getName(), handler.method.getName(), handler.namespace, handler.key, handler.desc);
+                classInfo.getDeclaredMethodInfo().stream().filter(methodInfo -> methodInfo.hasAnnotation(ConfigBinding.class)).map(MethodInfo::loadClassAndGetMethod).forEach(method -> {
+                    Handler handler = initMethodHandler(belong, center.namespace(), method);
+                    key2handlers.computeIfAbsent(Pair.of(handler.namespace, handler.key), _K -> new LinkedList<>()).add(handler);
+                    log.info("loaded @ConfigBinding method:[{}.{}] => namespace:[{}] key:[{}] desc:[{}].", handler.belongs.getName(), handler.method.getName(), handler.namespace, handler.key, handler.desc);
+                });
             }
         }
 
@@ -153,7 +157,13 @@ public class ConfigFrameworkRegister {
 
     private void handleConfigDataChanged(boolean starting, String namespace, String key, List<Handler> handlers, String newData) {
         Map<String, String> key2data = namespace2key2data.computeIfAbsent(namespace, _K -> new ConcurrentHashMap<>());
-        log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, key2data.get(key), newData);
+        String oldData = key2data.get(key);
+        if (oldData == null) {
+            log.info("namespace:[{}] key:[{}] data changing to:[{}].", namespace, key, newData);
+        } else {
+            log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, oldData, newData);
+        }
+
         if (handlers.isEmpty()) {
             log.warn("namespace:[{}] key:[{}] bounded handlers empty.", namespace, key);
             return;
@@ -162,6 +172,7 @@ public class ConfigFrameworkRegister {
         for (Handler handler : handlers) {
             handleConfigDataChanged(starting, handler, newData);
         }
+
         key2data.put(key, newData);
     }
 
@@ -217,7 +228,7 @@ public class ConfigFrameworkRegister {
                 return new Object[]{true, deserializer.deserialize(new Deserializer.Context(key, desc, valueStr, type1, type2, field, method, belongs))};
             } catch (Throwable t) {
                 Message message = Message.of("MATRIX-CONFIG-0000-0006", namespace, key, valueStr, type1, type2);
-                log.error("{}", message, t);
+                log.error("{}", message.getMessage(), t);
                 if (starting) {
                     throw new ConfigUpdateException(message, t);
                 }

@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.model.config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
@@ -21,8 +21,6 @@ public class Hsf implements Serializable {
     public String group = "HSF";
 
     public Integer timeout;
-
-    public boolean lazy = false;
 
     public Hsf(String service, String version) {
         Preconditions.checkArgument(!Strings.isNullOrEmpty(service));

@@ -1,10 +1,8 @@
 package com.alibaba.matrix.extension.router;
 
-import com.alibaba.matrix.extension.model.ExtExecCtx;
-import com.alibaba.matrix.extension.model.ExtImpl;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 
-import java.io.Serializable;
-import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -17,8 +15,8 @@ public interface ExtensionRouter {
     /**
      * 获取扩展实现
      *
-     * @param ctx
+     * @param context
      * @return
      */
-    List<ExtImpl> route(ExtExecCtx ctx);
+    List<ExtensionImplEntity> route(ExtensionExecuteContext context);
 }

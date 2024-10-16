@@ -2,6 +2,7 @@ package com.alibaba.matrix.extension.test.impl;
 
 import com.alibaba.matrix.extension.annotation.ExtensionImpl;
 import com.alibaba.matrix.extension.test.impl.base.BaseDemoShowExtImpl;
+import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
 
@@ -10,6 +11,7 @@ import java.util.Arrays;
  * @version 1.0
  * @since 2022/7/21 21:08.
  */
+@Component
 @ExtensionImpl(code = "code.b", desc = "Code B")
 public class CodeBDemoShowExtImpl extends BaseDemoShowExtImpl {
 

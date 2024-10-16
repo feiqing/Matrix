@@ -1,52 +1,54 @@
 package com.alibaba.matrix.extension.factory;
 
+import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
-import com.alibaba.matrix.extension.model.Dubbo;
+import com.alibaba.dubbo.config.RegistryConfig;
+import com.alibaba.matrix.extension.model.config.Dubbo;
 import com.google.common.base.Preconditions;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
+@Slf4j
 public class DubboServiceFactory {
-
-    private static final ConcurrentMap<String, Object> serviceMap = new ConcurrentHashMap<>();
 
     public static Object getDubboService(Class<?> ext, Dubbo dubbo) {
         Preconditions.checkArgument(!StringUtils.isAllEmpty(dubbo.version, dubbo.group));
-        String serviceKey = String.format("%s#%s#%s#%s#%s", ext.getName(), dubbo.version, dubbo.group, dubbo.timeout, dubbo.filter);
 
-        return serviceMap.computeIfAbsent(serviceKey, _K -> {
-            ReferenceConfig<Object> reference = new ReferenceConfig<>();
-            reference.setInterface(ext);
-            if (dubbo.version != null) {
-                reference.setVersion(dubbo.version);
-            }
-            if (dubbo.group != null) {
-                reference.setGroup(dubbo.group);
-            }
-            if (dubbo.timeout != null) {
-                reference.setTimeout(dubbo.timeout);
-            }
-            if (dubbo.filter != null) {
-                reference.setFilter(dubbo.filter);
-            }
-            if (dubbo.check != null) {
-                reference.setCheck(dubbo.check);
-            }
+        ReferenceConfig<Object> reference = new ReferenceConfig<>();
+        reference.setInterface(ext);
+        reference.setCheck(dubbo.check);
+        
+        if (dubbo.version != null) {
+            reference.setVersion(dubbo.version);
+        }
+        if (dubbo.group != null) {
+            reference.setGroup(dubbo.group);
+        }
+        if (dubbo.timeout != null) {
+            reference.setTimeout(dubbo.timeout);
+        }
+        if (dubbo.filter != null) {
+            reference.setFilter(dubbo.filter);
+        }
 
-            Object serviceObj = reference.get();
-            Preconditions.checkState(serviceObj != null, String.format("DubboService:[%s:%s:%s] init failed.", ext.getName(), dubbo.version, dubbo.group));
-            log.info("DubboService:[{}:{}:{}] serviceObj:[{}] init success.", ext.getName(), dubbo.version, dubbo.group, serviceObj);
+        if (StringUtils.isNotBlank(dubbo.applicationName)) {
+            reference.setApplication(new ApplicationConfig(dubbo.applicationName));
+        }
 
-            return serviceObj;
-        });
+        if (StringUtils.isNotBlank(dubbo.registryAddress)) {
+            reference.setRegistry(new RegistryConfig(dubbo.registryAddress));
+        }
+
+        Object serviceObj = reference.get();
+
+        Preconditions.checkState(serviceObj != null, String.format("Dubbo service:[%s] version:[%s] group:[%s] init failed.", ext.getName(), dubbo.version, dubbo.group));
+        log.info("Dubbo service:[{}] version:[{}] group:[{}] init success.", ext.getName(), dubbo.version, dubbo.group);
+
+        return serviceObj;
     }
 }

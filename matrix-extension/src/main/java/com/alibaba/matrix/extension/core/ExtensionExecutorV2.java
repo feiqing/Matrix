@@ -1,8 +1,8 @@
 package com.alibaba.matrix.extension.core;
 
 import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
-import com.alibaba.matrix.extension.model.ExtExecCtx;
-import com.alibaba.matrix.extension.model.ExtImpl;
+import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 import com.alibaba.matrix.extension.plugin.ExtensionInvocation;
 import com.alibaba.matrix.extension.reducer.Reducer;
 import com.alibaba.matrix.extension.util.Logger;
@@ -30,10 +30,10 @@ import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
  */
 public class ExtensionExecutorV2 {
 
-    static Object executeByJob(ExtExecCtx ctx, List<ExtImpl> impls, Reducer reducer) {
+    static Object executeByJob(ExtensionExecuteContext ctx, List<ExtensionImplEntity> impls, Reducer reducer) {
         AtomicBoolean isBreak = new AtomicBoolean(false);
         Job.Builder<Void, Pair<Boolean, Object>> jobBuilder = Job.newBuilder();
-        for (ExtImpl impl : impls) {
+        for (ExtensionImplEntity impl : impls) {
             jobBuilder.addTask(new Task<Void, Pair<Boolean, Object>>() {
                 @Override
                 public Pair<Boolean, Object> execute(Void o) {
@@ -85,7 +85,7 @@ public class ExtensionExecutorV2 {
         }
     }
 
-    private static Object executeImpl(ExtExecCtx ctx, ExtImpl impl) {
+    private static Object executeImpl(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
         Preconditions.checkState(ctx.ext.isInstance(impl.instance));
         return new ExtensionInvocation(ctx, impl, plugins).proceed();
     }
