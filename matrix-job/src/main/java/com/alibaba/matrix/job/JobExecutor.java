@@ -107,8 +107,8 @@ public class JobExecutor<Input, Output> {
         log.info("Summary:[{}] executed:[{}](except={}) skipped:[{}] outputs:[{}] cost:[{}]ms.", job.name, wrapper.executed.get(), wrapper.excepted.get(), wrapper.skipped.get(), wrapper.size(), wrapper.cost());
 
         if (CollectionUtils.isNotEmpty(wrapper.exceptions)) {
-            tracer.currentSpan().event("JobThrowException(s)", job.name);
-            metrics.incCounter("job_throw_exception(s)", job.name);
+            tracer.currentSpan().event("JobThrowExceptions", job.name);
+            metrics.incCounter("job_throw_exceptions", job.name);
             throw new JobExecuteException(Message.format("MATRIX-JOB-0000-0000", job.name), wrapper.exceptions.toArray(new Throwable[0]));
         }
 
