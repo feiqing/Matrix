@@ -113,6 +113,6 @@ public class T {
 
     private static void test4() {
         long td = T.td(System.currentTimeMillis(), DateTimeZone.UTC.toTimeZone());
-        System.out.println(DateFormatUtils.format(td, DATE_TIME_MILLIS_PATTERN, DateTimeZone.forID("+08:00").toTimeZone(), Locale.CHINA));
+        System.out.println(DateFormatUtils.format(td, DATE_TIME_MILLIS_PATTERN, DateTimeZone.forID("+08:00").toTimeZone(), Locale.getDefault()));
     }
 }

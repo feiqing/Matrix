@@ -10,7 +10,8 @@ import java.lang.annotation.Target;
 import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 
 /**
- * 扩展Extension 默认实现
+ * Defines the default implementation type and the belonging type of an extension.
+ * This annotation is used to mark the default implementation of an extension interface.
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0
@@ -21,16 +22,18 @@ import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 public @interface ExtensionBase {
 
     /**
-     * ExtensionBase实现类型(如: object、bean、guice)
+     * The default implementation type of the extension.
+     * Default value is {@link ExtensionImplType#OBJECT}.
      *
-     * @return
+     * @return The default implementation type
      */
     ExtensionImplType type() default OBJECT;
 
     /**
-     * ExtensionBase实现的Extension
+     * The belonging type of the extension.
+     * Default value is {@link Object\.class}, indicating no specific belonging type.
      *
-     * @return
+     * @return The belonging type
      */
     Class<?> belong() default Object.class;
 

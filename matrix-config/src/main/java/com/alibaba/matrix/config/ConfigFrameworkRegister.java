@@ -24,6 +24,8 @@ import java.lang.reflect.Type;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -41,7 +43,7 @@ public class ConfigFrameworkRegister {
 
     private static final ConcurrentMap<Class<?>, Object> clazz2instance = new ConcurrentHashMap<>();
 
-    private static final ConcurrentMap<String, ConcurrentMap<String, String>> namespace2key2data = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<String, ConcurrentMap<String, Optional<String>>> namespace2key2data = new ConcurrentHashMap<>();
 
     private final List<String> scanPackages;
 
@@ -103,6 +105,7 @@ public class ConfigFrameworkRegister {
         Handler handler = new Handler();
         handler.namespace = namespace;
         handler.key = binding.key();
+        handler.defaultValue = binding.defaultValue();
         handler.desc = binding.desc();
         handler.belongs = belongs;
         handler.field = field;
@@ -127,6 +130,7 @@ public class ConfigFrameworkRegister {
         Handler handler = new Handler();
         handler.namespace = namespace;
         handler.key = binding.key();
+        handler.defaultValue = binding.defaultValue();
         handler.desc = binding.desc();
         handler.belongs = clazz;
         handler.method = method;
@@ -164,12 +168,12 @@ public class ConfigFrameworkRegister {
     }
 
     private void handleConfigDataChanged(boolean starting, String namespace, String key, List<Handler> handlers, String newData) {
-        Map<String, String> key2data = namespace2key2data.computeIfAbsent(namespace, _K -> new ConcurrentHashMap<>());
-        String oldData = key2data.get(key);
-        if (oldData == null) {
-            log.info("namespace:[{}] key:[{}] data changing to:[{}].", namespace, key, newData);
+        Map<String, Optional<String>> key2data = namespace2key2data.computeIfAbsent(namespace, _K -> new ConcurrentHashMap<>());
+        Optional<String> oldData = key2data.get(key);
+        if (oldData != null && oldData.isPresent()) {
+            log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, oldData.get(), newData);
         } else {
-            log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, oldData, newData);
+            log.info("namespace:[{}] key:[{}] data changing to:[{}].", namespace, key, newData);
         }
 
         if (handlers.isEmpty()) {
@@ -181,10 +185,14 @@ public class ConfigFrameworkRegister {
             handleConfigDataChanged(starting, handler, newData);
         }
 
-        key2data.put(key, newData);
+        key2data.put(key, Optional.ofNullable(newData));
     }
 
     private void handleConfigDataChanged(boolean starting, Handler handler, String newConfig) {
+        if (newConfig == null && !Objects.equals(ConfigBinding.DEFAULT_VALUE, handler.defaultValue)) {
+            newConfig = handler.defaultValue;
+        }
+
         String name = handler.name();
         metrics.incCounter("handle_config_changed", name);
         ISpan span = tracer.newSpan("ConfigChanged", name);
@@ -219,6 +227,8 @@ public class ConfigFrameworkRegister {
         private String namespace;
 
         private String key;
+
+        private String defaultValue;
 
         private String desc;
 

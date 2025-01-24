@@ -13,11 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 public class HsfServiceFactory {
 
     public static Object getHsfService(Hsf hsf) {
-        // 后面如果有需要分布式传递ExtensionContext的话
-        // 就使用: RPCContext rpcContext = RPCContext.getClientContext();
-        // 详见: http://mw.alibaba-inc.com/products/hsf/_book/mw-docs/hsf-manuel-book/chapter14.html
-        // 要在此处生成一个Hsf服务的Proxy 还是 说使用hsf filter?
-
+        // RPCContext rpcContext = RPCContext.getClientContext();
+        // Ref: http://mw.alibaba-inc.com/products/hsf/_book/mw-docs/hsf-manuel-book/chapter14.html
         HSFApiConsumerBean hsfConsumerBean = new HSFApiConsumerBean();
         hsfConsumerBean.setInterfaceName(hsf.service);
         hsfConsumerBean.setVersion(hsf.version);

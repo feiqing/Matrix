@@ -212,7 +212,7 @@ public class AnnotationLoader {
 
         for (String code : code2wrappers.keySet()) {
             List<Wrapper> wrappers = code2wrappers.get(code);
-            // 先排序一次, 后序如果同code合并, 还需要再次排序
+            // Sort once first, and then sort again if merged with same code
             wrappers.sort(Comparator.comparingInt(wrapper -> wrapper.priority));
 
             List<ExtensionImpl> impls = new ArrayList<>(wrappers.size());

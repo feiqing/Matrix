@@ -31,7 +31,7 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- 项目模块 -->
+            <!-- Project Module -->
             <dependency>
                 <groupId>com.alibaba.matrix</groupId>
                 <artifactId>matrix-base</artifactId>
@@ -63,7 +63,7 @@
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- 基础组件 -->
+            <!-- Base Components -->
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
@@ -100,7 +100,7 @@
                 <version>23.0.0</version>
             </dependency>
 
-            <!-- 可选组件 -->
+            <!-- Optional Components -->
             <dependency>
                 <groupId>io.github.classgraph</groupId>
                 <artifactId>classgraph</artifactId>
@@ -170,7 +170,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- 序列化 -->
+            <!-- Serialization -->
             <dependency>
                 <groupId>com.caucho</groupId>
                 <artifactId>hessian</artifactId>
@@ -184,7 +184,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Spring相关 -->
+            <!-- Spring -->
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
@@ -222,7 +222,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- Extension扩展实现 -->
+            <!-- Extension Impls -->
             <dependency>
                 <groupId>com.google.inject</groupId>
                 <artifactId>guice</artifactId>
@@ -248,7 +248,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- 日志(Provided) -->
+            <!-- Log(Provided) -->
             <dependency>
                 <groupId>ch.qos.logback</groupId>
                 <artifactId>logback-classic</artifactId>
@@ -268,7 +268,7 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- 存储(Sequence) -->
+            <!-- Storage(Sequence) -->
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
@@ -364,7 +364,7 @@
         </pluginManagement>
     </build>
 
-    <!-- 弹内 -->
+    <!-- alibaba network -->
     <distributionManagement>
         <repository>
             <id>releases</id>

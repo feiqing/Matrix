@@ -11,21 +11,27 @@ public class ExtensionImplEntity implements Serializable {
 
     private static final long serialVersionUID = -8095928529159883845L;
 
+    public final String scope;
+
+    public final String code;
+
     /**
      * see {@link ExtensionImplType}
      */
     public final String type;
 
-    public final Object instance;
-
     public final int priority;
 
     public final String desc;
 
-    public ExtensionImplEntity(String type, Object instance, int priority, String desc) {
+    public final Object instance;
+
+    public ExtensionImplEntity(String scope, String code, String type, int priority, String desc, Object instance) {
+        this.scope = scope;
+        this.code = code;
         this.type = type;
-        this.instance = instance;
         this.priority = priority;
         this.desc = desc;
+        this.instance = instance;
     }
 }

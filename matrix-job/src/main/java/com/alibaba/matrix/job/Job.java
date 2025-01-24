@@ -2,6 +2,7 @@ package com.alibaba.matrix.job;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -13,7 +14,9 @@ import java.util.concurrent.TimeUnit;
  * @since 2020/9/18 13:41.
  */
 @Getter
-public class Job {
+public class Job implements Serializable {
+
+    private static final long serialVersionUID = 6090252744510482638L;
 
     public final String name;
 

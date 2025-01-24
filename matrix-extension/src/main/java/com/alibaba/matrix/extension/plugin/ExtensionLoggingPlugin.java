@@ -1,7 +1,12 @@
 package com.alibaba.matrix.extension.plugin;
 
+import com.alibaba.matrix.extension.reducer.Reducer;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.function.Function;
 
 import static com.alibaba.matrix.extension.util.Logger.getDesc;
 
@@ -18,12 +23,18 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
     public Object invoke(ExtensionInvocation invocation) {
         long start = System.currentTimeMillis();
         String scope = invocation.getScope();
+        List<String> codes = invocation.getCodes();
+        String extension = invocation.getExtension().getSimpleName();
+
+        Function action = invocation.getAction();
+        Reducer reducer = invocation.getReducer();
+
         String code = invocation.getCode();
-        String extension = invocation.getExtension().getName();
         String type = invocation.getType();
-        Object instance = invocation.getInstance();
         int priority = invocation.getPriority();
         String desc = invocation.getDesc();
+        Object instance = invocation.getInstance();
+
         Object result = null;
         Throwable except = null;
         try {
@@ -34,9 +45,9 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, extension, type, instance, priority, getDesc(desc), getResult(result), rt);
+                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt);
             } else {
-                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, code, extension, type, instance, priority, getDesc(desc), getResult(result), rt, except);
+                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt, except);
             }
         }
     }

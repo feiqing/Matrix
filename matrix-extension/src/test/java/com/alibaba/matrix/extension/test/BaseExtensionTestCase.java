@@ -51,12 +51,12 @@ public class BaseExtensionTestCase {
      */
     @Test(expected = IllegalArgumentException.class)
     public void test_null_code() {
-        Object first = ExtensionInvoker.invoke(null, TriFunction.class, ext -> ext.apply("arg1", model.list, null));
+        Object first = ExtensionInvoker.invoke((String) null, TriFunction.class, ext -> ext.apply("arg1", model.list, null));
         System.out.println(first);
         Assert.assertTrue(String.valueOf(first).startsWith("BaseTriFunctionImpl"));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void test_empty_code() {
         Object first = ExtensionInvoker.invoke("", TriFunction.class, ext -> ext.apply("arg1", model.list, null));
         System.out.println(first);
@@ -257,26 +257,29 @@ public class BaseExtensionTestCase {
         }
     }
 
-    /**
-     * todo test?
-     */
-
-    @Test
-    public void test_parallel_any_thread_name() {
-        Object result = ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> {
-            // Utils.sleep(100);
-            return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext2 -> {
-                //  Utils.sleep(100);
-                return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext3 -> {
+    @Test(expected = TimeoutException.class)
+    public void test_parallel_any_thread_name() throws Throwable {
+        try {
+            Object result = ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> {
+                // Utils.sleep(100);
+                return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext2 -> {
                     //  Utils.sleep(100);
-                    return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext4 -> {
+                    return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext3 -> {
                         //  Utils.sleep(100);
-                        System.out.println(Thread.currentThread().getName());
-                        return Thread.currentThread().getName();
+                        return ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext4 -> {
+                            //  Utils.sleep(100);
+                            System.out.println(Thread.currentThread().getName());
+                            return Thread.currentThread().getName();
+                        }, Reducers.any());
                     }, Reducers.any());
                 }, Reducers.any());
             }, Reducers.any());
-        }, Reducers.any());
-        Assert.assertTrue(StringUtils.startsWith(String.valueOf(result), "E-Parallel-Common-Exec-"));
+            Assert.assertTrue(StringUtils.startsWith(String.valueOf(result), "E-Parallel-Testing-Exec-"));
+        } catch (ExtensionRuntimeException e) {
+            e.printStackTrace();
+            Assert.assertTrue(ArrayUtils.isNotEmpty(e.getCauses()));
+            e.getCauses()[0].printStackTrace();
+            throw e.getCauses()[0];
+        }
     }
 }

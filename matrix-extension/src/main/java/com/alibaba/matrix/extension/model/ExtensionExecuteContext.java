@@ -4,6 +4,7 @@ import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.AllArgsConstructor;
 
 import java.io.Serializable;
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -12,13 +13,14 @@ import java.util.function.Function;
  * @since 2022/3/30 10:31.
  */
 @AllArgsConstructor
+@SuppressWarnings("all")
 public class ExtensionExecuteContext implements Serializable {
 
     private static final long serialVersionUID = 1374750581241420843L;
 
     public final String scope;
 
-    public final String code;
+    public final List<String> codes;
 
     public final Class<?> extension;
 

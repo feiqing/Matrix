@@ -39,9 +39,8 @@ public class SpringBeanFactory {
     }
 
     private static <T> T getSpringBean(Class<T> beanType) {
-        // 这里目前存在的问题:
-        // 1. 若bean被aop代理, 且spring使用的是jdk-proxy(而非cglib), 则无法基于实现的beanType找到对应的bean实例.
-        // 2. 若beanType为@ExtensionBase实现, 且@ExtensionImpl实现继承自@ExtensionBase, 则会抛出命中多个bean的异常.
+        // 1. Error when spring used jdk-proxy(not cglib)
+        // 2. Error when @ExtensionImpl extends @ExtensionBase and @ExtensionBase as a spring component.
         return applicationContext.getBean(beanType);
     }
 }

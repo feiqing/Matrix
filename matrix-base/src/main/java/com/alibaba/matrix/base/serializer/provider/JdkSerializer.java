@@ -8,7 +8,7 @@ import java.io.Serializable;
 /**
  * @author zhujifang@vdian.com
  * @version 1.0
- * @since 2016/7/2 下午5:00.
+ * @since 2016/7/2 5:00 PM.
  */
 public class JdkSerializer implements Serializer {
 

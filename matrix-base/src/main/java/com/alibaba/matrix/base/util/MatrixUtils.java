@@ -1,11 +1,13 @@
 package com.alibaba.matrix.base.util;
 
 import com.google.common.collect.ImmutableMap;
+import com.google.common.io.LineReader;
 import com.google.common.reflect.TypeToken;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.InetAddress;
@@ -13,6 +15,8 @@ import java.net.NetworkInterface;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
@@ -21,11 +25,13 @@ import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 3.0
- * @since 2016/8/18 下午6:09.
+ * @since 2016/8/18 6:09 PM.
  */
 @Slf4j
 @SuppressWarnings({"unchecked", "rawtypes"})
 public class MatrixUtils {
+
+    private static final AtomicBoolean inited = new AtomicBoolean(false);
 
     private static final Pattern IP_PATTERN = Pattern.compile("\\d{1,3}(\\.\\d{1,3}){3,5}$");
 
@@ -36,6 +42,7 @@ public class MatrixUtils {
     private static Map<Type, Method> primitiveMethods;
 
     static {
+        printLogo();
         initPrimitiveMethods();
         initLocalIp();
         initLocalMac();
@@ -184,7 +191,6 @@ public class MatrixUtils {
         }
     }
 
-
     private static boolean isValidAddress(InetAddress address) {
         if (address == null || address.isLoopbackAddress()) {
             return false;
@@ -222,6 +228,27 @@ public class MatrixUtils {
         }
 
         return false;
+    }
+
+    public static void printLogo() {
+        if (inited.compareAndSet(false, true)) {
+            try {
+                LineReader reader = new LineReader(new InputStreamReader(Objects.requireNonNull(MatrixUtils.class.getClassLoader().getResourceAsStream("logo.md"))));
+                String line;
+                int max = 0;
+                while (StringUtils.isNotBlank(line = reader.readLine())) {
+                    max = Math.max(max, line.length());
+                    System.out.println(line);
+                }
+
+                String version = "[version: " + resolveProjectVersion(MatrixUtils.class, "matrix-base") + "]";
+                for (int i = 0; i < max - version.length(); ++i) {
+                    System.out.print(' ');
+                }
+                System.out.println(version);
+            } catch (Throwable ignored) {
+            }
+        }
     }
 
     public static void main(String[] args) {

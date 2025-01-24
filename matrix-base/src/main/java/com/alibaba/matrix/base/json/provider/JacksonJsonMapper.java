@@ -30,20 +30,11 @@ public class JacksonJsonMapper implements JsonMapper {
     static {
         objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
         objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-        // 支持非标准json中增加//注释
         objectMapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        // 该属性是用于关闭json key的常量化, 默认jackson会将json的key规范化(调用String#intern)用于减小消耗
-        // 常见情况，将Map<String,Object>序列化为json
-        // 但如果存在大量非固定key的json需要序列化和反序列化的时候，建议将该属性关闭
-        // 如果主动开启该配置，需与 CANONICALIZE_FIELD_NAMES, true一起使用.
         objectMapper.getFactory().configure(JsonFactory.Feature.INTERN_FIELD_NAMES, false);
-        // 该特性目的是提高jackson的性能，但有可能导致内存泄露，建议关闭.
-        // 参考：https://github.com/FasterXML/jackson-core/issues/189
+        // Ref：https://github.com/FasterXML/jackson-core/issues/189
         objectMapper.getFactory().configure(JsonFactory.Feature.USE_THREAD_LOCAL_FOR_BUFFER_RECYCLING, false);
-        // 关闭未知属性错误异常，默认开启，建议关闭，对未知属性不处理
         objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-        // 属性为 null, 不序列化
         objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }
 

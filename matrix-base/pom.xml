@@ -13,7 +13,7 @@
     <artifactId>matrix-base</artifactId>
 
     <dependencies>
-        <!-- 基础组件 -->
+        <!-- Base Components -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>

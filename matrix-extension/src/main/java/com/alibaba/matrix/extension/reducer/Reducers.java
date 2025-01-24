@@ -28,7 +28,7 @@ public class Reducers {
     private static final Collect COLLECT_NOT_NULL = new Collect(Objects::nonNull);
 
     /**
-     * 返回: 第一个结果
+     * Return First Result
      *
      * @param <T>
      * @return
@@ -38,7 +38,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 第一个非null结果
+     * Return First NonNull Result
      *
      * @param <T>
      * @return
@@ -48,7 +48,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 满足条件的第一个结果
+     * Return The First Result Meets The Condition
      *
      * @param predicate
      * @param <T>
@@ -59,7 +59,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 任一个结果
+     * Return Any Result
      *
      * @param <T>
      * @return
@@ -69,7 +69,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 任一个非null结果
+     * Return Any NonNull Result
      *
      * @param <T>
      * @return
@@ -79,7 +79,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 满足条件的任一个结果
+     * Return Any Result That Meets The Condition
      *
      * @param predicate
      * @param <T>
@@ -91,7 +91,7 @@ public class Reducers {
 
 
     /**
-     * 返回: 所有结果
+     * Return All Results
      *
      * @param <T>
      * @return
@@ -101,7 +101,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 所有非null结果
+     * Return All NonNull Results
      *
      * @param <T>
      * @return
@@ -111,7 +111,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 满足条件的所有结果
+     * Return All Results That Meet The Condition
      *
      * @param predicate
      * @param <T>
@@ -122,7 +122,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 结果数量
+     * Return Number Of Results
      *
      * @param <T>
      * @return
@@ -132,7 +132,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 非null结果数量
+     * Return Number Of NonNull Results
      *
      * @param <T>
      * @return
@@ -142,7 +142,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 满足条件的结果数量
+     * Return Number of Results that meet the condition
      *
      * @param predicate
      * @param <T>
@@ -153,7 +153,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 是否有任意一个结果满足条件
+     * Return Whether Any Of The Results Meet The Criteria
      *
      * @param predicate
      * @param <T>
@@ -164,7 +164,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 是否所有结果都满足条件
+     * Return Whether All Results Meet The Criteria
      *
      * @param predicate
      * @param <T>
@@ -175,7 +175,7 @@ public class Reducers {
     }
 
     /**
-     * 返回: 是否所有结果都不满足条件
+     * Return Whether All Results Do Not Meet The Criteria
      *
      * @param predicate
      * @param <T>

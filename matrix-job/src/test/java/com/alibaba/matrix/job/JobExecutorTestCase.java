@@ -3,6 +3,8 @@ package com.alibaba.matrix.job;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.junit.Test;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -73,5 +75,41 @@ public class JobExecutorTestCase {
         }).buildParallelJob("MyJob", 1, TimeUnit.MILLISECONDS);
 
         executor.execute(job, null);
+    }
+
+    @Test
+    public void test_base_execute_for_list() {
+        Job.Builder<Object, Object> jobBuilder = Job.newBuilder();
+        for (int i = 0; i < 10; ++i) {
+            int finalI = i;
+            jobBuilder.addTask(o -> finalI);
+        }
+
+        List<Object> objects = executor.executeForList(jobBuilder.buildParallelJob("test_base_execute_for_list", 1, TimeUnit.SECONDS), null);
+        System.out.println(objects);
+    }
+
+    @Test
+    public void test_base_execute_for_list_serial() {
+        Job.Builder<Object, Object> jobBuilder = Job.newBuilder();
+        for (int i = 0; i < 10; ++i) {
+            int finalI = i;
+            jobBuilder.addTask(o -> finalI);
+        }
+
+        List<Object> objects = executor.executeForList(jobBuilder.buildSerialJob("test_base_execute_for_list_serial"), null);
+        System.out.println(objects);
+    }
+
+    @Test
+    public void test_base_execute_for_map() {
+        Job.Builder<Object, Object> jobBuilder = Job.newBuilder();
+        for (int i = 0; i < 10; ++i) {
+            int finalI = i;
+            jobBuilder.addTask(o -> finalI);
+        }
+
+        Map<String, Object> map = executor.executeForMap(jobBuilder.buildParallelJob("test_base_execute_for_map", 1, TimeUnit.SECONDS), null);
+        System.out.println(map);
     }
 }

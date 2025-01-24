@@ -30,7 +30,7 @@ public class YamlConfigService implements ConfigService {
         try {
             Resource[] resources = new PathMatchingResourcePatternResolver().getResources(configLocation);
             for (Resource resource : resources) {
-                // tips: 这里应该还有其他的优化空间: 比如一直递归到配置底部, 记录配置层次, 写入最终value?
+                // tips: Recursive optimization(todo)
                 Yaml yaml = new Yaml();
                 Map<String, String> config = yaml.load(resource.getInputStream());
                 configs.putAll(config);

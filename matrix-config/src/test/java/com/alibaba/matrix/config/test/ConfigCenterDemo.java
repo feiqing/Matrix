@@ -108,6 +108,9 @@ public class ConfigCenterDemo {
     @ConfigBinding(key = "string.list", desc = "${config.key.desc}")
     public static Set<String> stringSet;
 
+    @ConfigBinding(key = "string.list", desc = "${config.key.desc}")
+    public static String[] stringArray;
+
     @ConfigBinding(key = "int2int.map", desc = "${config.key.desc}")
     public static Map<String, Integer> str2intMap;
 
@@ -132,6 +135,9 @@ public class ConfigCenterDemo {
 
     @ConfigBinding(key = "custom.obj.list", desc = "${config.key.desc}")
     public static Set<CustomObj> customObjSet;
+
+    @ConfigBinding(key = "custom.obj.list", desc = "${config.key.desc}")
+    public static CustomObj[] customObjArray;
 
     @ConfigBinding(key = "custom.obj.list", desc = "${config.key.desc}")
     public static Collection<CustomObj> customObjCollection;
@@ -219,6 +225,7 @@ public class ConfigCenterDemo {
         MATRIX_FLOW(2, "Flow"),
         MATRIX_CONFIG(3, "Config"),
         MATRIX_EXTENSION(4, "Extension"),
+        MATRIX_CONFIG1(4, "Extension"),
         ;
 
         private final int code;

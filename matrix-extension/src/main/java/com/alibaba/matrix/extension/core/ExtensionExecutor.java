@@ -13,12 +13,12 @@ import com.google.common.util.concurrent.Futures;
 import com.google.common.util.concurrent.ListenableFuture;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.MutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -40,18 +40,18 @@ import static com.alibaba.matrix.extension.core.ExtensionManager.router;
  * @version 2.0
  * @since 2022/8/11 17:47.
  */
-//@SuppressWarnings({"unchecked", "rawtypes"})
+@SuppressWarnings({"unchecked"})
 public class ExtensionExecutor {
 
-    public static <Ext, T, R> R execute(String scope, String code, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
-        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, code, extension, action, reducer);
+    public static <Ext, T, R> R execute(String scope, List<String> codes, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
+        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, codes, extension, action, reducer);
         List<ExtensionImplEntity> impls = router.route(ctx);
         if (CollectionUtils.isEmpty(impls)) {
             throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0002", extension.getName()));
         }
 
         if (experiment.enableJobExecutor(ctx)) {
-            return (R) ExtensionExecutorV2.executeByJob(ctx, impls, reducer);
+            return (R) ExtensionJobExecutor.execute(ctx, impls);
         }
 
         if (impls.size() > 1 && parallel.enable(ctx) && reducer.parallel()) {
@@ -78,7 +78,7 @@ public class ExtensionExecutor {
                 triple.setLeft(true);
                 try {
                     triple.setMiddle(executeImpl(ctx, impl));
-                    // 由于这里的存在, 估计可能不能完全使用Job的机制实现
+                    // tips
                     if (ctx.reducer.willBreak(triple.getMiddle())) {
                         isBreak.set(true);
                     }
@@ -97,13 +97,12 @@ public class ExtensionExecutor {
             if (future.isDone()) {
                 Throwable[] exceptions = triples.stream().map(Triple::getRight).filter(Objects::nonNull).toArray(Throwable[]::new);
                 if (ArrayUtils.isNotEmpty(exceptions)) {
-                    String message = Arrays.stream(exceptions).map(ExceptionUtils::getMessage).collect(Collectors.joining(", "));
-                    throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.scope, ctx.code, exceptions.length, message), exceptions);
+                    throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.scope, StringUtils.join(ctx.codes, ','), exceptions.length), exceptions);
                 }
                 List<Object> results = triples.stream().filter(Triple::getLeft).map(Triple::getMiddle).collect(Collectors.toList());
                 return ctx.reducer.reduce(results);
             } else {
-                throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0007", ctx.extension.getName(), ctx.scope, ctx.code));
+                throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0007", ctx.extension.getName(), ctx.scope, StringUtils.join(ctx.codes, ',')));
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return ExceptionUtils.rethrow(e);
@@ -125,7 +124,7 @@ public class ExtensionExecutor {
     private static Object executeImpl(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
         Preconditions.checkState(ctx.extension.isInstance(impl.instance));
         metrics.incCounter("execute_extension", Logger.formatExec(ctx, impl));
-        ISpan span = tracer.newSpan("Extension", Logger.formatExec(ctx, impl));
+        ISpan span = tracer.newSpan("[Ext]:" + ctx.extension.getSimpleName(), Logger.formatExec(ctx, impl));
         try {
             Object proceed = new ExtensionInvocation(ctx, impl, plugins).proceed();
             span.setStatus(ISpan.STATUS_SUCCESS);

@@ -13,7 +13,7 @@ import java.util.List;
 public interface ExtensionRouter {
 
     /**
-     * 获取扩展实现
+     * Get The Extension Implementations
      *
      * @param context
      * @return

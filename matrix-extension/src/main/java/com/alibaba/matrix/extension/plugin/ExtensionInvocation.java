@@ -6,6 +6,7 @@ import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.function.Function;
 
 /**
@@ -20,7 +21,7 @@ public class ExtensionInvocation {
     private final String scope;
 
     @Getter
-    private final String code;
+    private final List<String> codes;
 
     @Getter
     private final Class<?> extension;
@@ -32,12 +33,11 @@ public class ExtensionInvocation {
     private final Reducer reducer;
 
     @Getter
-    @Setter
-    private String type;
+    private final String code;
 
     @Getter
     @Setter
-    private Object instance;
+    private String type;
 
     @Getter
     public int priority;
@@ -46,19 +46,25 @@ public class ExtensionInvocation {
     @Setter
     public String desc;
 
+    @Getter
+    @Setter
+    private Object instance;
+
     private final ExtensionPlugin[] plugins;
 
     public ExtensionInvocation(ExtensionExecuteContext ctx, ExtensionImplEntity impl, ExtensionPlugin[] plugins) {
         this.scope = ctx.scope;
-        this.code = ctx.code;
+        this.codes = ctx.codes;
         this.extension = ctx.extension;
         this.action = ctx.action;
         this.reducer = ctx.reducer;
 
+        this.code = impl.code;
         this.type = impl.type;
-        this.instance = impl.instance;
         this.priority = impl.priority;
         this.desc = impl.desc;
+
+        this.instance = impl.instance;
         this.plugins = plugins;
     }
 

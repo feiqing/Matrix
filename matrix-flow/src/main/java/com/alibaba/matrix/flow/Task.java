@@ -34,7 +34,7 @@ public interface Task<InputData, OutputData> {
     default OutputData next() {
         Flow.Meta meta = Flow.getMeta(this);
         Preconditions.checkState(meta != null);
-        // 已经到达终点
+        // The end has been reached
         if (!(++meta.idx < meta.tasks.length)) {
             throw new IllegalStateException(Message.format("MATRIX-FLOW-0000-0001", meta.name));
         }

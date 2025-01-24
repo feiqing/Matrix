@@ -34,7 +34,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * warning: 仅作为Demo演示Groovy类型扩展实现支持, 没做任何的优化和异常处理, 千万不要应用到实际业务当中
+ * warning: Do not use in Product Environment!!!
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
@@ -87,12 +87,6 @@ public class GroovyServiceFactory {
         }
     }
 
-    /**
-     * http的方式不支持动态加载
-     *
-     * @param groovy
-     * @return
-     */
     private static AtomicReference<Script> getHttpScript(Groovy groovy) {
         try {
             return new AtomicReference<>(groovyShell.parse(URI.create(groovy.path)));
@@ -101,12 +95,6 @@ public class GroovyServiceFactory {
         }
     }
 
-    /**
-     * file的方式不支持动态加载
-     *
-     * @param groovy
-     * @return
-     */
     private static AtomicReference<Script> getFileScript(Groovy groovy) {
         try {
             return new AtomicReference<>(groovyShell.parse(new InputStreamReader(new PathMatchingResourcePatternResolver().getResource(groovy.path).getInputStream())));

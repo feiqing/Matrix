@@ -33,10 +33,11 @@ import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
- * @version 1.0
- * @since 2022/3/30 10:31.
+ * @version 2.0
+ * @since 2021/09/30 10:31.
  */
 @Data
+@SuppressWarnings("all")
 public class ExtensionFrameworkRegister {
 
     private static final AtomicBoolean started = new AtomicBoolean(false);

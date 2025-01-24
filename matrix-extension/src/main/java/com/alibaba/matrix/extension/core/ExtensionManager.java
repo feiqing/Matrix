@@ -22,6 +22,8 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -41,7 +43,7 @@ public class ExtensionManager {
 
     public static ExtensionPlugin[] plugins;
 
-    public static List<ExtensionImplEntity> getExtensionImpls(String scope, String code, Class<?> ext) {
+    public static List<ExtensionImplEntity> getExtensionImpls(String scope, List<String> codes, Class<?> ext) {
         Extension extension = extensionMap.get(ext);
         if (extension == null) {
             throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0004", ext.getName()));
@@ -52,18 +54,30 @@ public class ExtensionManager {
             throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), scope));
         }
 
-        return extensionScope.CODE_TO_EXT_IMPLS_CACHE.computeIfAbsent(code, _K -> {
-            List<ExtensionImpl> impls = extensionScope.code2impls.get(code);
-            if (CollectionUtils.isEmpty(impls)) {
-                return Collections.singletonList(new ExtensionImplEntity(BASE.name(), extension.base, 0, null));
-            } else {
-                return impls.stream().map(impl -> makeImplEntity(ext, impl)).collect(toList());
-            }
-        });
+        List<ExtensionImplEntity> impls = new LinkedList<>();
+        for (String code : codes) {
+            List<ExtensionImplEntity> codeImpls = extensionScope.CODE_TO_EXT_IMPLS_CACHE.computeIfAbsent(code, _K -> {
+                List<ExtensionImpl> _impls = extensionScope.code2impls.get(code);
+                if (CollectionUtils.isEmpty(_impls)) {
+                    return Collections.emptyList();
+                } else {
+                    return _impls.stream().map(impl -> makeImplEntity(ext, impl)).collect(toList());
+                }
+            });
+            impls.addAll(codeImpls);
+        }
+        if (impls.isEmpty()) {
+            impls.add(new ExtensionImplEntity(null, null, BASE.name(), 0, null, extension.base));
+        }
+
+        if (codes.size() > 1 && impls.size() > 1) {
+            impls.sort(Comparator.comparingInt(o -> o.priority));
+        }
+
+        return impls;
     }
 
     private static ExtensionImplEntity makeImplEntity(Class<?> ext, ExtensionImpl impl) {
-        // tips: 懒加载的具体加载
         if (impl.instance == null) {
             try {
                 if (impl.object != null) {
@@ -93,6 +107,6 @@ public class ExtensionManager {
             throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, ext.getName()));
         }
 
-        return new ExtensionImplEntity(impl.type, impl.instance, impl.priority, impl.desc);
+        return new ExtensionImplEntity(impl.scope, impl.code, impl.type, impl.priority, impl.desc, impl.instance);
     }
 }

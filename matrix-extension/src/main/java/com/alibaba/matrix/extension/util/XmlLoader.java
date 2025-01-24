@@ -52,7 +52,7 @@ import static java.util.Optional.ofNullable;
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
- * @since 2022/3/30 10:31.
+ * @since 2021/12/24 18:31.
  */
 public class XmlLoader {
 
@@ -198,7 +198,6 @@ public class XmlLoader {
         ofNullable(extensionImplElement.attributeValue("lazy")).map(Boolean::valueOf).ifPresent(lazy -> wrapper.lazy = lazy);
 
         ExtensionImplType type = ExtensionImplType.fromStr(getAttrValNoneNull(extensionImplElement, "<ExtensionImpl/>", "type"));
-        // 后续有可能得话, 可以把这部分搞成Jar包的扩展、XML的scope扩展
         wrapper.type = type.name();
         switch (type) {
             case OBJECT:
@@ -241,7 +240,7 @@ public class XmlLoader {
 
         for (String code : code2wrappers.keySet()) {
             List<Wrapper> wrappers = code2wrappers.get(code);
-            // 先排序一次, 后序如果同code合并, 还需要再次排序
+            // Sort once first, and then sort again if merged with same code
             wrappers.sort(Comparator.comparingInt(wrapper -> wrapper.priority));
 
             List<ExtensionImpl> impls = new ArrayList<>(wrappers.size());

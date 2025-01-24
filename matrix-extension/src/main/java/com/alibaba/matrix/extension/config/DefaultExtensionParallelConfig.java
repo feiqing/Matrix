@@ -41,6 +41,11 @@ public class DefaultExtensionParallelConfig implements ExtensionParallelConfig {
     }
 
     @Override
+    public boolean enableFailFast(ExtensionExecuteContext ctx) {
+        return true;
+    }
+
+    @Override
     public TimeUnit unit(ExtensionExecuteContext ctx) {
         return TimeUnit.MILLISECONDS;
     }

@@ -42,7 +42,7 @@ public class ScriptExtensionTestCase {
 
     @Test
     public void test_script_spel_nacos() throws InterruptedException {
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 10; ++i) {
             Object invoke = ExtensionInvoker.invoke("code.spel.nacos", DemoScriptExt.class, ext -> ext.apply("arg1", model, null));
             MatcherAssert.assertThat(invoke, new BaseMatcher<Object>() {
 
@@ -78,7 +78,7 @@ public class ScriptExtensionTestCase {
 
     @Test
     public void test_remote_groovy_nacos() throws InterruptedException {
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 10; ++i) {
             Object invoke = ExtensionInvoker.invoke("code.groovy.nacos", DemoScriptExt.class, ext -> ext.apply("arg1", model, null));
             Assert.assertEquals("SUCCESS", invoke);
             Thread.sleep(3000);

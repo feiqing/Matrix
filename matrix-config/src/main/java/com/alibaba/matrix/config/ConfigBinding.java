@@ -10,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0
@@ -19,7 +20,11 @@ import java.lang.annotation.Target;
 @Target({ElementType.FIELD, ElementType.METHOD})
 public @interface ConfigBinding {
 
+    String DEFAULT_VALUE = "";
+
     String key();
+
+    String defaultValue() default DEFAULT_VALUE;
 
     String desc() default "";
 

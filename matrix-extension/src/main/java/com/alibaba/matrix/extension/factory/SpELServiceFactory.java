@@ -29,7 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicReference;
 
 /**
- * warning: 仅作为Demo演示SpEL类型扩展实现支持, 没做任何的优化和异常处理, 千万不要应用到实际业务当中
+ * warning: Do not use in Product Environment!!!
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 1.0

@@ -1,9 +1,13 @@
 package com.alibaba.matrix.extension.annotation;
 
-import java.lang.annotation.*;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * 扩展Extension 定义
+ * Defines an extension with an optional description.
+ * This annotation is used to mark interfaces or classes as extensions.
  *
  * @author jifang.zjf@alibaba-inc.com (FeiQing)
  * @version 2.0
@@ -14,9 +18,10 @@ import java.lang.annotation.*;
 public @interface Extension {
 
     /**
-     * Extension描述
+     * The description of the extension.
+     * Default value is an empty string.
      *
-     * @return
+     * @return The description of the extension
      */
     String desc() default "";
 

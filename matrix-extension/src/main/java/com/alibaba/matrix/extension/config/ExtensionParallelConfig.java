@@ -12,9 +12,15 @@ import java.util.concurrent.TimeUnit;
  */
 public interface ExtensionParallelConfig {
 
-    boolean enable(ExtensionExecuteContext ctx);
+    default boolean enable(ExtensionExecuteContext ctx) {
+        return true;
+    }
 
     ExecutorService executor(ExtensionExecuteContext ctx);
+
+    default boolean enableFailFast(ExtensionExecuteContext ctx) {
+        return true;
+    }
 
     long timeout(ExtensionExecuteContext ctx);
 

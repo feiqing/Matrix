@@ -17,7 +17,6 @@ public class ExtensionContext {
 
     private static final TransmittableThreadLocal<Map<String, Serializable>> contextMap = new TransmittableThreadLocal<>();
 
-    // 扩展自定义上下文
     public static <Ctx extends Serializable> void addExtCtx(Ctx ctx) {
         if (ctx != null) {
             setCtxVal(ctx.getClass().toString(), ctx);
@@ -78,7 +77,7 @@ public class ExtensionContext {
         }
     }
 
-    // ContextCopy(for 多线程/RPC)
+    // ContextCopy(for Multi Thread/RPC)
     public static Map<String, Serializable> getCopyOfContextMap() {
         return Collections.unmodifiableMap(ExtensionContext.contextMap.get());
     }
