@@ -13,7 +13,7 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2021/2/23 20:00.
  */

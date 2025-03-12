@@ -11,7 +11,7 @@ import org.apache.commons.collections4.bag.SynchronizedBag;
 import org.apache.commons.collections4.bag.TreeBag;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/8 16:50.
  */

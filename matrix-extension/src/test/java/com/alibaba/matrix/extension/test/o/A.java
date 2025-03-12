@@ -5,7 +5,7 @@ import org.HdrHistogram.Histogram;
 import org.LatencyUtils.LatencyStats;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/7 10:53.
  */

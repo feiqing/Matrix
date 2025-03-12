@@ -36,15 +36,15 @@ import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
 import static com.alibaba.matrix.extension.core.ExtensionManager.router;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2022/8/11 17:47.
  */
 @SuppressWarnings({"unchecked"})
 public class ExtensionExecutor {
 
-    public static <Ext, T, R> R execute(String scope, List<String> codes, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
-        ExtensionExecuteContext ctx = new ExtensionExecuteContext(scope, codes, extension, action, reducer);
+    public static <Ext, T, R> R execute(String namespace, List<String> codes, Class<Ext> extension, Function<Ext, T> action, Reducer<T, R> reducer) {
+        ExtensionExecuteContext ctx = new ExtensionExecuteContext(namespace, codes, extension, action, reducer);
         List<ExtensionImplEntity> impls = router.route(ctx);
         if (CollectionUtils.isEmpty(impls)) {
             throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0002", extension.getName()));
@@ -97,12 +97,12 @@ public class ExtensionExecutor {
             if (future.isDone()) {
                 Throwable[] exceptions = triples.stream().map(Triple::getRight).filter(Objects::nonNull).toArray(Throwable[]::new);
                 if (ArrayUtils.isNotEmpty(exceptions)) {
-                    throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.scope, StringUtils.join(ctx.codes, ','), exceptions.length), exceptions);
+                    throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ','), exceptions.length), exceptions);
                 }
                 List<Object> results = triples.stream().filter(Triple::getLeft).map(Triple::getMiddle).collect(Collectors.toList());
                 return ctx.reducer.reduce(results);
             } else {
-                throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0007", ctx.extension.getName(), ctx.scope, StringUtils.join(ctx.codes, ',')));
+                throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0007", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ',')));
             }
         } catch (InterruptedException | ExecutionException | TimeoutException e) {
             return ExceptionUtils.rethrow(e);

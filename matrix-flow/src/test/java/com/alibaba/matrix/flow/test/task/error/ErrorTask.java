@@ -6,7 +6,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.io.IOException;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2023/9/29 17:51.
  */

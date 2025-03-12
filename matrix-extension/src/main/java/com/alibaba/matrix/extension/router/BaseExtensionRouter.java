@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2023/11/13 10:48.
  */
@@ -20,16 +20,16 @@ public class BaseExtensionRouter implements ExtensionRouter {
 
     @Override
     public List<ExtensionImplEntity> route(ExtensionExecuteContext ctx) {
-        String scope = ctx.scope;
+        String namespace = ctx.namespace;
         List<String> codes = ctx.codes;
         Class<?> extension = ctx.extension;
-        Preconditions.checkArgument(StringUtils.isNotBlank(scope));
+        Preconditions.checkArgument(StringUtils.isNotBlank(namespace));
         Preconditions.checkArgument(CollectionUtils.isNotEmpty(codes) && codes.stream().allMatch(StringUtils::isNotBlank));
         Preconditions.checkArgument(extension != null);
 
-        List<ExtensionImplEntity> impls = ExtensionManager.getExtensionImpls(scope, codes, extension);
+        List<ExtensionImplEntity> impls = ExtensionManager.getExtensionImpls(namespace, codes, extension);
         if (CollectionUtils.isEmpty(impls)) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0003", extension.getName(), scope, codes));
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0003", extension.getName(), namespace, codes));
         }
         return impls;
     }

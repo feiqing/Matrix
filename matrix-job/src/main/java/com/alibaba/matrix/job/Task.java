@@ -7,7 +7,7 @@ package com.alibaba.matrix.job;
  * @param <Input>  The type of input parameter
  * @param <Output> The type of output parameter
  *
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2020/9/18 13:41.
  */

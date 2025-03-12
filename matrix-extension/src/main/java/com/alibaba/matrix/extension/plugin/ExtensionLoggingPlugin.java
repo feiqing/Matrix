@@ -11,7 +11,7 @@ import java.util.function.Function;
 import static com.alibaba.matrix.extension.util.Logger.getDesc;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2023/8/12 11:20.
  */
@@ -22,7 +22,7 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
     @Override
     public Object invoke(ExtensionInvocation invocation) {
         long start = System.currentTimeMillis();
-        String scope = invocation.getScope();
+        String namespace = invocation.getNamespace();
         List<String> codes = invocation.getCodes();
         String extension = invocation.getExtension().getSimpleName();
 
@@ -45,9 +45,9 @@ public class ExtensionLoggingPlugin implements ExtensionPlugin {
         } finally {
             long rt = System.currentTimeMillis() - start;
             if (except == null) {
-                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt);
+                logger.info("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", namespace, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt);
             } else {
-                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", scope, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt, except);
+                logger.error("{}|{}|{}|{}|{}|{}|{}|{}|{}|{}|", namespace, StringUtils.join(codes, ','), extension, code, type, priority, getDesc(desc), instance.toString(), getResult(result), rt, except);
             }
         }
     }

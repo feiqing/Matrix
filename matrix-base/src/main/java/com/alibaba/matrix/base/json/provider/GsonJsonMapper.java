@@ -7,7 +7,7 @@ import com.google.gson.Gson;
 import java.lang.reflect.Type;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2018/8/30 11:45.
  */

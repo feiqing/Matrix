@@ -7,14 +7,15 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_SCOPE;
+import static com.alibaba.matrix.extension.ExtensionInvoker.DEFAULT_NAMESPACE;
 import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 
 /**
- * Defines an implementation of an extension with various attributes.
- * This annotation is used to mark classes as specific implementations of an extension.
+ * This annotation is used to mark a class as an extension implementation within the Matrix framework.
+ * It provides metadata about the extension such as namespace, code identifiers, type, priority, lazy loading behavior,
+ * description, and the class it belongs to.
  *
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2023/11/20 18:00.
  */
@@ -23,59 +24,58 @@ import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
 public @interface ExtensionImpl {
 
     /**
-     * The scope(s) of the extension implementation.
-     * Default value is the base scope defined in {@link com.alibaba.matrix.extension.ExtensionInvoker#BASE_SCOPE}.
+     * Specifies the namespace(s) under which this extension implementation is registered.
+     * Defaults to {@link com.alibaba.matrix.extension.ExtensionInvoker#DEFAULT_NAMESPACE}.
      *
-     * @return The scope(s) of the extension implementation
+     * @return an array of namespace strings
      */
-    String[] scope() default BASE_SCOPE;
+    String[] namespace() default DEFAULT_NAMESPACE;
 
     /**
-     * The code(s) that identify the extension implementation.
-     * This attribute is required.
+     * Identifies the code or identifier(s) associated with this extension implementation.
      *
-     * @return The code(s) of the extension implementation
+     * @return an array of code strings
      */
     String[] code();
 
     /**
-     * The type of the extension implementation.
-     * Default value is {@link ExtensionImplType#OBJECT}.
+     * Defines the type of this extension implementation.
+     * Defaults to {@link com.alibaba.matrix.extension.model.ExtensionImplType#OBJECT}.
      *
-     * @return The type of the extension implementation
+     * @return the type of the extension implementation
      */
     ExtensionImplType type() default OBJECT;
 
     /**
-     * The priority of the extension implementation.
-     * Lower values indicate higher priority.
-     * Default value is 0.
+     * Specifies the priority of this extension implementation.
+     * Higher values indicate higher priority.
+     * Defaults to 0.
      *
-     * @return The priority of the extension implementation
+     * @return the priority of the extension implementation
      */
     int priority() default 0;
 
     /**
-     * Indicates whether the extension implementation should be lazily loaded.
-     * Default value is false.
+     * Indicates whether this extension implementation should be lazily loaded.
+     * Defaults to false.
      *
-     * @return Whether the extension implementation should be lazily loaded
+     * @return true if the extension should be lazily loaded, false otherwise
      */
     boolean lazy() default false;
 
     /**
-     * The description of the extension implementation.
-     * Default value is an empty string.
+     * Provides a description of this extension implementation.
+     * Defaults to an empty string.
      *
-     * @return The description of the extension implementation
+     * @return a description of the extension implementation
      */
     String desc() default "";
 
     /**
-     * The belonging type of the extension implementation.
-     * Default value is {@link Object\.class}, indicating no specific belonging type.
+     * Specifies the class to which this extension implementation belongs.
+     * Defaults to {@link Object}.
      *
-     * @return The belonging type of the extension implementation
+     * @return the class to which the extension implementation belongs
      */
     Class<?> belong() default Object.class;
 

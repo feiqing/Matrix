@@ -5,7 +5,7 @@ import com.alibaba.matrix.base.json.JsonMapperProvider;
 import com.alibaba.matrix.extension.test.ext.DemoRemoteExt;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/11 21:12.
  */

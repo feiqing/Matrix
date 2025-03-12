@@ -5,7 +5,7 @@ import com.alibaba.matrix.testing.flow.OrderCreateContext;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/5/31 16:42.
  */

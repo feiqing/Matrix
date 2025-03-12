@@ -9,7 +9,7 @@ import com.alibaba.matrix.extension.model.ExtensionImplType;
 import com.alibaba.matrix.extension.model.config.Bean;
 import com.alibaba.matrix.extension.model.config.Extension;
 import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionScope;
+import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.model.config.Guice;
 import com.alibaba.matrix.extension.model.config.ObjectT;
 import io.github.classgraph.ClassGraph;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
@@ -67,9 +67,9 @@ public class AnnotationLoader {
             log.info("Loaded @Extension: [{}].", Logger.formatExt(extension, desc));
 
             Object base = loadExtensionBase(extension, scanResult);
-            Map<String, ExtensionScope> scopeMap = loadExtensionScopeMap(extension, scanResult);
+            Map<String, ExtensionNamespace> namespaceMap = loadExtensionNamespaceMap(extension, scanResult);
 
-            extensionMap.put(extension, new Extension(extension, desc, base, scopeMap));
+            extensionMap.put(extension, new Extension(extension, desc, base, namespaceMap));
         }
 
         if (extensionMap.isEmpty()) {
@@ -135,9 +135,9 @@ public class AnnotationLoader {
         return base;
     }
 
-    private static Map<String, ExtensionScope> loadExtensionScopeMap(Class<?> extension, ScanResult scanResult) throws Exception {
+    private static Map<String, ExtensionNamespace> loadExtensionNamespaceMap(Class<?> extension, ScanResult scanResult) throws Exception {
 
-        Map<String, Map<String, List<Wrapper>>> scope2code2wrappers = new LinkedHashMap<>();
+        Map<String, Map<String, List<Wrapper>>> namespace2code2wrappers = new LinkedHashMap<>();
         for (ClassInfo classInfo : scanResult.getClassesWithAnnotation(com.alibaba.matrix.extension.annotation.ExtensionImpl.class)) {
             if (!classInfo.extendsSuperclass(extension) && !classInfo.implementsInterface(extension)) {
                 continue;
@@ -158,31 +158,31 @@ public class AnnotationLoader {
             }
 
             Wrapper wrapper = loadImplWrapper(clazz, extensionImpl);
-            for (String scope : wrapper.scope) {
+            for (String namespace : wrapper.namespace) {
                 for (String code : wrapper.code) {
-                    scope2code2wrappers.computeIfAbsent(scope, _K -> new LinkedHashMap<>()).computeIfAbsent(code, _K -> new LinkedList<>()).add(wrapper);
+                    namespace2code2wrappers.computeIfAbsent(namespace, _K -> new LinkedHashMap<>()).computeIfAbsent(code, _K -> new LinkedList<>()).add(wrapper);
                 }
             }
         }
 
-        if (MapUtils.isEmpty(scope2code2wrappers)) {
+        if (MapUtils.isEmpty(namespace2code2wrappers)) {
             log.warn("{}", Message.format("MATRIX-EXTENSION-0002-0004", extension.getName()));
         }
 
-        Map<String, ExtensionScope> scopeMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Map<String, List<Wrapper>>> entry : scope2code2wrappers.entrySet()) {
-            String scope = entry.getKey();
+        Map<String, ExtensionNamespace> namespaceMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, List<Wrapper>>> entry : namespace2code2wrappers.entrySet()) {
+            String namespace = entry.getKey();
             Map<String, List<Wrapper>> code2wrappers = entry.getValue();
 
-            scopeMap.put(scope, convertToExtensionScope(extension, scope, code2wrappers));
+            namespaceMap.put(namespace, convertToExtensionNamespace(extension, namespace, code2wrappers));
         }
 
-        return scopeMap;
+        return namespaceMap;
     }
 
     private static Wrapper loadImplWrapper(Class<?> impl, com.alibaba.matrix.extension.annotation.ExtensionImpl extensionImpl) {
         Wrapper wrapper = new Wrapper();
-        wrapper.scope = extensionImpl.scope();
+        wrapper.namespace = extensionImpl.namespace();
         wrapper.code = extensionImpl.code();
         wrapper.type = extensionImpl.type();
         wrapper.priority = extensionImpl.priority();
@@ -206,7 +206,7 @@ public class AnnotationLoader {
         return wrapper;
     }
 
-    private static ExtensionScope convertToExtensionScope(Class<?> extension, String scope, Map<String, List<Wrapper>> code2wrappers) throws Exception {
+    private static ExtensionNamespace convertToExtensionNamespace(Class<?> extension, String namespace, Map<String, List<Wrapper>> code2wrappers) throws Exception {
 
         Map<String, List<ExtensionImpl>> code2impls = new LinkedHashMap<>();
 
@@ -217,7 +217,7 @@ public class AnnotationLoader {
 
             List<ExtensionImpl> impls = new ArrayList<>(wrappers.size());
             for (Wrapper wrapper : wrappers) {
-                ExtensionImpl impl = convertToImpl(extension, scope, code, wrapper);
+                ExtensionImpl impl = convertToImpl(extension, namespace, code, wrapper);
 
                 if (impl.instance != null && !extension.isInstance(impl.instance)) {
                     throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()));
@@ -227,30 +227,30 @@ public class AnnotationLoader {
             }
 
             code2impls.put(code, impls);
-            log.info("Loaded @ExtensionImpl: extension:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+            log.info("Loaded @ExtensionImpl: extension:[{}] namespace:[{}] code:[{}] -> [{}].", extension.getName(), namespace, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
         }
 
-        return new ExtensionScope(scope, code2impls);
+        return new ExtensionNamespace(namespace, code2impls);
     }
 
-    private static ExtensionImpl convertToImpl(Class<?> extension, String scope, String code, Wrapper wrapper) throws Exception {
+    private static ExtensionImpl convertToImpl(Class<?> extension, String namespace, String code, Wrapper wrapper) throws Exception {
 
         if (wrapper.object != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.object = wrapper.object;
             impl.instance = wrapper.lazy ? null : ObjectInstanceFactory.getObjectInstance(wrapper.object);
             return impl;
         }
 
         if (wrapper.bean != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.bean = wrapper.bean;
             impl.instance = wrapper.lazy ? null : SpringBeanFactory.getSpringBean(wrapper.bean);
             return impl;
         }
 
         if (wrapper.guice != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type.name(), wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.guice = wrapper.guice;
             impl.instance = wrapper.lazy ? null : GuiceInstanceFactory.getGuiceInstance(wrapper.guice);
             return impl;
@@ -261,7 +261,7 @@ public class AnnotationLoader {
 
     private static class Wrapper implements Serializable {
         private static final long serialVersionUID = -7603465850850920008L;
-        public String[] scope;
+        public String[] namespace;
         public String[] code;
         public int priority = 0;
         public String desc;

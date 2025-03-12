@@ -6,7 +6,7 @@ import com.alibaba.matrix.extension.test.ext.DemoRemoteExt;
 import java.util.function.BiFunction;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/12 17:50.
  */

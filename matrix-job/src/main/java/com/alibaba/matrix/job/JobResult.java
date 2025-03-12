@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.Collection;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2025/2/9 23:07.
  */

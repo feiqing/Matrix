@@ -1,6 +1,5 @@
 package com.alibaba.matrix.testing.other;
 
-import com.alibaba.matrix.base.json.JsonMapperProvider;
 import javassist.CannotCompileException;
 import javassist.ClassPool;
 import javassist.CtClass;
@@ -16,7 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2023/9/22 22:35.
  */

@@ -15,7 +15,7 @@ import com.alibaba.matrix.extension.model.config.Bean;
 import com.alibaba.matrix.extension.model.config.Dubbo;
 import com.alibaba.matrix.extension.model.config.Extension;
 import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionScope;
+import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.model.config.Groovy;
 import com.alibaba.matrix.extension.model.config.Guice;
 import com.alibaba.matrix.extension.model.config.Hsf;
@@ -45,12 +45,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.alibaba.matrix.extension.ExtensionInvoker.BASE_SCOPE;
+import static com.alibaba.matrix.extension.ExtensionInvoker.DEFAULT_NAMESPACE;
 import static com.alibaba.matrix.extension.util.Logger.log;
 import static java.util.Optional.ofNullable;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2021/12/24 18:31.
  */
@@ -119,9 +119,9 @@ public class XmlLoader {
         log.info("Loaded <Extension/>: [{}].", Logger.formatExt(extension, desc));
 
         Object base = loadExtensionBase(extension, extensionElement);
-        Map<String, ExtensionScope> scopeMap = loadExtensionScopeMap(extension, extensionElement);
+        Map<String, ExtensionNamespace> namespaceMap = loadExtensionNamespaceMap(extension, extensionElement);
 
-        return new Extension(extension, desc, base, scopeMap);
+        return new Extension(extension, desc, base, namespaceMap);
     }
 
     private static Object loadExtensionBase(Class<?> extension, Element extensionElement) throws Exception {
@@ -157,40 +157,40 @@ public class XmlLoader {
         return base;
     }
 
-    private static Map<String, ExtensionScope> loadExtensionScopeMap(Class<?> extension, Element extensionElement) throws Exception {
+    private static Map<String, ExtensionNamespace> loadExtensionNamespaceMap(Class<?> extension, Element extensionElement) throws Exception {
 
-        Map<String, Map<String, List<Wrapper>>> scope2code2wrappers = new LinkedHashMap<>();
+        Map<String, Map<String, List<Wrapper>>> namespace2code2wrappers = new LinkedHashMap<>();
         for (Iterator<Element> iterator = extensionElement.elementIterator("ExtensionImpl"); iterator.hasNext(); ) {
             Wrapper wrapper = loadImplWrapper(iterator.next());
-            for (String scope : wrapper.scope) {
+            for (String namespace : wrapper.namespace) {
                 for (String code : wrapper.code) {
-                    scope2code2wrappers.computeIfAbsent(scope, _K -> new LinkedHashMap<>()).computeIfAbsent(code, _K -> new LinkedList<>()).add(wrapper);
+                    namespace2code2wrappers.computeIfAbsent(namespace, _K -> new LinkedHashMap<>()).computeIfAbsent(code, _K -> new LinkedList<>()).add(wrapper);
                 }
             }
         }
 
-        if (MapUtils.isEmpty(scope2code2wrappers)) {
+        if (MapUtils.isEmpty(namespace2code2wrappers)) {
             log.warn("{}", Message.format("MATRIX-EXTENSION-0001-0006", extension.getName()));
         }
 
-        Map<String, ExtensionScope> scopeMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Map<String, List<Wrapper>>> entry : scope2code2wrappers.entrySet()) {
-            String scope = entry.getKey();
+        Map<String, ExtensionNamespace> namespaceMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Map<String, List<Wrapper>>> entry : namespace2code2wrappers.entrySet()) {
+            String namespace = entry.getKey();
             Map<String, List<Wrapper>> code2wrappers = entry.getValue();
 
-            scopeMap.put(scope, convertToExtensionScope(extension, scope, code2wrappers));
+            namespaceMap.put(namespace, convertToExtensionNamespace(extension, namespace, code2wrappers));
         }
 
-        return scopeMap;
+        return namespaceMap;
     }
 
     private static Wrapper loadImplWrapper(Element extensionImplElement) {
         Wrapper wrapper = new Wrapper();
 
-        String scope = ofNullable(extensionImplElement.attributeValue("scope")).orElse(BASE_SCOPE);
+        String namespace = ofNullable(extensionImplElement.attributeValue("namespace")).orElse(DEFAULT_NAMESPACE);
         String code = getAttrValNoneNull(extensionImplElement, "<ExtensionImpl/>", "code");
 
-        wrapper.scope = Splitter.on(",").trimResults().omitEmptyStrings().split(scope);
+        wrapper.namespace = Splitter.on(",").trimResults().omitEmptyStrings().split(namespace);
         wrapper.code = Splitter.on(",").trimResults().omitEmptyStrings().split(code);
         wrapper.desc = extensionImplElement.attributeValue("desc");
 
@@ -234,7 +234,7 @@ public class XmlLoader {
         return wrapper;
     }
 
-    private static ExtensionScope convertToExtensionScope(Class<?> extension, String scope, Map<String, List<Wrapper>> code2wrappers) throws Exception {
+    private static ExtensionNamespace convertToExtensionNamespace(Class<?> extension, String namespace, Map<String, List<Wrapper>> code2wrappers) throws Exception {
 
         Map<String, List<ExtensionImpl>> code2impls = new LinkedHashMap<>();
 
@@ -245,7 +245,7 @@ public class XmlLoader {
 
             List<ExtensionImpl> impls = new ArrayList<>(wrappers.size());
             for (Wrapper wrapper : wrappers) {
-                ExtensionImpl impl = convertToImpl(extension, scope, code, wrapper);
+                ExtensionImpl impl = convertToImpl(extension, namespace, code, wrapper);
 
                 if (impl.instance != null && !extension.isInstance(impl.instance)) {
                     throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, extension.getName()));
@@ -255,72 +255,72 @@ public class XmlLoader {
             }
 
             code2impls.put(code, impls);
-            log.info("Loaded <ExtensionImpl/>: extension:[{}] scope:[{}] code:[{}] -> [{}].", extension.getName(), scope, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+            log.info("Loaded <ExtensionImpl/>: extension:[{}] namespace:[{}] code:[{}] -> [{}].", extension.getName(), namespace, code, impls.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
         }
 
-        return new ExtensionScope(scope, code2impls);
+        return new ExtensionNamespace(namespace, code2impls);
     }
 
-    private static ExtensionImpl convertToImpl(Class<?> extension, String scope, String code, Wrapper wrapper) throws Exception {
+    private static ExtensionImpl convertToImpl(Class<?> extension, String namespace, String code, Wrapper wrapper) throws Exception {
 
         if (wrapper.object != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.object = wrapper.object;
             impl.instance = wrapper.lazy ? null : ObjectInstanceFactory.getObjectInstance(wrapper.object);
             return impl;
         }
 
         if (wrapper.bean != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.bean = wrapper.bean;
             impl.instance = wrapper.lazy ? null : SpringBeanFactory.getSpringBean(wrapper.bean);
             return impl;
         }
 
         if (wrapper.guice != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.guice = wrapper.guice;
             impl.instance = wrapper.lazy ? null : GuiceInstanceFactory.getGuiceInstance(wrapper.guice);
             return impl;
         }
 
         if (wrapper.hsf != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.hsf = wrapper.hsf;
             impl.instance = wrapper.lazy ? null : HsfServiceFactory.getHsfService(wrapper.hsf);
             return impl;
         }
 
         if (wrapper.dubbo != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.dubbo = wrapper.dubbo;
             impl.instance = wrapper.lazy ? null : DubboServiceFactory.getDubboService(extension, wrapper.dubbo);
             return impl;
         }
 
         if (wrapper.http != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.http = wrapper.http;
             impl.instance = wrapper.lazy ? null : HttpServiceFactory.getHttpService(extension, wrapper.http);
             return impl;
         }
 
         if (wrapper.groovy != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.groovy = wrapper.groovy;
             impl.instance = wrapper.lazy ? null : GroovyServiceFactory.getGroovyService(extension, wrapper.groovy);
             return impl;
         }
 
         if (wrapper.spel != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.spel = wrapper.spel;
             impl.instance = wrapper.lazy ? null : SpELServiceFactory.getSpELService(extension, wrapper.spel);
             return impl;
         }
 
         if (wrapper.provider != null) {
-            ExtensionImpl impl = new ExtensionImpl(scope, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
+            ExtensionImpl impl = new ExtensionImpl(namespace, code, wrapper.type, wrapper.priority, wrapper.lazy, wrapper.desc);
             impl.provider = wrapper.provider;
             impl.instance = wrapper.lazy ? null : ProviderInstanceFactory.getProviderInstance(wrapper.provider);
             return impl;
@@ -475,7 +475,7 @@ public class XmlLoader {
 
         private static final long serialVersionUID = -287883352030585384L;
 
-        public Iterable<String> scope;
+        public Iterable<String> namespace;
         public Iterable<String> code;
         public int priority = 0;
         public String desc;

@@ -2,12 +2,12 @@ package com.alibaba.matrix.base.telemetry;
 
 import com.alibaba.matrix.base.telemetry.metrics.IMetrics;
 import com.alibaba.matrix.base.telemetry.metrics.LogMetrics;
-import com.alibaba.matrix.base.telemetry.trace.LogTracer;
 import com.alibaba.matrix.base.telemetry.trace.ITracer;
+import com.alibaba.matrix.base.telemetry.trace.LogTracer;
 import com.alibaba.matrix.base.util.MatrixServiceLoader;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2022/9/5 16:19.
  */

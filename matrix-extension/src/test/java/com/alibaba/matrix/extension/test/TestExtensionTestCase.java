@@ -28,7 +28,7 @@ import static com.alibaba.matrix.extension.test.constants.ExtScopes.SCOPE_1;
 import static com.alibaba.matrix.extension.test.constants.ExtScopes.SCOPE_2;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2023/8/16 14:10.
  */

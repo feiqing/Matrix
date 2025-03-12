@@ -6,7 +6,7 @@ import org.apache.commons.collections4.bag.HashBag;
 import java.util.List;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/10 14:29.
  */

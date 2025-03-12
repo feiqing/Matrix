@@ -13,7 +13,7 @@ import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
  * Defines the default implementation type and the belonging type of an extension.
  * This annotation is used to mark the default implementation of an extension interface.
  *
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2023/11/20 18:00.
  */
@@ -31,7 +31,7 @@ public @interface ExtensionBase {
 
     /**
      * The belonging type of the extension.
-     * Default value is {@link Object\.class}, indicating no specific belonging type.
+     * Default value is {@link Object}, indicating no specific belonging type.
      *
      * @return The belonging type
      */

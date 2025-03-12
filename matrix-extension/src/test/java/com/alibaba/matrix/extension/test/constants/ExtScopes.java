@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.test.constants;
 
 /**
- * @author jifang.zjf@alibaba-inc.com
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/7/22 11:36.
  */

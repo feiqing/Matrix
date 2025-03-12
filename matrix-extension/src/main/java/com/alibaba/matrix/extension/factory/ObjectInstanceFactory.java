@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.Optional;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */

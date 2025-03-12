@@ -7,6 +7,10 @@ import com.alibaba.matrix.config.exception.ConfigCenterException;
 import com.alibaba.matrix.config.service.ConfigService;
 import com.alibaba.matrix.config.util.Message;
 import com.alibaba.matrix.config.validator.Validator;
+import com.alibaba.matrix.job.Job;
+import com.alibaba.matrix.job.JobExecuteException;
+import com.alibaba.matrix.job.JobExecutor;
+import com.alibaba.matrix.job.Task;
 import com.google.common.base.Preconditions;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
@@ -14,46 +18,62 @@ import io.github.classgraph.FieldInfo;
 import io.github.classgraph.MethodInfo;
 import io.github.classgraph.ScanResult;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 import static com.alibaba.matrix.config.service.ConfigServiceProvider.configServices;
+import static com.alibaba.matrix.config.util.ConfigFrameworkConfigProvider.parallel;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2017/4/23 22:51.
  */
 @Slf4j(topic = "Config")
 public class ConfigFrameworkRegister {
 
+    private static final JobExecutor<Object, Object> executor = new JobExecutor<>(parallel.executor(), false);
+
     private static final ConcurrentMap<Class<?>, Object> clazz2instance = new ConcurrentHashMap<>();
 
-    private static final ConcurrentMap<String, ConcurrentMap<String, Optional<String>>> namespace2key2data = new ConcurrentHashMap<>();
+    private static final ConcurrentMap<Pair<String, String>, SoftReference<String>> key2data = new ConcurrentHashMap<>();
 
     private final List<String> scanPackages;
+
+    public ConfigFrameworkRegister(String scanPackage) {
+        this(Collections.singletonList(scanPackage));
+    }
 
     public ConfigFrameworkRegister(List<String> scanPackages) {
         this.scanPackages = scanPackages;
     }
 
+    public void start() {
+        init();
+    }
+
     public void init() {
         log.info("{}", Message.format("MATRIX-CONFIG-0001-0000", MatrixUtils.resolveProjectVersion(ConfigFrameworkRegister.class, "matrix-config")));
-        if (scanPackages == null || scanPackages.isEmpty()) {
+        if (CollectionUtils.isEmpty(scanPackages)) {
             throw new ConfigCenterException(Message.format("MATRIX-CONFIG-0000-0000"));
         }
         log.info("scanPackages: {}", scanPackages);
@@ -79,14 +99,36 @@ public class ConfigFrameworkRegister {
             }
         }
 
+        Job.Builder<Object, Object> builder = Job.newBuilder();
         for (Map.Entry<Pair<String, String>, List<Handler>> entry : key2handlers.entrySet()) {
             String namespace = entry.getKey().getLeft();
             String key = entry.getKey().getRight();
             List<Handler> handlers = entry.getValue();
 
-            String configData = getConfigData(namespace, key);
-            handleConfigDataChanged(true, namespace, key, handlers, configData);
-            addConfigListener(namespace, key, handlers);
+            builder.addTask(new Task<Object, Object>() {
+                @Override
+                public Object execute(Object o) {
+                    String configData = getConfigData(namespace, key);
+                    handleConfigUpdate(true, namespace, key, handlers, configData);
+                    addConfigListener(namespace, key, handlers);
+                    return null;
+                }
+
+                @Override
+                public String name() {
+                    return StringUtils.isBlank(namespace) ? key : namespace + ":" + key;
+                }
+            });
+        }
+
+        try {
+            Job job = parallel.enable() ? builder.buildParallelJob("ConfigRegister", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigRegister");
+            executor.execute(job, null);
+        } catch (JobExecuteException exception) {
+            if (ArrayUtils.isNotEmpty(exception.getCauses())) {
+                ExceptionUtils.rethrow(exception.getCauses()[0]);
+            }
+            throw exception;
         }
 
         log.info("{}", Message.format("MATRIX-CONFIG-0001-0001"));
@@ -160,20 +202,19 @@ public class ConfigFrameworkRegister {
     private void addConfigListener(String namespace, String key, List<Handler> handlers) {
         try {
             for (ConfigService configService : configServices) {
-                configService.addConfigListener(namespace, key, newData -> handleConfigDataChanged(false, namespace, key, handlers, newData));
+                configService.addConfigListener(namespace, key, newData -> handleConfigUpdate(false, namespace, key, handlers, newData));
             }
         } catch (Throwable t) {
             throw new ConfigCenterException(Message.format("MATRIX-CONFIG-0000-0002", namespace, key), t);
         }
     }
 
-    private void handleConfigDataChanged(boolean starting, String namespace, String key, List<Handler> handlers, String newData) {
-        Map<String, Optional<String>> key2data = namespace2key2data.computeIfAbsent(namespace, _K -> new ConcurrentHashMap<>());
-        Optional<String> oldData = key2data.get(key);
-        if (oldData != null && oldData.isPresent()) {
-            log.info("namespace:[{}] key:[{}] data changing from:[{}] to:[{}].", namespace, key, oldData.get(), newData);
+    private void handleConfigUpdate(boolean starting, String namespace, String key, List<Handler> handlers, String newData) {
+        SoftReference<String> oldData = key2data.get(Pair.of(namespace, key));
+        if (oldData != null && oldData.get() != null) {
+            log.info("namespace:[{}] key:[{}] updating to:[{}], from:[]{}.", namespace, key, newData, oldData.get());
         } else {
-            log.info("namespace:[{}] key:[{}] data changing to:[{}].", namespace, key, newData);
+            log.info("namespace:[{}] key:[{}] updating to:[{}].", namespace, key, newData);
         }
 
         if (handlers.isEmpty()) {
@@ -181,30 +222,52 @@ public class ConfigFrameworkRegister {
             return;
         }
 
+        Job.Builder<Object, Object> builder = Job.newBuilder();
         for (Handler handler : handlers) {
-            handleConfigDataChanged(starting, handler, newData);
+            builder.addTask(new Task<Object, Object>() {
+                @Override
+                public Object execute(Object newConfig) {
+                    triggerHandlerUpdate(starting, handler, newData);
+                    return null;
+                }
+
+                @Override
+                public String name() {
+                    return handler.name();
+                }
+            });
         }
 
-        key2data.put(key, Optional.ofNullable(newData));
+        try {
+            Job job = parallel.enable() ? builder.buildParallelJob("ConfigUpdate", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigUpdate");
+            executor.execute(job, null);
+        } catch (JobExecuteException exception) {
+            if (ArrayUtils.isNotEmpty(exception.getCauses())) {
+                ExceptionUtils.rethrow(exception.getCauses()[0]);
+            }
+            throw exception;
+        }
+
+        key2data.put(Pair.of(namespace, key), new SoftReference<>(newData));
     }
 
-    private void handleConfigDataChanged(boolean starting, Handler handler, String newConfig) {
-        if (newConfig == null && !Objects.equals(ConfigBinding.DEFAULT_VALUE, handler.defaultValue)) {
-            newConfig = handler.defaultValue;
+    private void triggerHandlerUpdate(boolean starting, Handler handler, String newData) {
+        if (newData == null && !Objects.equals(ConfigBinding.DEFAULT_VALUE, handler.defaultValue)) {
+            newData = handler.defaultValue;
         }
 
         String name = handler.name();
-        metrics.incCounter("handle_config_changed", name);
-        ISpan span = tracer.newSpan("ConfigChanged", name);
+        metrics.incCounter("handle_config_update", name);
+        ISpan span = tracer.newSpan("ConfigUpdate", name);
         try {
-            Object[] deserialize = handler.deserialize(starting, newConfig);
+            Object[] deserialize = handler.deserialize(starting, newData);
             if (!(boolean) deserialize[0]) {
                 span.event("DeserializeConfigFailed", name);
                 metrics.incCounter("deserialize_config_failed", name);
                 span.setStatus(ISpan.STATUS_FAILED);
                 return;
             }
-            if (!handler.validate(starting, newConfig, deserialize[1])) {
+            if (!handler.validate(starting, newData, deserialize[1])) {
                 span.event("ValidateConfigFailed", name);
                 metrics.incCounter("validate_config_failed", name);
                 span.setStatus(ISpan.STATUS_FAILED);
@@ -213,8 +276,8 @@ public class ConfigFrameworkRegister {
             handler.handle(starting, deserialize[1]);
             span.setStatus(ISpan.STATUS_SUCCESS);
         } catch (ConfigCenterException e) {
-            span.event("HandleConfigChangeError", name);
-            metrics.incCounter("handle_config_change_error", name);
+            span.event("HandleConfigUpdateError", name);
+            metrics.incCounter("handle_config_update_error", name);
             span.setStatus(e);
             throw e;
         } finally {
@@ -286,7 +349,7 @@ public class ConfigFrameworkRegister {
             try {
                 if (field != null) {
                     field.set(null, valueObj);
-                    log.info("field:[{}.{}] => namespace:[{}] key:[{}] changed to:[{}] success.", belongs.getName(), field.getName(), namespace, key, valueObj);
+                    log.info("field:[{}.{}] => namespace:[{}] key:[{}] update to:[{}] success.", belongs.getName(), field.getName(), namespace, key, valueObj);
                 }
             } catch (Throwable t) {
                 String message = Message.format("MATRIX-CONFIG-0000-0009", belongs.getName(), field.getName(), namespace, key, valueObj);
@@ -312,9 +375,9 @@ public class ConfigFrameworkRegister {
 
         public String name() {
             if (field != null) {
-                return String.format("field:[%s.%s](%s/%s)", belongs.getName(), field.getName(), namespace, key);
+                return String.format("F[%s.%s](%s)", belongs.getName(), field.getName(), StringUtils.isBlank(namespace) ? key : namespace + ":" + key);
             } else {
-                return String.format("method:[%s.%s](%s/%s)", belongs.getName(), method.getName(), namespace, key);
+                return String.format("M[%s.%s](%s)", belongs.getName(), method.getName(), StringUtils.isBlank(namespace) ? key : namespace + ":" + key);
             }
         }
     }

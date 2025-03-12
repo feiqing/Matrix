@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
@@ -18,7 +18,7 @@ public class ExtensionExecuteContext implements Serializable {
 
     private static final long serialVersionUID = 1374750581241420843L;
 
-    public final String scope;
+    public final String namespace;
 
     public final List<String> codes;
 

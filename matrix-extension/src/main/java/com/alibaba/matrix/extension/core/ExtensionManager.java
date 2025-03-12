@@ -13,7 +13,7 @@ import com.alibaba.matrix.extension.factory.SpringBeanFactory;
 import com.alibaba.matrix.extension.model.ExtensionImplEntity;
 import com.alibaba.matrix.extension.model.config.Extension;
 import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionScope;
+import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.router.ExtensionRouter;
 import com.alibaba.matrix.extension.util.Message;
@@ -31,7 +31,7 @@ import static com.alibaba.matrix.extension.model.ExtensionImplType.BASE;
 import static java.util.stream.Collectors.toList;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
@@ -43,21 +43,21 @@ public class ExtensionManager {
 
     public static ExtensionPlugin[] plugins;
 
-    public static List<ExtensionImplEntity> getExtensionImpls(String scope, List<String> codes, Class<?> ext) {
+    public static List<ExtensionImplEntity> getExtensionImpls(String namespace, List<String> codes, Class<?> ext) {
         Extension extension = extensionMap.get(ext);
         if (extension == null) {
             throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0004", ext.getName()));
         }
 
-        ExtensionScope extensionScope = extension.scopeMap.get(scope);
-        if (extensionScope == null) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), scope));
+        ExtensionNamespace extensionNamespace = extension.namespaceMap.get(namespace);
+        if (extensionNamespace == null) {
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), namespace));
         }
 
         List<ExtensionImplEntity> impls = new LinkedList<>();
         for (String code : codes) {
-            List<ExtensionImplEntity> codeImpls = extensionScope.CODE_TO_EXT_IMPLS_CACHE.computeIfAbsent(code, _K -> {
-                List<ExtensionImpl> _impls = extensionScope.code2impls.get(code);
+            List<ExtensionImplEntity> codeImpls = extensionNamespace.CODE_TO_EXT_IMPLS_CACHE.computeIfAbsent(code, _K -> {
+                List<ExtensionImpl> _impls = extensionNamespace.code2impls.get(code);
                 if (CollectionUtils.isEmpty(_impls)) {
                     return Collections.emptyList();
                 } else {
@@ -107,6 +107,6 @@ public class ExtensionManager {
             throw new ExtensionException(Message.format("MATRIX-EXTENSION-0001-0010", impl.instance, ext.getName()));
         }
 
-        return new ExtensionImplEntity(impl.scope, impl.code, impl.type, impl.priority, impl.desc, impl.instance);
+        return new ExtensionImplEntity(impl.namespace, impl.code, impl.type, impl.priority, impl.desc, impl.instance);
     }
 }

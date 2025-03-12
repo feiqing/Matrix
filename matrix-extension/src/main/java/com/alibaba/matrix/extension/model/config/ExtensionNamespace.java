@@ -9,20 +9,20 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
-public class ExtensionScope {
+public class ExtensionNamespace {
 
-    public final String scope;
+    public final String namespace;
 
     public final Map<String, List<ExtensionImpl>> code2impls;
 
     public final ConcurrentMap<String, List<ExtensionImplEntity>> CODE_TO_EXT_IMPLS_CACHE = new ConcurrentHashMap<>();
 
-    public ExtensionScope(@Nonnull String scope, @Nonnull Map<String, List<ExtensionImpl>> code2impls) {
-        this.scope = scope;
+    public ExtensionNamespace(@Nonnull String namespace, @Nonnull Map<String, List<ExtensionImpl>> code2impls) {
+        this.namespace = namespace;
         this.code2impls = code2impls;
     }
 }

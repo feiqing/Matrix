@@ -3,7 +3,7 @@ package com.alibaba.matrix.flow.test.task.error;
 import com.alibaba.matrix.flow.Task;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2023/9/29 17:50.
  */

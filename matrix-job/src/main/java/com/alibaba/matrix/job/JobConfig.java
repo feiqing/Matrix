@@ -8,7 +8,7 @@ import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2025/2/10 19:48.
  */

@@ -21,12 +21,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 
 /**
- * @author feiqing.zjf@gmail.com (FeiQing)
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a> (FeiQing)
  * @version 1.0
  * @since 2023/6/24 16:10.
  */
-@ConfigCenter(namespace = "DEFAULT_GROUP")
+@ConfigCenter(namespace = "DEFAULT_GROUP", desc = "ConfigCenterDemo")
 public class ConfigCenterDemo {
+
+    @ConfigBinding(key = "demo.config.value", desc = "${config.desc}")
+    public static volatile String demoConfigValue;
 
     /**
      * 属性映射
@@ -220,12 +223,7 @@ public class ConfigCenterDemo {
 
     @Getter
     public enum AppEnum {
-        MATRIX_BASE(0, "Base"),
-        MATRIX_JOB(1, "Job"),
-        MATRIX_FLOW(2, "Flow"),
-        MATRIX_CONFIG(3, "Config"),
-        MATRIX_EXTENSION(4, "Extension"),
-        MATRIX_CONFIG1(4, "Extension"),
+        MATRIX_BASE(0, "Base"), MATRIX_JOB(1, "Job"), MATRIX_FLOW(2, "Flow"), MATRIX_CONFIG(3, "Config"), MATRIX_EXTENSION(4, "Extension"), MATRIX_CONFIG1(4, "Extension"),
         ;
 
         private final int code;

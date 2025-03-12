@@ -7,7 +7,7 @@ import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
@@ -29,7 +29,7 @@ public class Logger {
     }
 
     public static String formatExec(ExtensionExecuteContext ctx, ExtensionImplEntity impl) {
-        return String.format("%s:%s(%s)", impl.scope, impl.code, impl.priority);
+        return String.format("%s:%s(%s)", impl.namespace, impl.code, impl.priority);
     }
 
     private static Object getImplDesc(ExtensionImpl impl) {

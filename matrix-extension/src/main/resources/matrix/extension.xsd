@@ -93,7 +93,7 @@
     </xsd:element>
 
     <xsd:attributeGroup name="extensionImplAttrs">
-        <xsd:attribute name="scope" type="xsd:string" use="optional" default="BASE">
+        <xsd:attribute name="namespace" type="xsd:string" use="optional" default="BASE">
             <xsd:annotation>
                 <xsd:documentation>Extension Domain Definition: Support multi definition by ',' separator
                 </xsd:documentation>

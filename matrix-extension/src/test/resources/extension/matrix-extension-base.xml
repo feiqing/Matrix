@@ -25,7 +25,7 @@
         <ExtensionImpl code="code.sub.scope" type="bean">
             <bean class="com.alibaba.matrix.extension.test.impl.function.SubScopeTriFunctionExtImpl"/>
         </ExtensionImpl>
-        <ExtensionImpl scope="SUB-SCOPE" code="code.sub.scope" type="bean">
+        <ExtensionImpl namespace="SUB-SCOPE" code="code.sub.scope" type="bean">
             <bean class="com.alibaba.matrix.extension.test.impl.function.SubScopeTriFunctionExtImpl"/>
         </ExtensionImpl>
 
@@ -55,7 +55,7 @@
         <ExtensionImpl code="code.yhb" type="bean" priority="1">
             <bean name="yhbDemoBaseExtImpl"/>
         </ExtensionImpl>
-        <ExtensionImpl scope="SUB-SCOPE" code="code.yhb" type="bean">
+        <ExtensionImpl namespace="SUB-SCOPE" code="code.yhb" type="bean">
             <bean name="yhbDemoBaseExtImpl"/>
         </ExtensionImpl>
         <ExtensionImpl code="code.common" type="bean">

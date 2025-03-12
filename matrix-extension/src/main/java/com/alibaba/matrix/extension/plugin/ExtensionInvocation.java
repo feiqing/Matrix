@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2023/8/12 11:20.
  */
@@ -18,7 +18,7 @@ import java.util.function.Function;
 public class ExtensionInvocation {
 
     @Getter
-    private final String scope;
+    private final String namespace;
 
     @Getter
     private final List<String> codes;
@@ -53,7 +53,7 @@ public class ExtensionInvocation {
     private final ExtensionPlugin[] plugins;
 
     public ExtensionInvocation(ExtensionExecuteContext ctx, ExtensionImplEntity impl, ExtensionPlugin[] plugins) {
-        this.scope = ctx.scope;
+        this.namespace = ctx.namespace;
         this.codes = ctx.codes;
         this.extension = ctx.extension;
         this.action = ctx.action;

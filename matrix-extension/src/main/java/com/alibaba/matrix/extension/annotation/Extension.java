@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
  * Defines an extension with an optional description.
  * This annotation is used to mark interfaces or classes as extensions.
  *
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2023/11/20 18:00.
  */

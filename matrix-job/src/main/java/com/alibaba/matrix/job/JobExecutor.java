@@ -22,7 +22,7 @@ import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 2.0
  * @since 2020/9/18 13:41.
  */
@@ -131,7 +131,7 @@ public class JobExecutor<Input, Output> {
         }
 
         this.executeJob(job, input, context);
-        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Spend={}ms.", job.name, job.parallel ? "parallel" : "serial", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
+        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Spend={}ms.", job.name, job.parallel ? "p" : "s", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
 
         if (context.throwsExecuteException && CollectionUtils.isNotEmpty(context.exceptions)) {
             tracer.currentSpan().event("JobThrowExceptions", job.name);

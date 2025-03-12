@@ -25,7 +25,7 @@ import static com.alibaba.matrix.extension.config.ExtensionConfigProvider.parall
 import static com.alibaba.matrix.extension.core.ExtensionManager.plugins;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2022/8/11 17:47.
  */
@@ -69,7 +69,7 @@ class ExtensionJobExecutor {
 
         JobResult<Object[]> result = new JobExecutor<AtomicBoolean, Object[]>(parallel.executor(ctx), parallel.enableFailFast(ctx)).executeForResult(job, new AtomicBoolean(false));
         if (CollectionUtils.isNotEmpty(result.getExceptions())) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.scope, StringUtils.join(ctx.codes, ','), result.getExceptions().size()), result.getExceptions().toArray(new Throwable[0]));
+            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ','), result.getExceptions().size()), result.getExceptions().toArray(new Throwable[0]));
         }
 
         List<Object> results = result

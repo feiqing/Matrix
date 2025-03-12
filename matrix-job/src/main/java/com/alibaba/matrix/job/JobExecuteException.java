@@ -3,7 +3,7 @@ package com.alibaba.matrix.job;
 import lombok.Getter;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2020/9/18 13:41.
  */

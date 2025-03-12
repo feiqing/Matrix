@@ -5,7 +5,7 @@ import com.alibaba.matrix.extension.test.impl.base.BaseTriFunctionImpl;
 import org.springframework.stereotype.Component;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2023/9/18 20:29.
  */

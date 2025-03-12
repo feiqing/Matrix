@@ -4,7 +4,7 @@ import javax.annotation.Nonnull;
 import java.util.Map;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2022/3/30 10:31.
  */
@@ -16,12 +16,12 @@ public class Extension {
 
     public final Object base;
 
-    public final Map<String, ExtensionScope> scopeMap;
+    public final Map<String, ExtensionNamespace> namespaceMap;
 
-    public Extension(@Nonnull Class<?> clazz, String desc, @Nonnull Object base, @Nonnull Map<String, ExtensionScope> scopeMap) {
+    public Extension(@Nonnull Class<?> clazz, String desc, @Nonnull Object base, @Nonnull Map<String, ExtensionNamespace> namespaceMap) {
         this.clazz = clazz;
         this.desc = desc;
         this.base = base;
-        this.scopeMap = scopeMap;
+        this.namespaceMap = namespaceMap;
     }
 }

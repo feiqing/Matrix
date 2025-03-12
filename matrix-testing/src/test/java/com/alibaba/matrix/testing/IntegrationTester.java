@@ -14,7 +14,7 @@ import javax.annotation.Resource;
 import java.util.Random;
 
 /**
- * @author jifang.zjf@alibaba-inc.com
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 1.0
  * @since 2023/7/24 23:05.
  */

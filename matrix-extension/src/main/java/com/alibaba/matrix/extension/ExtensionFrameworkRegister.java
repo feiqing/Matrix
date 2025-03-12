@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension;
 import com.alibaba.matrix.extension.core.ExtensionManager;
 import com.alibaba.matrix.extension.model.config.Extension;
 import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionScope;
+import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.router.BaseExtensionRouter;
 import com.alibaba.matrix.extension.router.ExtensionRouter;
@@ -32,7 +32,7 @@ import static com.alibaba.matrix.base.util.MatrixUtils.resolveProjectVersion;
 import static com.alibaba.matrix.extension.util.Logger.log;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2021/09/30 10:31.
  */
@@ -53,6 +53,10 @@ public class ExtensionFrameworkRegister {
     private ExtensionRouter extensionRouter = new BaseExtensionRouter();
 
     private List<ExtensionPlugin> extensionPlugins = Collections.emptyList();
+
+    public void start() {
+        init();
+    }
 
     public void init() {
         if (!started.compareAndSet(false, true)) {
@@ -118,29 +122,29 @@ public class ExtensionFrameworkRegister {
         Preconditions.checkState(extension1.clazz != null && extension2.clazz != null && extension1.clazz == extension2.clazz);
         Preconditions.checkState(extension1.base != null && extension2.base != null && extension1.base == extension2.base);
 
-        Map<String, ExtensionScope> scopeMap1 = extension1.scopeMap == null ? Collections.emptyMap() : extension1.scopeMap;
-        Map<String, ExtensionScope> scopeMap2 = extension2.scopeMap == null ? Collections.emptyMap() : extension2.scopeMap;
+        Map<String, ExtensionNamespace> namespaceMap1 = extension1.namespaceMap == null ? Collections.emptyMap() : extension1.namespaceMap;
+        Map<String, ExtensionNamespace> namespaceMap2 = extension2.namespaceMap == null ? Collections.emptyMap() : extension2.namespaceMap;
 
-        MapDifference<String, ExtensionScope> difference = Maps.difference(scopeMap1, scopeMap2);
-        Map<String, ExtensionScope> resultScopeMap = new LinkedHashMap<>();
-        resultScopeMap.putAll(difference.entriesOnlyOnLeft());
-        resultScopeMap.putAll(difference.entriesOnlyOnRight());
-        for (Map.Entry<String, MapDifference.ValueDifference<ExtensionScope>> entry : difference.entriesDiffering().entrySet()) {
-            resultScopeMap.put(entry.getKey(), resoleScopeDifference(extension1.clazz, entry.getValue()));
+        MapDifference<String, ExtensionNamespace> difference = Maps.difference(namespaceMap1, namespaceMap2);
+        Map<String, ExtensionNamespace> resultNamespaceMap = new LinkedHashMap<>();
+        resultNamespaceMap.putAll(difference.entriesOnlyOnLeft());
+        resultNamespaceMap.putAll(difference.entriesOnlyOnRight());
+        for (Map.Entry<String, MapDifference.ValueDifference<ExtensionNamespace>> entry : difference.entriesDiffering().entrySet()) {
+            resultNamespaceMap.put(entry.getKey(), resoleNamespaceDifference(extension1.clazz, entry.getValue()));
         }
 
-        return new Extension(extension1.clazz, extension1.desc, extension1.base, resultScopeMap);
+        return new Extension(extension1.clazz, extension1.desc, extension1.base, resultNamespaceMap);
     }
 
-    private ExtensionScope resoleScopeDifference(Class<?> ext, MapDifference.ValueDifference<ExtensionScope> scopeDifference) {
-        ExtensionScope scope1 = scopeDifference.leftValue();
-        ExtensionScope scope2 = scopeDifference.rightValue();
+    private ExtensionNamespace resoleNamespaceDifference(Class<?> ext, MapDifference.ValueDifference<ExtensionNamespace> namespaceDifference) {
+        ExtensionNamespace namespace1 = namespaceDifference.leftValue();
+        ExtensionNamespace namespace2 = namespaceDifference.rightValue();
 
-        Preconditions.checkState(scope1 != null && scope2 != null);
-        Preconditions.checkState(scope1.scope != null && scope2.scope != null && StringUtils.equals(scope1.scope, scope2.scope));
+        Preconditions.checkState(namespace1 != null && namespace2 != null);
+        Preconditions.checkState(namespace1.namespace != null && namespace2.namespace != null && StringUtils.equals(namespace1.namespace, namespace2.namespace));
 
-        Map<String, List<ExtensionImpl>> code2impls1 = scope1.code2impls == null ? Collections.emptyMap() : scope1.code2impls;
-        Map<String, List<ExtensionImpl>> code2impls2 = scope2.code2impls == null ? Collections.emptyMap() : scope2.code2impls;
+        Map<String, List<ExtensionImpl>> code2impls1 = namespace1.code2impls == null ? Collections.emptyMap() : namespace1.code2impls;
+        Map<String, List<ExtensionImpl>> code2impls2 = namespace2.code2impls == null ? Collections.emptyMap() : namespace2.code2impls;
 
         MapDifference<String, List<ExtensionImpl>> difference = Maps.difference(code2impls1, code2impls2);
 
@@ -149,25 +153,25 @@ public class ExtensionFrameworkRegister {
         resultCode2impls.putAll(difference.entriesOnlyOnRight());
 
         for (Map.Entry<String, MapDifference.ValueDifference<List<ExtensionImpl>>> entry : difference.entriesDiffering().entrySet()) {
-            resultCode2impls.put(entry.getKey(), resoleImplsDifference(ext, scope1.scope, entry.getKey(), entry.getValue()));
+            resultCode2impls.put(entry.getKey(), resoleImplsDifference(ext, namespace1.namespace, entry.getKey(), entry.getValue()));
         }
 
-        return new ExtensionScope(scope1.scope, resultCode2impls);
+        return new ExtensionNamespace(namespace1.namespace, resultCode2impls);
     }
 
-    private List<ExtensionImpl> resoleImplsDifference(Class<?> ext, String scope, String code, MapDifference.ValueDifference<List<ExtensionImpl>> difference) {
+    private List<ExtensionImpl> resoleImplsDifference(Class<?> ext, String namespace, String code, MapDifference.ValueDifference<List<ExtensionImpl>> difference) {
         List<ExtensionImpl> impls1 = difference.leftValue() == null ? Collections.emptyList() : difference.leftValue();
         List<ExtensionImpl> impls2 = difference.rightValue() == null ? Collections.emptyList() : difference.rightValue();
 
-        Preconditions.checkState(impls1.stream().allMatch(impl -> StringUtils.equals(scope, impl.scope) && StringUtils.equals(code, impl.code)));
-        Preconditions.checkState(impls2.stream().allMatch(impl -> StringUtils.equals(scope, impl.scope) && StringUtils.equals(code, impl.code)));
+        Preconditions.checkState(impls1.stream().allMatch(impl -> StringUtils.equals(namespace, impl.namespace) && StringUtils.equals(code, impl.code)));
+        Preconditions.checkState(impls2.stream().allMatch(impl -> StringUtils.equals(namespace, impl.namespace) && StringUtils.equals(code, impl.code)));
 
         List<ExtensionImpl> implsResult = new ArrayList<>(impls1.size() + impls2.size());
         implsResult.addAll(impls1);
         implsResult.addAll(impls2);
 
         implsResult.sort(Comparator.comparingInt(o -> o.priority));
-        log.info("[MERGE] ExtensionImpl: ext:[{}] scope:[{}] code:[{}] -> [{}].", ext.getName(), scope, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
+        log.info("[MERGE] ExtensionImpl: ext:[{}] namespace:[{}] code:[{}] -> [{}].", ext.getName(), namespace, code, implsResult.stream().map(Logger::formatImpl).collect(Collectors.joining(", ")));
 
         return implsResult;
     }
@@ -175,16 +179,16 @@ public class ExtensionFrameworkRegister {
     private String toExtensionSummary(Map<Class<?>, Extension> extensionMap) {
         Map<String, Object> summary = new LinkedHashMap<>();
         for (Extension extension : extensionMap.values()) {
-            summary.put(Logger.formatExt(extension.clazz, extension.desc), toScopeSummary(extension.base, extension.scopeMap));
+            summary.put(Logger.formatExt(extension.clazz, extension.desc), toNamespaceSummary(extension.base, extension.namespaceMap));
         }
         return jsonMapper.toJson(summary);
     }
 
-    private Map<String, Object> toScopeSummary(Object base, Map<String, ExtensionScope> scopeMap) {
+    private Map<String, Object> toNamespaceSummary(Object base, Map<String, ExtensionNamespace> namespaceMap) {
         Map<String, Object> summary = new LinkedHashMap<>();
         summary.put("_BASE_IMPL_", Logger.formatBase(base));
-        for (ExtensionScope scope : scopeMap.values()) {
-            summary.put(scope.scope, toCodeSummary(scope.code2impls));
+        for (ExtensionNamespace namespace : namespaceMap.values()) {
+            summary.put(namespace.namespace, toCodeSummary(namespace.code2impls));
         }
         return summary;
     }

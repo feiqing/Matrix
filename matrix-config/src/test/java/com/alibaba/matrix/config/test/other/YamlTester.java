@@ -4,7 +4,7 @@ import com.alibaba.matrix.config.service.provider.YamlConfigService;
 import org.junit.Test;
 
 /**
- * @author feiqing.zjf@gmail.com
+ * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2024/10/30 11:48.
  */

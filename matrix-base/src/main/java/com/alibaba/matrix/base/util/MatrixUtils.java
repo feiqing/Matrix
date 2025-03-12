@@ -23,7 +23,7 @@ import java.util.regex.Pattern;
 import static com.alibaba.matrix.base.json.JsonMapperProvider.jsonMapper;
 
 /**
- * @author jifang.zjf@alibaba-inc.com (FeiQing)
+ * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 3.0
  * @since 2016/8/18 6:09 PM.
  */

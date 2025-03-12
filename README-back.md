@@ -241,7 +241,7 @@ public class DemoExtensionParser implements ExtensionParser<String[]> {
 
 ### 插件机制(ExtensionPlugin)
 
-### 二次路由调用(Scope)
+### 二次路由调用(Namespace)
 
 ### 实现原理
 

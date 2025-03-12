@@ -41,7 +41,7 @@
 <!--        <ExtensionImpl code="xx" type="dubbo" desc="hhh" lazy="true">-->
 <!--            <dubbo version="1.0.0" check="false" application-name="hhh" registry-address="nacos://localhost:8848"/>-->
 <!--        </ExtensionImpl>-->
-<!--        <ExtensionImpl code="xx" type="dubbo" scope="BASE" desc="hhh" lazy="true" priority="0">-->
+    <!--        <ExtensionImpl code="xx" type="dubbo" namespace="BASE" desc="hhh" lazy="true" priority="0">-->
 <!--            <dubbo version="1.0.0" check="false" application-name="hhh" registry-address="nacos://localhost:8848"/>-->
 <!--        </ExtensionImpl>-->
 <!--    </Extension>-->

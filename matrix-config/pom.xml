@@ -7,7 +7,7 @@
     <parent>
         <groupId>com.alibaba.matrix</groupId>
         <artifactId>matrix</artifactId>
-        <version>2.4.0.RELEASE</version>
+        <version>2.5.0.RELEASE</version>
     </parent>
 
     <artifactId>matrix-config</artifactId>
@@ -17,6 +17,10 @@
         <dependency>
             <groupId>com.alibaba.matrix</groupId>
             <artifactId>matrix-base</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.alibaba.matrix</groupId>
+            <artifactId>matrix-job</artifactId>
         </dependency>
         <dependency>
             <groupId>io.github.classgraph</groupId>

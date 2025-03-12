@@ -14,13 +14,13 @@
         <ExtensionBase type="bean">
             <bean name="baseFunctionExtImpl"/>
         </ExtensionBase>
-        <ExtensionImpl priority="1" scope="BASE, SUB-SCOPE" code="normal" type="bean" desc="普通电商交易">
+        <ExtensionImpl priority="1" namespace="BASE, SUB-SCOPE" code="normal" type="bean" desc="普通电商交易">
             <bean name="normalFunctionExtImpl"/>
         </ExtensionImpl>
         <ExtensionImpl priority="2" code="normal" type="bean" desc="普通电商交易">
             <bean class="com.alibaba.matrix.extension.test.impl.function.NormalPriority2FunctionExtImpl"/>
         </ExtensionImpl>
-        <ExtensionImpl scope="BASE, SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
+        <ExtensionImpl namespace="BASE, SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
             <bean class="com.alibaba.matrix.extension.test.impl.function.YhbFunctionExtImpl"/>
         </ExtensionImpl>
     </Extension>
@@ -32,7 +32,7 @@
         <ExtensionImpl code="normal" type="bean" desc="普通电商交易">
             <bean name="normalSupplierExtImpl"/>
         </ExtensionImpl>
-        <ExtensionImpl scope="SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
+        <ExtensionImpl namespace="SUB-SCOPE" code="yhb" type="bean" desc="验货宝交易">
             <bean class="com.alibaba.matrix.extension.test.impl.function.YhbSupplierExtImpl"/>
         </ExtensionImpl>
     </Extension>
