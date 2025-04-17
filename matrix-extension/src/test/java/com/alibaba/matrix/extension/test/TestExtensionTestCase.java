@@ -2,7 +2,7 @@ package com.alibaba.matrix.extension.test;
 
 import com.alibaba.matrix.extension.ExtensionContext;
 import com.alibaba.matrix.extension.ExtensionInvoker;
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
+import com.alibaba.matrix.extension.exception.ExtensionWrappedMultipleFailureException;
 import com.alibaba.matrix.extension.reducer.Reducers;
 import com.alibaba.matrix.extension.test.domain.TestModel;
 import com.alibaba.matrix.extension.test.ext.DemoRemoteExt;
@@ -152,7 +152,7 @@ public class TestExtensionTestCase {
         Assert.assertTrue(CollectionUtils.isEqualCollection(model.list, (Collection<?>) result));
     }
 
-    @Test(expected = ExtensionRuntimeException.class)
+    @Test(expected = ExtensionWrappedMultipleFailureException.class)
     public void test_parallel_throwable() {
         Object result = ExtensionInvoker.invoke("code.http", DemoRemoteExt.class, ext -> {
             System.out.println(Thread.currentThread().getName());

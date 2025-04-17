@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.test.o;
 
 
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
+import com.alibaba.matrix.extension.exception.ExtensionException;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
@@ -38,7 +38,7 @@ public class ProxyTest {
 
                 {
                     if (true) {
-                        throw new ExtensionRuntimeException("jj");
+                        throw new ExtensionException("jj");
                     }
                 }
 

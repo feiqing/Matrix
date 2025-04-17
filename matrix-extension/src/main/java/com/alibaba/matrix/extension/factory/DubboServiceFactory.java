@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.factory;
 import com.alibaba.dubbo.config.ApplicationConfig;
 import com.alibaba.dubbo.config.ReferenceConfig;
 import com.alibaba.dubbo.config.RegistryConfig;
-import com.alibaba.matrix.extension.model.config.Dubbo;
+import com.alibaba.matrix.extension.core.config.Dubbo;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

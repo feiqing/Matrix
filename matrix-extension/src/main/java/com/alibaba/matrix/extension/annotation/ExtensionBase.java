@@ -1,13 +1,13 @@
 package com.alibaba.matrix.extension.annotation;
 
-import com.alibaba.matrix.extension.model.ExtensionImplType;
+import com.alibaba.matrix.extension.core.ExtensionImplType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
+import static com.alibaba.matrix.extension.core.ExtensionImplType.OBJECT;
 
 /**
  * Defines the default implementation type and the belonging type of an extension.

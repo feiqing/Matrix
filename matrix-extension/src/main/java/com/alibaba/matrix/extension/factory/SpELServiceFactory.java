@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.factory;
 
-import com.alibaba.matrix.extension.model.config.SpEL;
+import com.alibaba.matrix.extension.core.config.SpEL;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;

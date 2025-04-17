@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.function.Function;
 
 /**
+ * The ExtensionInvoker class provides a set of static methods to invoke extensions.
+ * It supports invoking single or multiple implementations of an extension, optionally within a specified namespace,
+ * and allows processing the results using a specified reducer.
+ *
  * @author <a href="mailto:jifang.zjf@alibaba-inc.com">jifang.zjf(FeiQing)</a>
  * @version 2.0
  * @since 2022/3/30 10:31.
@@ -21,7 +25,7 @@ public final class ExtensionInvoker {
     }
 
     /**
-     * Invokes a single implementation of the specified extension.
+     * Invokes a single implementation of the specified extension and returns the result of the action.
      *
      * @param code      The code identifier of the extension
      * @param extension The extension interface class
@@ -35,7 +39,7 @@ public final class ExtensionInvoker {
     }
 
     /**
-     * Invokes multiple implementations of the specified extension and processes the results using the specified reducer.
+     * Invokes a single implementation of the specified extension and processes the results using the specified reducer.
      *
      * @param code      The code identifier of the extension
      * @param extension The extension interface class
@@ -51,7 +55,7 @@ public final class ExtensionInvoker {
     }
 
     /**
-     * Invokes multiple implementations of the specified extension.
+     * Invokes multiple implementations of the specified extension and returns the result of the action.
      *
      * @param codes     The list of code identifiers of the extensions
      * @param extension The extension interface class
@@ -81,7 +85,7 @@ public final class ExtensionInvoker {
     }
 
     /**
-     * Invokes a single implementation of the specified extension within the given namespace.
+     * Invokes a single implementation of the specified extension within the given namespace and returns the result of the action.
      *
      * @param namespace The namespace of the extension
      * @param code      The code identifier of the extension
@@ -113,7 +117,7 @@ public final class ExtensionInvoker {
     }
 
     /**
-     * Invokes multiple implementations of the specified extension within the given namespace.
+     * Invokes multiple implementations of the specified extension within the given namespace and returns the result of the action.
      *
      * @param namespace The namespace of the extension
      * @param codes     The list of code identifiers of the extensions

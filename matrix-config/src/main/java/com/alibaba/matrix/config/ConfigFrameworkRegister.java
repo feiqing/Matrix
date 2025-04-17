@@ -8,8 +8,8 @@ import com.alibaba.matrix.config.service.ConfigService;
 import com.alibaba.matrix.config.util.Message;
 import com.alibaba.matrix.config.validator.Validator;
 import com.alibaba.matrix.job.Job;
-import com.alibaba.matrix.job.JobExecuteException;
 import com.alibaba.matrix.job.JobExecutor;
+import com.alibaba.matrix.job.JobWrappedMultipleFailureException;
 import com.alibaba.matrix.job.Task;
 import com.google.common.base.Preconditions;
 import io.github.classgraph.ClassGraph;
@@ -124,7 +124,7 @@ public class ConfigFrameworkRegister {
         try {
             Job job = parallel.enable() ? builder.buildParallelJob("ConfigRegister", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigRegister");
             executor.execute(job, null);
-        } catch (JobExecuteException exception) {
+        } catch (JobWrappedMultipleFailureException exception) {
             if (ArrayUtils.isNotEmpty(exception.getCauses())) {
                 ExceptionUtils.rethrow(exception.getCauses()[0]);
             }
@@ -241,7 +241,7 @@ public class ConfigFrameworkRegister {
         try {
             Job job = parallel.enable() ? builder.buildParallelJob("ConfigUpdate", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigUpdate");
             executor.execute(job, null);
-        } catch (JobExecuteException exception) {
+        } catch (JobWrappedMultipleFailureException exception) {
             if (ArrayUtils.isNotEmpty(exception.getCauses())) {
                 ExceptionUtils.rethrow(exception.getCauses()[0]);
             }

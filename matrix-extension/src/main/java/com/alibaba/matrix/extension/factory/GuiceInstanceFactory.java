@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.factory;
 
-import com.alibaba.matrix.extension.model.config.Guice;
+import com.alibaba.matrix.extension.core.config.Guice;
 import com.google.common.base.Preconditions;
 import com.google.inject.Injector;
 import com.google.inject.Key;

@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.factory;
 
+import com.alibaba.matrix.extension.core.config.Groovy;
 import com.alibaba.matrix.extension.exception.ExtensionException;
-import com.alibaba.matrix.extension.model.config.Groovy;
 import com.alibaba.nacos.api.NacosFactory;
 import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.config.ConfigService;

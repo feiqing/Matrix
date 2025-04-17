@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.core;
 
 import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.AllArgsConstructor;

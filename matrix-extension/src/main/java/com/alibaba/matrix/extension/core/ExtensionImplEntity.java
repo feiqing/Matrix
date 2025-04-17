@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.core;
 
 import java.io.Serializable;
 

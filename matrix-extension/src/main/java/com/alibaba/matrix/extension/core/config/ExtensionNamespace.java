@@ -1,6 +1,6 @@
-package com.alibaba.matrix.extension.model.config;
+package com.alibaba.matrix.extension.core.config;
 
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.core.ExtensionImplEntity;
 
 import javax.annotation.Nonnull;
 import java.util.List;

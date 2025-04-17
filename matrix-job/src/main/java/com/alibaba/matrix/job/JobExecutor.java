@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -22,6 +23,12 @@ import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 
 /**
+ * The JobExecutor class is responsible for executing jobs with tasks that can be either serial or parallel.
+ * It provides methods to execute jobs and gather results in different formats, such as a map, a list, or a detailed result object.
+ * The executor also handles exceptions and logs relevant information using telemetry.
+ *
+ * @param <Input>  The type of the input parameter for the job
+ * @param <Output> The type of the output value for the job tasks
  * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 2.0
  * @since 2020/9/18 13:41.
@@ -31,74 +38,64 @@ public class JobExecutor<Input, Output> {
 
     private final JobConfig config;
 
+    /**
+     * Constructs a JobExecutor with default configuration.
+     */
     public JobExecutor() {
         this(new JobConfig(null, true));
     }
 
+    /**
+     * Constructs a JobExecutor with a specified ExecutorService and default fail-fast behavior.
+     *
+     * @param executor The ExecutorService to use for executing tasks
+     */
     public JobExecutor(ExecutorService executor) {
         this(new JobConfig(executor, true));
     }
 
+    /**
+     * Constructs a JobExecutor with a specified ExecutorService and fail-fast behavior.
+     *
+     * @param executor       The ExecutorService to use for executing tasks
+     * @param enableFailFast Whether to enable fail-fast behavior
+     */
     public JobExecutor(ExecutorService executor, boolean enableFailFast) {
         this(new JobConfig(executor, enableFailFast));
     }
 
+    /**
+     * Constructs a JobExecutor with a specified JobConfig.
+     *
+     * @param config The JobConfig to use for configuring the executor
+     */
     public JobExecutor(JobConfig config) {
         this.config = config;
     }
 
     /**
      * Executes the specified job without returning any result.
-     * If an exception occurs during job execution, a JobExecuteException will be thrown.
+     * If an exception occurs during job execution, a JobWrappedMultipleFailureException will be thrown.
      *
      * @param job   The job to be executed
      * @param input The input parameter for the job
-     * @throws JobExecuteException If an exception occurs during job execution
+     * @throws JobWrappedMultipleFailureException If an exception occurs during job execution
      */
-    public void execute(Job job, Input input) throws JobExecuteException {
+    public void execute(Job job, Input input) throws JobWrappedMultipleFailureException {
         doExecute(job, input, new JobContext(true, null));
     }
 
     /**
-     * Executes the specified job and returns a Map where the keys are task keys and the values are task return values.
-     * If an exception occurs during job execution, a JobExecuteException will be thrown.
-     * If there are duplicate task keys, a JobExecuteException will be thrown.
-     *
-     * @param job   The job to be executed
-     * @param input The input parameter for the job
-     * @return A Map where the keys are task keys and the values are task return values
-     * @throws JobExecuteException If an exception occurs during job execution, or if there are duplicate task keys
-     */
-    @SuppressWarnings("unchecked")
-    public Map<String, Output> executeForMap(Job job, Input input) throws JobExecuteException {
-        JobContext context = doExecute(job, input, new JobContext(true, new ConcurrentLinkedQueue<>()));
-        if (CollectionUtils.isEmpty(context.outputs)) {
-            return Collections.emptyMap();
-        }
-
-        Map<String, Output> outputMap = new LinkedHashMap<>(context.outputs.size());
-        for (Pair<String, Object> output : context.outputs) {
-            if (outputMap.put(output.getKey(), (Output) output.getValue()) != null) {
-                tracer.currentSpan().event("TaskKeyDuplicated", job.name);
-                metrics.incCounter("task_key_duplicated", job.name);
-                log.error("Job:[{}] task key duplicated.", job.name);
-                throw new JobExecuteException(Message.format("MATRIX-JOB-0000-0001", job.name), null);
-            }
-        }
-        return outputMap;
-    }
-
-    /**
      * Executes the specified job and returns a List containing all task return values.
-     * If an exception occurs during job execution, a JobExecuteException will be thrown.
+     * If an exception occurs during job execution, a JobWrappedMultipleFailureException will be thrown.
      *
      * @param job   The job to be executed
      * @param input The input parameter for the job
      * @return A List containing all task return values
-     * @throws JobExecuteException If an exception occurs during job execution
+     * @throws JobWrappedMultipleFailureException If an exception occurs during job execution
      */
     @SuppressWarnings("unchecked")
-    public List<Output> executeForList(Job job, Input input) throws JobExecuteException {
+    public List<Output> executeForList(Job job, Input input) throws JobWrappedMultipleFailureException {
         JobContext context = doExecute(job, input, new JobContext(true, new ConcurrentLinkedQueue<>()));
         if (CollectionUtils.isEmpty(context.outputs)) {
             return Collections.emptyList();
@@ -107,8 +104,29 @@ public class JobExecutor<Input, Output> {
     }
 
     /**
+     * Executes the specified job and returns a Map where the keys are task keys and the values are task return values.
+     * If an exception occurs during job execution, a JobWrappedMultipleFailureException will be thrown.
+     *
+     * @param job   The job to be executed
+     * @param input The input parameter for the job
+     * @return A Map where the keys are task keys and the values are task return values
+     * @throws JobWrappedMultipleFailureException If an exception occurs during job execution, or if there are duplicate task keys
+     */
+    @SuppressWarnings("unchecked")
+    public Map<String, List<Output>> executeForMap(Job job, Input input) throws JobWrappedMultipleFailureException {
+        JobContext context = doExecute(job, input, new JobContext(true, new ConcurrentLinkedQueue<>()));
+        if (CollectionUtils.isEmpty(context.outputs)) {
+            return Collections.emptyMap();
+        }
+        Map<String, List<Output>> outputMap = new LinkedHashMap<>(context.outputs.size());
+        for (Pair<String, Object> output : context.outputs) {
+            outputMap.computeIfAbsent(output.getKey(), _K -> new ArrayList<>()).add((Output) output.getValue());
+        }
+        return outputMap;
+    }
+
+    /**
      * Executes the specified job and returns a JobResult object containing all task return values and exception information.
-     * No JobExecuteException will be thrown.
      *
      * @param job   The job to be executed
      * @param input The input parameter for the job
@@ -123,7 +141,9 @@ public class JobExecutor<Input, Output> {
         return result;
     }
 
-    private JobContext doExecute(Job job, Input input, JobContext context) throws JobExecuteException {
+    // ---- core helpers ---- //
+
+    private JobContext doExecute(Job job, Input input, JobContext context) throws JobWrappedMultipleFailureException {
         Preconditions.checkArgument(job != null);
         Preconditions.checkArgument(config.executor != null || !hasParallelJob(job));
         if (CollectionUtils.isEmpty(job.tasks)) {
@@ -131,12 +151,12 @@ public class JobExecutor<Input, Output> {
         }
 
         this.executeJob(job, input, context);
-        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Spend={}ms.", job.name, job.parallel ? "p" : "s", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
+        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Elapsed={}ms.", job.name, job.parallel ? "p" : "s", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
 
         if (context.throwsExecuteException && CollectionUtils.isNotEmpty(context.exceptions)) {
             tracer.currentSpan().event("JobThrowExceptions", job.name);
             metrics.incCounter("job_throw_exceptions", job.name);
-            throw new JobExecuteException(Message.format("MATRIX-JOB-0000-0000", job.name), context.exceptions.toArray(new Throwable[0]));
+            throw new JobWrappedMultipleFailureException(Message.format("MATRIX-JOB-0000-0000", job.name), context.exceptions.toArray(new Throwable[0]));
         }
 
         return context;
@@ -187,7 +207,7 @@ public class JobExecutor<Input, Output> {
                 return;
             }
 
-            context.addException(new TimeoutException(Message.format("MATRIX-JOB-0000-0002", job.name, job.timeout, job.unit.name())));
+            context.addException(new TimeoutException(Message.format("MATRIX-JOB-0000-0001", job.name, job.timeout, job.unit.name())));
 
             tracer.currentSpan().event("JobAwaitTimeout", job.name);
             metrics.incCounter("job_await_timeout", job.name);

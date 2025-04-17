@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.plugin;
 
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionImplEntity;
 import com.alibaba.matrix.extension.reducer.Reducer;
 import lombok.Getter;
 import lombok.Setter;

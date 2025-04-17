@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.config;
 
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model.config;
+package com.alibaba.matrix.extension.core.config;
 
 import javax.annotation.Nonnull;
 import java.io.Serializable;

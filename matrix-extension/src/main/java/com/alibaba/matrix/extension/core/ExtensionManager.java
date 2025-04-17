@@ -1,7 +1,9 @@
 package com.alibaba.matrix.extension.core;
 
+import com.alibaba.matrix.extension.core.config.Extension;
+import com.alibaba.matrix.extension.core.config.ExtensionImpl;
+import com.alibaba.matrix.extension.core.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.exception.ExtensionException;
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
 import com.alibaba.matrix.extension.factory.DubboServiceFactory;
 import com.alibaba.matrix.extension.factory.GroovyServiceFactory;
 import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
@@ -10,10 +12,6 @@ import com.alibaba.matrix.extension.factory.HttpServiceFactory;
 import com.alibaba.matrix.extension.factory.ObjectInstanceFactory;
 import com.alibaba.matrix.extension.factory.SpELServiceFactory;
 import com.alibaba.matrix.extension.factory.SpringBeanFactory;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
-import com.alibaba.matrix.extension.model.config.Extension;
-import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.router.ExtensionRouter;
 import com.alibaba.matrix.extension.util.Message;
@@ -27,7 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import static com.alibaba.matrix.extension.model.ExtensionImplType.BASE;
+import static com.alibaba.matrix.extension.core.ExtensionImplType.BASE;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -46,12 +44,12 @@ public class ExtensionManager {
     public static List<ExtensionImplEntity> getExtensionImpls(String namespace, List<String> codes, Class<?> ext) {
         Extension extension = extensionMap.get(ext);
         if (extension == null) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0004", ext.getName()));
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0000-0004", ext.getName()));
         }
 
         ExtensionNamespace extensionNamespace = extension.namespaceMap.get(namespace);
         if (extensionNamespace == null) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), namespace));
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0000-0005", ext.getName(), namespace));
         }
 
         List<ExtensionImplEntity> impls = new LinkedList<>();

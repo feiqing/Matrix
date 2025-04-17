@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.config;
 
 import com.alibaba.matrix.base.util.T;
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
 import com.alibaba.ttl.threadpool.TtlExecutors;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 

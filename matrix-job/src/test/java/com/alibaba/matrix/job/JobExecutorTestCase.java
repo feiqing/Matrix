@@ -17,7 +17,7 @@ public class JobExecutorTestCase {
 
     private static final JobExecutor<Object, Object> executor = new JobExecutor<>(Executors.newCachedThreadPool());
 
-    @Test(expected = JobExecuteException.class)
+    @Test(expected = JobWrappedMultipleFailureException.class)
     public void test_task_execute_error() {
         Job job = Job.newBuilder().addTask(o -> {
             throw new RuntimeException("test_task");
@@ -34,12 +34,12 @@ public class JobExecutorTestCase {
 
         try {
             executor.execute(job, null);
-        } catch (JobExecuteException e) {
+        } catch (JobWrappedMultipleFailureException e) {
             ExceptionUtils.rethrow(e.getCauses()[0]);
         }
     }
 
-    @Test(expected = JobExecuteException.class)
+    @Test(expected = JobWrappedMultipleFailureException.class)
     public void test_task_duplicate_key() {
         Job.Builder<Object, Object> builder = Job.newBuilder();
         builder.addTask(new Task<Object, Object>() {
@@ -109,7 +109,7 @@ public class JobExecutorTestCase {
             jobBuilder.addTask(o -> finalI);
         }
 
-        Map<String, Object> map = executor.executeForMap(jobBuilder.buildParallelJob("test_base_execute_for_map", 1, TimeUnit.SECONDS), null);
+        Map<String, List<Object>> map = executor.executeForMap(jobBuilder.buildParallelJob("test_base_execute_for_map", 1, TimeUnit.SECONDS), null);
         System.out.println(map);
     }
 }

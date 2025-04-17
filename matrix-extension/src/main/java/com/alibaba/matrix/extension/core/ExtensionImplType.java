@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model;
+package com.alibaba.matrix.extension.core;
 
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.util.Message;

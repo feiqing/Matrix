@@ -1,9 +1,9 @@
 package com.alibaba.matrix.extension.router;
 
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionImplEntity;
 import com.alibaba.matrix.extension.core.ExtensionManager;
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.util.Message;
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections4.CollectionUtils;
@@ -29,7 +29,7 @@ public class BaseExtensionRouter implements ExtensionRouter {
 
         List<ExtensionImplEntity> impls = ExtensionManager.getExtensionImpls(namespace, codes, extension);
         if (CollectionUtils.isEmpty(impls)) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0003", extension.getName(), namespace, codes));
+            throw new ExtensionException(Message.format("MATRIX-EXTENSION-0000-0003", extension.getName(), namespace, codes));
         }
         return impls;
     }

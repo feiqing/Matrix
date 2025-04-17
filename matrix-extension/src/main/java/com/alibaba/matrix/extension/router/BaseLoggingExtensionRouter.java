@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.router;
 
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionImplEntity;
 import com.alibaba.matrix.extension.util.Logger;
 import org.apache.commons.lang3.StringUtils;
 

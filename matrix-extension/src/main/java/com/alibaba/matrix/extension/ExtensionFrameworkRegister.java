@@ -1,9 +1,9 @@
 package com.alibaba.matrix.extension;
 
 import com.alibaba.matrix.extension.core.ExtensionManager;
-import com.alibaba.matrix.extension.model.config.Extension;
-import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
+import com.alibaba.matrix.extension.core.config.Extension;
+import com.alibaba.matrix.extension.core.config.ExtensionImpl;
+import com.alibaba.matrix.extension.core.config.ExtensionNamespace;
 import com.alibaba.matrix.extension.plugin.ExtensionPlugin;
 import com.alibaba.matrix.extension.router.BaseExtensionRouter;
 import com.alibaba.matrix.extension.router.ExtensionRouter;

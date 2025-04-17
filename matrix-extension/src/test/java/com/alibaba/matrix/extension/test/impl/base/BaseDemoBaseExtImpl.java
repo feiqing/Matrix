@@ -6,7 +6,7 @@ import com.alibaba.matrix.extension.test.ext.DemoBaseExt;
 
 import java.util.Arrays;
 
-import static com.alibaba.matrix.extension.model.ExtensionImplType.GUICE;
+import static com.alibaba.matrix.extension.core.ExtensionImplType.GUICE;
 
 /**
  * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>

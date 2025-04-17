@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.test.utils;
 import com.alibaba.matrix.base.util.T;
 import com.alibaba.matrix.extension.config.DefaultExtensionParallelConfig;
 import com.alibaba.matrix.extension.config.ExtensionParallelConfig;
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
 import com.google.auto.service.AutoService;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.function.TriFunction;

@@ -1,17 +1,17 @@
 package com.alibaba.matrix.extension.util;
 
 import com.alibaba.matrix.extension.annotation.ExtensionBase;
+import com.alibaba.matrix.extension.core.ExtensionImplType;
+import com.alibaba.matrix.extension.core.config.Bean;
+import com.alibaba.matrix.extension.core.config.Extension;
+import com.alibaba.matrix.extension.core.config.ExtensionImpl;
+import com.alibaba.matrix.extension.core.config.ExtensionNamespace;
+import com.alibaba.matrix.extension.core.config.Guice;
+import com.alibaba.matrix.extension.core.config.ObjectT;
 import com.alibaba.matrix.extension.exception.ExtensionException;
 import com.alibaba.matrix.extension.factory.GuiceInstanceFactory;
 import com.alibaba.matrix.extension.factory.ObjectInstanceFactory;
 import com.alibaba.matrix.extension.factory.SpringBeanFactory;
-import com.alibaba.matrix.extension.model.ExtensionImplType;
-import com.alibaba.matrix.extension.model.config.Bean;
-import com.alibaba.matrix.extension.model.config.Extension;
-import com.alibaba.matrix.extension.model.config.ExtensionImpl;
-import com.alibaba.matrix.extension.model.config.ExtensionNamespace;
-import com.alibaba.matrix.extension.model.config.Guice;
-import com.alibaba.matrix.extension.model.config.ObjectT;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ScanResult;

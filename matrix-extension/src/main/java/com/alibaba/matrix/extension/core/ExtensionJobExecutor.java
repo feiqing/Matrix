@@ -1,8 +1,6 @@
 package com.alibaba.matrix.extension.core;
 
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
+import com.alibaba.matrix.extension.exception.ExtensionWrappedMultipleFailureException;
 import com.alibaba.matrix.extension.plugin.ExtensionInvocation;
 import com.alibaba.matrix.extension.util.Logger;
 import com.alibaba.matrix.extension.util.Message;
@@ -69,7 +67,7 @@ class ExtensionJobExecutor {
 
         JobResult<Object[]> result = new JobExecutor<AtomicBoolean, Object[]>(parallel.executor(ctx), parallel.enableFailFast(ctx)).executeForResult(job, new AtomicBoolean(false));
         if (CollectionUtils.isNotEmpty(result.getExceptions())) {
-            throw new ExtensionRuntimeException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ','), result.getExceptions().size()), result.getExceptions().toArray(new Throwable[0]));
+            throw new ExtensionWrappedMultipleFailureException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ','), result.getExceptions().size()), result.getExceptions().toArray(new Throwable[0]));
         }
 
         List<Object> results = result

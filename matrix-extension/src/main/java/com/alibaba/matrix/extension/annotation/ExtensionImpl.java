@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.annotation;
 
-import com.alibaba.matrix.extension.model.ExtensionImplType;
+import com.alibaba.matrix.extension.core.ExtensionImplType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -8,7 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import static com.alibaba.matrix.extension.ExtensionInvoker.DEFAULT_NAMESPACE;
-import static com.alibaba.matrix.extension.model.ExtensionImplType.OBJECT;
+import static com.alibaba.matrix.extension.core.ExtensionImplType.OBJECT;
 
 /**
  * This annotation is used to mark a class as an extension implementation within the Matrix framework.
@@ -40,7 +40,7 @@ public @interface ExtensionImpl {
 
     /**
      * Defines the type of this extension implementation.
-     * Defaults to {@link com.alibaba.matrix.extension.model.ExtensionImplType#OBJECT}.
+     * Defaults to {@link ExtensionImplType#OBJECT}.
      *
      * @return the type of the extension implementation
      */

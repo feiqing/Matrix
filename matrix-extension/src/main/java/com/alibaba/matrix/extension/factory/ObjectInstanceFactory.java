@@ -1,7 +1,7 @@
 package com.alibaba.matrix.extension.factory;
 
 import com.alibaba.matrix.base.util.MatrixUtils;
-import com.alibaba.matrix.extension.model.config.ObjectT;
+import com.alibaba.matrix.extension.core.config.ObjectT;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

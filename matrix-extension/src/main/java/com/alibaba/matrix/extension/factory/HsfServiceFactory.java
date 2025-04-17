@@ -1,6 +1,6 @@
 package com.alibaba.matrix.extension.factory;
 
-import com.alibaba.matrix.extension.model.config.Hsf;
+import com.alibaba.matrix.extension.core.config.Hsf;
 import com.google.common.base.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 

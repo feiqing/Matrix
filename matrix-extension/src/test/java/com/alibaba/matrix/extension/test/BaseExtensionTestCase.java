@@ -3,7 +3,7 @@ package com.alibaba.matrix.extension.test;
 import com.alibaba.matrix.base.util.T;
 import com.alibaba.matrix.extension.ExtensionContext;
 import com.alibaba.matrix.extension.ExtensionInvoker;
-import com.alibaba.matrix.extension.exception.ExtensionRuntimeException;
+import com.alibaba.matrix.extension.exception.ExtensionWrappedMultipleFailureException;
 import com.alibaba.matrix.extension.reducer.Reducers;
 import com.alibaba.matrix.extension.test.domain.TestModel;
 import org.apache.commons.collections4.CollectionUtils;
@@ -220,7 +220,7 @@ public class BaseExtensionTestCase {
 
                 return resutl;
             }, Reducers.collect());
-        } catch (ExtensionRuntimeException e) {
+        } catch (ExtensionWrappedMultipleFailureException e) {
             Thread.sleep(T.OneS);
             throw e.getCauses()[0];
         }
@@ -235,12 +235,12 @@ public class BaseExtensionTestCase {
                     return ext.apply("arg1", model, null);
                 }, Reducers.any());
             }, Reducers.collect());
-        } catch (ExtensionRuntimeException e) {
+        } catch (ExtensionWrappedMultipleFailureException e) {
             throw e.getCauses()[0];
         }
     }
 
-    @Test(expected = ExtensionRuntimeException.class)
+    @Test(expected = ExtensionWrappedMultipleFailureException.class)
     public void test_parallel_throwable() {
         try {
             ExtensionInvoker.invoke("code.normal.concurrent", TriFunction.class, ext -> {
@@ -250,7 +250,7 @@ public class BaseExtensionTestCase {
                 }
                 return ext.apply("arg1", model.list, null);
             }, Reducers.collect());
-        } catch (ExtensionRuntimeException e) {
+        } catch (ExtensionWrappedMultipleFailureException e) {
             e.printStackTrace();
             Assert.assertTrue(ArrayUtils.isNotEmpty(e.getCauses()));
             throw e;
@@ -275,7 +275,7 @@ public class BaseExtensionTestCase {
                 }, Reducers.any());
             }, Reducers.any());
             Assert.assertTrue(StringUtils.startsWith(String.valueOf(result), "E-Parallel-Testing-Exec-"));
-        } catch (ExtensionRuntimeException e) {
+        } catch (ExtensionWrappedMultipleFailureException e) {
             e.printStackTrace();
             Assert.assertTrue(ArrayUtils.isNotEmpty(e.getCauses()));
             e.getCauses()[0].printStackTrace();

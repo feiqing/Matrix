@@ -1,4 +1,4 @@
-package com.alibaba.matrix.extension.model.config;
+package com.alibaba.matrix.extension.core.config;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;

@@ -1,8 +1,8 @@
 package com.alibaba.matrix.extension.util;
 
-import com.alibaba.matrix.extension.model.ExtensionExecuteContext;
-import com.alibaba.matrix.extension.model.ExtensionImplEntity;
-import com.alibaba.matrix.extension.model.config.ExtensionImpl;
+import com.alibaba.matrix.extension.core.ExtensionExecuteContext;
+import com.alibaba.matrix.extension.core.ExtensionImplEntity;
+import com.alibaba.matrix.extension.core.config.ExtensionImpl;
 import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 
