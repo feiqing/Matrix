@@ -58,14 +58,14 @@ class ExtensionJobExecutor {
             });
         }
 
-        Job job;
+        Job<AtomicBoolean, Object[]> job;
         if (impls.size() > 1 && parallel.enable(ctx) && ctx.reducer.parallel()) {
             job = builder.buildParallelJob("[Ext]:" + ctx.extension.getSimpleName(), parallel.timeout(ctx), parallel.unit(ctx));
         } else {
             job = builder.buildSerialJob("[Ext]:" + ctx.extension.getSimpleName());
         }
 
-        JobResult<Object[]> result = new JobExecutor<AtomicBoolean, Object[]>(parallel.executor(ctx), parallel.enableFailFast(ctx)).executeForResult(job, new AtomicBoolean(false));
+        JobResult<Object[]> result = new JobExecutor(parallel.executor(ctx), parallel.enableFailFast(ctx)).executeForResult(job, new AtomicBoolean(false));
         if (CollectionUtils.isNotEmpty(result.getExceptions())) {
             throw new ExtensionWrappedMultipleFailureException(Message.format("MATRIX-EXTENSION-0000-0006", ctx.extension.getName(), ctx.namespace, StringUtils.join(ctx.codes, ','), result.getExceptions().size()), result.getExceptions().toArray(new Throwable[0]));
         }

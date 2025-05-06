@@ -13,13 +13,13 @@ import java.util.concurrent.atomic.AtomicLong;
  * @version 1.0
  * @since 2025/2/10 16:41.
  */
-class JobContext implements Serializable {
+class JobContext<Output> implements Serializable {
 
     private static final long serialVersionUID = 6392898597976639655L;
 
     final boolean throwsExecuteException;
 
-    final Collection<Pair<String, Object>> outputs;
+    final Collection<Pair<String, Output>> outputs;
 
     final Collection<Throwable> exceptions = new ConcurrentLinkedQueue<>();
 
@@ -31,7 +31,7 @@ class JobContext implements Serializable {
 
     final long start = System.currentTimeMillis();
 
-    JobContext(boolean throwsExecuteException, Collection<Pair<String, Object>> outputs) {
+    JobContext(boolean throwsExecuteException, Collection<Pair<String, Output>> outputs) {
         this.throwsExecuteException = throwsExecuteException;
         this.outputs = outputs;
     }
@@ -44,7 +44,7 @@ class JobContext implements Serializable {
         return System.currentTimeMillis() - start;
     }
 
-    void addOutput(String key, Object output) {
+    void addOutput(String key, Output output) {
         if (outputs != null) {
             outputs.add(Pair.of(key, output));
         }

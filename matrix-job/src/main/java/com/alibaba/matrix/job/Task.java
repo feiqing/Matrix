@@ -1,18 +1,19 @@
 package com.alibaba.matrix.job;
 
+import java.util.function.Function;
+
 /**
  * Task interface definition, representing an executable task.
  * This is a functional interface that allows creating task instances using lambda expressions.
  *
  * @param <Input>  The type of input parameter
  * @param <Output> The type of output parameter
- *
  * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2020/9/18 13:41.
  */
 @FunctionalInterface
-public interface Task<Input, Output> {
+public interface Task<Input, Output> extends Function<Input, Output> {
 
     /**
      * Perform initialization before task execution.
@@ -61,5 +62,10 @@ public interface Task<Input, Output> {
      */
     default String key(Input input) {
         return this.toString();
+    }
+
+    @Override
+    default Output apply(Input input) {
+        return execute(input);
     }
 }

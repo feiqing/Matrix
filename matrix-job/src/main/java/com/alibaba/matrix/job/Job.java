@@ -8,18 +8,21 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
  * The Job class represents a job that consists of a list of tasks or sub-jobs.
  * It supports both serial and parallel execution of tasks and can have a specified timeout.
  *
+ * @param <Input>  the input type for the tasks
+ * @param <Output> the output type for the tasks
  * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 1.0
  * @since 2020/9/18 13:41.
  */
 @Getter
-public class Job implements Serializable {
+public class Job<Input, Output> implements Serializable, Function<Input, Output> {
 
     private static final long serialVersionUID = 6090252744510482638L;
 
@@ -31,7 +34,7 @@ public class Job implements Serializable {
     /**
      * The list of tasks or sub-jobs that make up the job.
      */
-    final List<Object> tasks;
+    final List<Function<Input, Output>> tasks;
 
     /**
      * Indicates whether the job should be executed in parallel.
@@ -57,9 +60,9 @@ public class Job implements Serializable {
      * @param timeout  the timeout for the job execution, if applicable
      * @param unit     the time unit for the timeout, if applicable
      */
-    public Job(String name, List<Object> tasks, boolean parallel, Long timeout, TimeUnit unit) {
+    public Job(String name, List<Function<Input, Output>> tasks, boolean parallel, Long timeout, TimeUnit unit) {
         this.name = name;
-        this.tasks = tasks;
+        this.tasks = Collections.unmodifiableList(tasks);
         this.parallel = parallel;
         this.timeout = timeout;
         this.unit = unit;
@@ -74,7 +77,7 @@ public class Job implements Serializable {
      * @param tasks   the array of tasks
      * @return a new parallel job
      */
-    public static Job newParallelJob(String name, Long timeout, TimeUnit unit, Task... tasks) {
+    public static <Input, Output> Job<Input, Output> newParallelJob(String name, Long timeout, TimeUnit unit, Task<Input, Output>... tasks) {
         return newParallelJob(name, timeout, unit, Arrays.stream(tasks).collect(Collectors.toList()));
     }
 
@@ -87,7 +90,7 @@ public class Job implements Serializable {
      * @param jobs    the array of sub-jobs
      * @return a new parallel job
      */
-    public static Job newParallelJob(String name, Long timeout, TimeUnit unit, Job... jobs) {
+    public static <Input, Output> Job<Input, Output> newParallelJob(String name, Long timeout, TimeUnit unit, Job<Input, Output>... jobs) {
         return newParallelJob(name, timeout, unit, Arrays.stream(jobs).collect(Collectors.toList()));
     }
 
@@ -100,8 +103,8 @@ public class Job implements Serializable {
      * @param tasks   A list of objects representing the tasks or jobs that make up the job.
      * @return A new Job instance configured for parallel execution.
      */
-    public static Job newParallelJob(String name, Long timeout, TimeUnit unit, List<Object> tasks) {
-        return new Job(name, tasks, true, timeout, unit);
+    public static <Input, Output> Job<Input, Output> newParallelJob(String name, Long timeout, TimeUnit unit, List<Function<Input, Output>> tasks) {
+        return new Job<>(name, Collections.unmodifiableList(tasks), true, timeout, unit);
     }
 
     /**
@@ -111,7 +114,7 @@ public class Job implements Serializable {
      * @param tasks the array of tasks
      * @return a new serial job
      */
-    public static Job newSerialJob(String name, Task... tasks) {
+    public static <Input, Output> Job<Input, Output> newSerialJob(String name, Task<Input, Output>... tasks) {
         return newSerialJob(name, Arrays.stream(tasks).collect(Collectors.toList()));
     }
 
@@ -122,7 +125,7 @@ public class Job implements Serializable {
      * @param jobs the array of sub-jobs
      * @return a new serial job
      */
-    public static Job newSerialJob(String name, Job... jobs) {
+    public static <Input, Output> Job<Input, Output> newSerialJob(String name, Job<Input, Output>... jobs) {
         return newSerialJob(name, Arrays.stream(jobs).collect(Collectors.toList()));
     }
 
@@ -135,8 +138,8 @@ public class Job implements Serializable {
      * @return A new Job instance configured for serial execution.
      * The timeout and time unit are set to null since this method does not support specifying a timeout.
      */
-    public static Job newSerialJob(String name, List<Object> tasks) {
-        return new Job(name, Collections.unmodifiableList(tasks), false, null, null);
+    public static <Input, Output> Job<Input, Output> newSerialJob(String name, List<Function<Input, Output>> tasks) {
+        return new Job<>(name, Collections.unmodifiableList(tasks), false, null, null);
     }
 
     /**
@@ -161,7 +164,7 @@ public class Job implements Serializable {
         /**
          * The list of tasks or sub-jobs being built.
          */
-        private final List<Object> tasks = new LinkedList<>();
+        private final List<Function<Input, Output>> tasks = new LinkedList<>();
 
         /**
          * Adds a task to the job.
@@ -180,7 +183,7 @@ public class Job implements Serializable {
          * @param job the sub-job to add
          * @return the Builder instance for method chaining
          */
-        public Builder<Input, Output> addJob(Job job) {
+        public Builder<Input, Output> addJob(Job<Input, Output> job) {
             tasks.add(job);
             return this;
         }
@@ -191,8 +194,8 @@ public class Job implements Serializable {
          * @param name the name of the job
          * @return a new serial job
          */
-        public Job buildSerialJob(String name) {
-            return new Job(name, Collections.unmodifiableList(tasks), false, null, null);
+        public Job<Input, Output> buildSerialJob(String name) {
+            return new Job<>(name, Collections.unmodifiableList(tasks), false, null, null);
         }
 
         /**
@@ -203,8 +206,14 @@ public class Job implements Serializable {
          * @param unit    the time unit for the timeout
          * @return a new parallel job
          */
-        public Job buildParallelJob(String name, long timeout, TimeUnit unit) {
-            return new Job(name, Collections.unmodifiableList(tasks), true, timeout, unit);
+        public Job<Input, Output> buildParallelJob(String name, long timeout, TimeUnit unit) {
+            return new Job<>(name, Collections.unmodifiableList(tasks), true, timeout, unit);
         }
     }
+
+    @Override
+    public Output apply(Input input) {
+        throw new UnsupportedOperationException("Job is not a function");
+    }
 }
+

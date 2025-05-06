@@ -15,7 +15,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class JobExecutorTestCase {
 
-    private static final JobExecutor<Object, Object> executor = new JobExecutor<>(Executors.newCachedThreadPool());
+    private static final JobExecutor executor = new JobExecutor(Executors.newCachedThreadPool());
 
     @Test(expected = JobWrappedMultipleFailureException.class)
     public void test_task_execute_error() {
@@ -39,7 +39,7 @@ public class JobExecutorTestCase {
         }
     }
 
-    @Test(expected = JobWrappedMultipleFailureException.class)
+    @Test
     public void test_task_duplicate_key() {
         Job.Builder<Object, Object> builder = Job.newBuilder();
         builder.addTask(new Task<Object, Object>() {
@@ -65,7 +65,8 @@ public class JobExecutorTestCase {
             }
         });
 
-        executor.executeForMap(builder.buildSerialJob("MyJob"), null);
+        Map<String, List<Object>> myJob = executor.executeForMap(builder.buildSerialJob("MyJob"), null);
+        System.out.println(myJob);
     }
 
     @Test

@@ -51,7 +51,7 @@ import static com.alibaba.matrix.config.util.ConfigFrameworkConfigProvider.paral
 @Slf4j(topic = "Config")
 public class ConfigFrameworkRegister {
 
-    private static final JobExecutor<Object, Object> executor = new JobExecutor<>(parallel.executor(), false);
+    private static final JobExecutor executor = new JobExecutor(parallel.executor(), false);
 
     private static final ConcurrentMap<Class<?>, Object> clazz2instance = new ConcurrentHashMap<>();
 
@@ -122,7 +122,7 @@ public class ConfigFrameworkRegister {
         }
 
         try {
-            Job job = parallel.enable() ? builder.buildParallelJob("ConfigRegister", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigRegister");
+            Job<Object, Object> job = parallel.enable() ? builder.buildParallelJob("ConfigRegister", parallel.timeout(), parallel.unit()) : builder.buildSerialJob("ConfigRegister");
             executor.execute(job, null);
         } catch (JobWrappedMultipleFailureException exception) {
             if (ArrayUtils.isNotEmpty(exception.getCauses())) {

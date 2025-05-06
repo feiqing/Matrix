@@ -8,7 +8,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,24 +16,24 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeoutException;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.metrics;
 import static com.alibaba.matrix.base.telemetry.TelemetryProvider.tracer;
 
 /**
- * The JobExecutor class is responsible for executing jobs with tasks that can be either serial or parallel.
- * It provides methods to execute jobs and gather results in different formats, such as a map, a list, or a detailed result object.
- * The executor also handles exceptions and logs relevant information using telemetry.
+ * The JobExecutor class is responsible for executing jobs, which are composed of a series of tasks.
+ * It supports both serial and parallel execution of tasks and provides different methods to retrieve
+ * the results of the job execution. The class also handles fail-fast behavior and tracks metrics
+ * and tracing information for each job and task execution.
  *
- * @param <Input>  The type of the input parameter for the job
- * @param <Output> The type of the output value for the job tasks
  * @author <a href="mailto:feiqing.zjf@gmail.com">feiqing.zjf</a>
  * @version 2.0
  * @since 2020/9/18 13:41.
  */
 @Slf4j(topic = "Job")
-public class JobExecutor<Input, Output> {
+public class JobExecutor {
 
     private final JobConfig config;
 
@@ -81,8 +80,9 @@ public class JobExecutor<Input, Output> {
      * @param input The input parameter for the job
      * @throws JobWrappedMultipleFailureException If an exception occurs during job execution
      */
-    public void execute(Job job, Input input) throws JobWrappedMultipleFailureException {
-        doExecute(job, input, new JobContext(true, null));
+    public <Input, Output> void execute(Job<Input, Output> job, Input input) throws JobWrappedMultipleFailureException {
+        JobContext<Output> context = new JobContext<>(true, null);
+        this.doExecute(job, input, context);
     }
 
     /**
@@ -94,13 +94,14 @@ public class JobExecutor<Input, Output> {
      * @return A List containing all task return values
      * @throws JobWrappedMultipleFailureException If an exception occurs during job execution
      */
-    @SuppressWarnings("unchecked")
-    public List<Output> executeForList(Job job, Input input) throws JobWrappedMultipleFailureException {
-        JobContext context = doExecute(job, input, new JobContext(true, new ConcurrentLinkedQueue<>()));
+    public <Input, Output> List<Output> executeForList(Job<Input, Output> job, Input input) throws JobWrappedMultipleFailureException {
+        JobContext<Output> context = new JobContext<>(true, new ConcurrentLinkedQueue<>());
+
+        this.doExecute(job, input, context);
         if (CollectionUtils.isEmpty(context.outputs)) {
             return Collections.emptyList();
         }
-        return context.outputs.stream().map(pair -> (Output) pair.getRight()).collect(Collectors.toList());
+        return context.outputs.stream().map(Pair::getRight).collect(Collectors.toList());
     }
 
     /**
@@ -112,15 +113,17 @@ public class JobExecutor<Input, Output> {
      * @return A Map where the keys are task keys and the values are task return values
      * @throws JobWrappedMultipleFailureException If an exception occurs during job execution, or if there are duplicate task keys
      */
-    @SuppressWarnings("unchecked")
-    public Map<String, List<Output>> executeForMap(Job job, Input input) throws JobWrappedMultipleFailureException {
-        JobContext context = doExecute(job, input, new JobContext(true, new ConcurrentLinkedQueue<>()));
+    public <Input, Output> Map<String, List<Output>> executeForMap(Job<Input, Output> job, Input input) throws JobWrappedMultipleFailureException {
+        JobContext<Output> context = new JobContext<>(true, new ConcurrentLinkedQueue<>());
+
+        this.doExecute(job, input, context);
+
         if (CollectionUtils.isEmpty(context.outputs)) {
             return Collections.emptyMap();
         }
         Map<String, List<Output>> outputMap = new LinkedHashMap<>(context.outputs.size());
-        for (Pair<String, Object> output : context.outputs) {
-            outputMap.computeIfAbsent(output.getKey(), _K -> new ArrayList<>()).add((Output) output.getValue());
+        for (Pair<String, Output> output : context.outputs) {
+            outputMap.computeIfAbsent(output.getKey(), _K -> new ArrayList<>()).add(output.getValue());
         }
         return outputMap;
     }
@@ -132,37 +135,54 @@ public class JobExecutor<Input, Output> {
      * @param input The input parameter for the job
      * @return A JobResult object containing all task return values and exception information
      */
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public JobResult<Output> executeForResult(Job job, Input input) {
-        JobContext context = doExecute(job, input, new JobContext(false, new ConcurrentLinkedQueue<>()));
+    public <Input, Output> JobResult<Output> executeForResult(Job<Input, Output> job, Input input) {
+        JobContext<Output> context = new JobContext<>(false, new ConcurrentLinkedQueue<>());
+
+        this.doExecute(job, input, context);
+
         JobResult<Output> result = new JobResult<>();
-        result.setOutputs(Collections.unmodifiableCollection((Collection) context.outputs));
+        result.setOutputs(Collections.unmodifiableCollection(context.outputs));
         result.setExceptions(Collections.unmodifiableCollection(context.exceptions));
         return result;
     }
 
     // ---- core helpers ---- //
 
-    private JobContext doExecute(Job job, Input input, JobContext context) throws JobWrappedMultipleFailureException {
+    /**
+     * Executes the job with the given input and context.
+     * Handles both serial and parallel execution based on the job configuration.
+     *
+     * @param job     The job to be executed
+     * @param input   The input parameter for the job
+     * @param context The context to store execution results and exceptions
+     * @throws JobWrappedMultipleFailureException If an exception occurs during job execution
+     */
+    private <Input, Output> void doExecute(Job<Input, Output> job, Input input, JobContext<Output> context) throws JobWrappedMultipleFailureException {
         Preconditions.checkArgument(job != null);
         Preconditions.checkArgument(config.executor != null || !hasParallelJob(job));
         if (CollectionUtils.isEmpty(job.tasks)) {
-            return context;
+            return;
         }
 
         this.executeJob(job, input, context);
-        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Elapsed={}ms.", job.name, job.parallel ? "p" : "s", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
+        log.info("Job:[{}({})] Executed={}(Err:{}) Skipped={} Output={} Elapsed={}ms.", job.name, job.parallel ? "P" : "S", context.executed.get(), context.excepted.get(), context.skipped.get(), context.size(), context.cost());
 
         if (context.throwsExecuteException && CollectionUtils.isNotEmpty(context.exceptions)) {
             tracer.currentSpan().event("JobThrowExceptions", job.name);
             metrics.incCounter("job_throw_exceptions", job.name);
             throw new JobWrappedMultipleFailureException(Message.format("MATRIX-JOB-0000-0000", job.name), context.exceptions.toArray(new Throwable[0]));
         }
-
-        return context;
     }
 
-    private void executeJob(Job job, Input input, JobContext context) {
+    /**
+     * Executes the job with the given input and context.
+     * Handles both serial and parallel execution based on the job configuration.
+     *
+     * @param job     The job to be executed
+     * @param input   The input parameter for the job
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void executeJob(Job<Input, Output> job, Input input, JobContext<Output> context) {
         metrics.incCounter("execute_job", job.name);
         ISpan span = tracer.newSpan("ExecuteJob", job.name);
         try {
@@ -180,25 +200,37 @@ public class JobExecutor<Input, Output> {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void executeSerialJob(Job job, Input input, JobContext context) {
-        for (Object t : job.tasks) {
+    /**
+     * Executes the job tasks in serial order.
+     *
+     * @param job     The job to be executed
+     * @param input   The input parameter for the job
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void executeSerialJob(Job<Input, Output> job, Input input, JobContext<Output> context) {
+        for (Function<Input, Output> t : job.tasks) {
             if (t instanceof Task) {
                 this.executeTask(job.name, (Task<Input, Output>) t, input, context);
             } else {
-                this.executeJob((Job) t, input, context);
+                this.executeJob((Job<Input, Output>) t, input, context);
             }
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private void executeParallelJob(Job job, Input input, JobContext context) {
+    /**
+     * Executes the job tasks in parallel order.
+     *
+     * @param job     The job to be executed
+     * @param input   The input parameter for the job
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void executeParallelJob(Job<Input, Output> job, Input input, JobContext<Output> context) {
         CountDownLatch latch = new CountDownLatch(job.tasks.size());
-        for (Object t : job.tasks) {
+        for (Function<Input, Output> t : job.tasks) {
             if (t instanceof Task) {
                 this.submitTask(job.name, (Task<Input, Output>) t, input, latch, context);
             } else {
-                this.submitJob((Job) t, input, latch, context);
+                this.submitJob((Job<Input, Output>) t, input, latch, context);
             }
         }
 
@@ -221,7 +253,15 @@ public class JobExecutor<Input, Output> {
         }
     }
 
-    private void submitJob(Job job, Input input, CountDownLatch latch, JobContext context) {
+    /**
+     * Submits a job for parallel execution.
+     *
+     * @param job     The job to be executed
+     * @param input   The input parameter for the job
+     * @param latch   The CountDownLatch to synchronize task completion
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void submitJob(Job<Input, Output> job, Input input, CountDownLatch latch, JobContext<Output> context) {
         try {
             metrics.incCounter("submit_job", job.name);
             config.executor.submit(() -> {
@@ -241,7 +281,16 @@ public class JobExecutor<Input, Output> {
         }
     }
 
-    private void submitTask(String jobName, Task<Input, Output> task, Input input, CountDownLatch latch, JobContext context) {
+    /**
+     * Submits a task for parallel execution.
+     *
+     * @param jobName The name of the job containing the task
+     * @param task    The task to be executed
+     * @param input   The input parameter for the task
+     * @param latch   The CountDownLatch to synchronize task completion
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void submitTask(String jobName, Task<Input, Output> task, Input input, CountDownLatch latch, JobContext<Output> context) {
         String taskName = String.format("%s:%s", jobName, task.name());
         try {
             metrics.incCounter("submit_task", taskName);
@@ -262,7 +311,15 @@ public class JobExecutor<Input, Output> {
         }
     }
 
-    private void executeTask(String jobName, Task<Input, Output> task, Input input, JobContext context) {
+    /**
+     * Executes a single task.
+     *
+     * @param jobName The name of the job containing the task
+     * @param task    The task to be executed
+     * @param input   The input parameter for the task
+     * @param context The context to store execution results and exceptions
+     */
+    private <Input, Output> void executeTask(String jobName, Task<Input, Output> task, Input input, JobContext<Output> context) {
         String taskName = String.format("%s:%s", jobName, task.name());
         if (config.enableFailFast & !context.exceptions.isEmpty()) {
             context.skipped.incrementAndGet();
@@ -300,16 +357,22 @@ public class JobExecutor<Input, Output> {
         }
     }
 
-    private static boolean hasParallelJob(Job job) {
+    /**
+     * Checks if the job or any nested jobs contain parallel tasks.
+     *
+     * @param job The job to check
+     * @return true if the job or any nested jobs contain parallel tasks, false otherwise
+     */
+    private static boolean hasParallelJob(Job<?, ?> job) {
         if (job == null) {
             return false;
         }
         if (job.parallel) {
             return true;
         }
-        for (Object t : job.tasks) {
+        for (Function<?, ?> t : job.tasks) {
             if (t instanceof Job) {
-                if (hasParallelJob((Job) t)) {
+                if (hasParallelJob((Job<?, ?>) t)) {
                     return true;
                 }
             }
